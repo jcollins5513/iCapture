@@ -1,0 +1,188 @@
+---
+description: Single source of truth Project Plan
+globs:
+alwaysApply: true
+---
+master-plan.md
+
+Single source of truth. Do not edit except to check off approvals at the bottom.
+
+1) Product goal
+
+Hands‑free, statically mounted iPhone app that captures photos (and optional video) of a vehicle as the driver slowly rotates the car in front of a fixed camera. Triggers: when the vehicle enters a defined on‑screen frame box and either (a) the vehicle stops, or (b) every 5 seconds. Each session is tied to a stock number. Auth via Firebase. All capture, processing, and storage are on‑device. Targets iPhone 15 Pro and newer on iOS 26.
+
+2) Non‑goals
+	•	Cloud processing, remote storage, or multi‑device sync.
+	•	Complex pose/angle classification. Simple ROI entry + stop/interval triggers only.
+	•	Desktop companion app.
+
+3) Success metrics
+	•	≤1s shutter latency from trigger.
+	•	≥95% of sessions complete without manual intervention.
+	•	≤0.5% app crashes over 1,000 sessions.
+	•	Export bundle organized by stock number with metadata JSON.
+
+4) System architecture (on device)
+	•	UI layer: SwiftUI; full‑screen preview; overlay “frame box”; capture HUD; session state.
+	•	Capture core: AVFoundation pipeline (HEIF 48MP stills option; 1080p H.264 video optional).
+	•	Trigger engine: Vision + optical flow + motion heuristic. If average motion < threshold for N frames or 5s interval elapsed and ROI occupied → fire.
+	•	ROI detector: User‑defined rectangle; occupancy = foreground magnitude within ROI above baseline.
+	•	Session manager: Creates /Documents/Captures/<STOCK_ID>/ with photos/, video/, session.json.
+	•	Auth: Firebase Auth (Email/Password, Apple, Google). Usage strictly for sign‑in gating.
+	•	Persistence: SQLite via GRDB (or lightweight JSON if preferred) for sessions and assets index.
+	•	Background tasks: None; runs foreground while mounted.
+	•	Telemetry: Local only; simple log file inside session folder.
+	•	Tooling: SwiftLint + build script with xcodebuild validation.
+
+5) Data model (minimal)
+	•	VehicleSession { id, stockNumber, startedAt, endedAt, deviceModel, iosVersion, notes }
+	•	CaptureAsset { id, sessionId, type: photo|video, filename, createdAt, width, height, roiRect, triggerType: stop|interval, exposureISO, exposureDuration, focusDistance }
+	•	SessionJSON saved per session mirrors DB for easy export.
+
+6) Triggers spec
+	•	Interval trigger: every 5s while ROI occupied.
+	•	Stop trigger: compute optical flow magnitude over ROI across last 15 frames @ 30fps; if median magnitude < ε for 0.7s and ROI occupied → capture still.
+	•	ROI occupied: normalized foreground mask area ≥ τ (learned at start using 1s background sampling).
+	•	Safety: de‑bounce 1.2s between stills; cap 60 photos per session unless overridden.
+
+7) Media spec
+	•	Stills: HEIF, 48MP when available; fallback 12MP. Bracketed auto exposure off by default.
+	•	Video: 1080p30 optional during rotation only; write to /video/turn.MOV.
+	•	EXIF/metadata: embed stock number and frame box rect in XMP sidecar or in session JSON.
+
+8) Permissions & Info.plist
+	•	NSCameraUsageDescription
+	•	NSMicrophoneUsageDescription (only if recording audio; else disable audio track)
+	•	NSPhotoLibraryAddUsageDescription (only if exporting to Photos; not required for app sandbox)
+
+9) Build targets
+	•	iOS 26.0, devices: iPhone 15 Pro and newer.
+	•	Architectures: arm64.
+
+10) Third‑party
+	•	FirebaseAuth via SPM.
+	•	GRDB.swift via SPM (optional).
+	•	SwiftLint via Mint or Homebrew; config checked in.
+
+11) Risks & mitigations
+	•	Optical‑flow jitter: median filter over sliding window; cooldown between shots.
+	•	Lighting variance: lock exposure after first good frame; allow manual override.
+	•	User framing error: setup wizard to align frame box; quick test shot.
+	•	Thermal throttling: limit preview FPS to 30; prefer video only when requested.
+	•	Storage blow‑up: enforce per‑session limits; show estimate HUD.
+
+12) Milestones
+	1.	Project bootstrap + toolchain pass (build, lint, run).
+	2.	Camera preview + frame‑box overlay.
+	3.	Interval capture working with ROI occupancy.
+	4.	Stop‑based capture working.
+	5.	Session storage + per‑stock folders + JSON export.
+	6.	Video recording toggle during rotation.
+	7.	Auth gate + stock number intake flow.
+	8.	QA pass on iPhone 15 Pro and 15 Pro Max.
+	9.	Pre‑release field test in booth.
+
+13) Approvals checklist
+	•	Architecture frozen
+	•	Media specs verified
+	•	Privacy strings reviewed
+	•	Build scripts green on local
+
+
+
+README.md (starter)
+	•	Build: ./Scripts/build.sh
+	•	Lint: ./Scripts/lint.sh
+	•	Run: open in Xcode and select a physical iPhone 15 Pro/Pro Max.
+	•	Respect Docs/master-plan.md and Docs/granular-plan.md. Do not change scope.master-plan.md
+
+Single source of truth. Do not edit except to check off approvals at the bottom.
+
+1) Product goal
+
+Hands‑free, statically mounted iPhone app that captures photos (and optional video) of a vehicle as the driver slowly rotates the car in front of a fixed camera. Triggers: when the vehicle enters a defined on‑screen frame box and either (a) the vehicle stops, or (b) every 5 seconds. Each session is tied to a stock number. Auth via Firebase. All capture, processing, and storage are on‑device. Targets iPhone 15 Pro and newer on iOS 26.
+
+2) Non‑goals
+	•	Cloud processing, remote storage, or multi‑device sync.
+	•	Complex pose/angle classification. Simple ROI entry + stop/interval triggers only.
+	•	Desktop companion app.
+
+3) Success metrics
+	•	≤1s shutter latency from trigger.
+	•	≥95% of sessions complete without manual intervention.
+	•	≤0.5% app crashes over 1,000 sessions.
+	•	Export bundle organized by stock number with metadata JSON.
+
+4) System architecture (on device)
+	•	UI layer: SwiftUI; full‑screen preview; overlay “frame box”; capture HUD; session state.
+	•	Capture core: AVFoundation pipeline (HEIF 48MP stills option; 1080p H.264 video optional).
+	•	Trigger engine: Vision + optical flow + motion heuristic. If average motion < threshold for N frames or 5s interval elapsed and ROI occupied → fire.
+	•	ROI detector: User‑defined rectangle; occupancy = foreground magnitude within ROI above baseline.
+	•	Session manager: Creates /Documents/Captures/<STOCK_ID>/ with photos/, video/, session.json.
+	•	Auth: Firebase Auth (Email/Password, Apple, Google). Usage strictly for sign‑in gating.
+	•	Persistence: SQLite via GRDB (or lightweight JSON if preferred) for sessions and assets index.
+	•	Background tasks: None; runs foreground while mounted.
+	•	Telemetry: Local only; simple log file inside session folder.
+	•	Tooling: SwiftLint + build script with xcodebuild validation.
+
+5) Data model (minimal)
+	•	VehicleSession { id, stockNumber, startedAt, endedAt, deviceModel, iosVersion, notes }
+	•	CaptureAsset { id, sessionId, type: photo|video, filename, createdAt, width, height, roiRect, triggerType: stop|interval, exposureISO, exposureDuration, focusDistance }
+	•	SessionJSON saved per session mirrors DB for easy export.
+
+6) Triggers spec
+	•	Interval trigger: every 5s while ROI occupied.
+	•	Stop trigger: compute optical flow magnitude over ROI across last 15 frames @ 30fps; if median magnitude < ε for 0.7s and ROI occupied → capture still.
+	•	ROI occupied: normalized foreground mask area ≥ τ (learned at start using 1s background sampling).
+	•	Safety: de‑bounce 1.2s between stills; cap 60 photos per session unless overridden.
+
+7) Media spec
+	•	Stills: HEIF, 48MP when available; fallback 12MP. Bracketed auto exposure off by default.
+	•	Video: 1080p30 optional during rotation only; write to /video/turn.MOV.
+	•	EXIF/metadata: embed stock number and frame box rect in XMP sidecar or in session JSON.
+
+8) Permissions & Info.plist
+	•	NSCameraUsageDescription
+	•	NSMicrophoneUsageDescription (only if recording audio; else disable audio track)
+	•	NSPhotoLibraryAddUsageDescription (only if exporting to Photos; not required for app sandbox)
+
+9) Build targets
+	•	iOS 26.0, devices: iPhone 15 Pro and newer.
+	•	Architectures: arm64.
+
+10) Third‑party
+	•	FirebaseAuth via SPM.
+	•	GRDB.swift via SPM (optional).
+	•	SwiftLint via Mint or Homebrew; config checked in.
+
+11) Risks & mitigations
+	•	Optical‑flow jitter: median filter over sliding window; cooldown between shots.
+	•	Lighting variance: lock exposure after first good frame; allow manual override.
+	•	User framing error: setup wizard to align frame box; quick test shot.
+	•	Thermal throttling: limit preview FPS to 30; prefer video only when requested.
+	•	Storage blow‑up: enforce per‑session limits; show estimate HUD.
+
+12) Milestones
+	1.	Project bootstrap + toolchain pass (build, lint, run).
+	2.	Camera preview + frame‑box overlay.
+	3.	Interval capture working with ROI occupancy.
+	4.	Stop‑based capture working.
+	5.	Session storage + per‑stock folders + JSON export.
+	6.	Video recording toggle during rotation.
+	7.	Auth gate + stock number intake flow.
+	8.	QA pass on iPhone 15 Pro and 15 Pro Max.
+	9.	Pre‑release field test in booth.
+
+13) Approvals checklist
+	•	Architecture frozen
+	•	Media specs verified
+	•	Privacy strings reviewed
+	•	Build scripts green on local
+
+
+
+README.md (starter)
+	•	Build: ./Scripts/build.sh
+	•	Lint: ./Scripts/lint.sh
+	•	Run: open in Xcode and select a physical iPhone 15 Pro/Pro Max.
+	•	Respect Docs/master-plan.md and Docs/granular-plan.md. Do not change scope.
