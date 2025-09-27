@@ -8,24 +8,35 @@
 @preconcurrency import AVFoundation
 import Combine
 import SwiftUI
+import AudioToolbox
 
+@MainActor
 class CameraManager: NSObject, ObservableObject {
     @Published var isAuthorized = false
     @Published var previewLayer: AVCaptureVideoPreviewLayer?
     @Published var isSessionRunning = false
     @Published var testShotCaptured = false
+    @Published var showCaptureFlash = false
 
     private let captureSession = AVCaptureSession()
     private let videoOutput = AVCaptureVideoDataOutput()
     private let photoOutput = AVCapturePhotoOutput()
+    private var captureDevice: AVCaptureDevice?
 
     private let sessionQueue = DispatchQueue(label: "camera.session.queue")
     private let videoDataQueue = DispatchQueue(label: "camera.video.data.queue")
     private let photoQueue = DispatchQueue(label: "camera.photo.queue")
 
+    // ROI Detection and Trigger Engine
+    @Published var roiDetector = ROIDetector()
+    @Published var triggerEngine = TriggerEngine()
+
     override init() {
         super.init()
         checkAuthorization()
+
+        // Configure trigger engine with dependencies
+        triggerEngine.configure(cameraManager: self, roiDetector: roiDetector)
     }
 
     func checkAuthorization() {
@@ -77,6 +88,7 @@ class CameraManager: NSObject, ObservableObject {
             }
 
             self.captureSession.addInput(videoInput)
+            self.captureDevice = videoDevice
 
             // Add video output for preview
             if self.captureSession.canAddOutput(self.videoOutput) {
@@ -147,15 +159,34 @@ class CameraManager: NSObject, ObservableObject {
             self.photoOutput.capturePhoto(with: photoSettings, delegate: self)
         }
     }
+
+    func triggerCaptureFeedback() {
+        // Visual flash feedback
+        showCaptureFlash = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            self.showCaptureFlash = false
+        }
+
+        // Haptic feedback
+        let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
+        impactFeedback.impactOccurred()
+
+        // Sound feedback
+        AudioServicesPlaySystemSound(1108) // Camera shutter sound
+    }
 }
 
 // MARK: - AVCaptureVideoDataOutputSampleBufferDelegate
 extension CameraManager: AVCaptureVideoDataOutputSampleBufferDelegate {
-    nonisolated func captureOutput(_ output: AVCaptureOutput,
-                                   didOutput sampleBuffer: CMSampleBuffer,
-                                   from connection: AVCaptureConnection) {
-        // This will be used for ROI detection and motion analysis
-        // Implementation will be added in future milestones
+    func captureOutput(_ output: AVCaptureOutput,
+                       didOutput sampleBuffer: CMSampleBuffer,
+                       from connection: AVCaptureConnection) {
+        // Process frame for ROI detection
+        guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { return }
+
+        Task { @MainActor in
+            roiDetector.processFrame(pixelBuffer)
+        }
     }
 }
 
