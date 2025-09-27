@@ -1,0 +1,37 @@
+# iCapture Commit Message Template
+#
+# Format: <type>(<scope>): <description>
+#
+# Types:
+# feat: New feature
+# fix: Bug fix
+# docs: Documentation changes
+# style: Code style changes (formatting, etc.)
+# refactor: Code refactoring
+# test: Adding or updating tests
+# chore: Maintenance tasks
+#
+# Scope examples:
+# milestone1, milestone2, milestone3, etc.
+# auth, camera, ui, core, etc.
+#
+# Examples:
+# feat(milestone2): Add draggable frame box functionality
+# fix(camera): Resolve AVFoundation concurrency warnings
+# docs(readme): Update build instructions
+#
+# Description should be clear and concise.
+# Use present tense ("add feature" not "added feature").
+# Capitalize the first letter.
+# No period at the end.
+#
+# Body (optional):
+# Provide additional context about the change.
+# Explain what and why, not how.
+#
+# Footer (optional):
+# Reference issues: Closes #123
+# Breaking changes: BREAKING CHANGE: description
+#
+# ---
+# Commit message (remove this line and write your message below)
