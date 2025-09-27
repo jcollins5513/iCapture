@@ -20,7 +20,7 @@ struct CameraView: View {
                     .ignoresSafeArea()
 
                 // Frame box overlay
-                FrameBoxOverlay()
+                FrameBoxOverlay(roiDetector: cameraManager.roiDetector)
                     .ignoresSafeArea()
 
                 // Capture HUD
@@ -47,13 +47,49 @@ struct CameraView: View {
                         Spacer()
 
                         // Session status
-                        Text("Ready")
-                            .foregroundColor(.white)
-                            .padding()
-                            .background(Color.black.opacity(0.7))
-                            .cornerRadius(8)
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(cameraManager.triggerEngine.isIntervalCaptureActive ? "Recording" : "Ready")
+                                .foregroundColor(cameraManager.triggerEngine.isIntervalCaptureActive ? .green : .white)
+                                .fontWeight(.semibold)
+
+                            if cameraManager.triggerEngine.isIntervalCaptureActive {
+                                Text("Captures: \(cameraManager.triggerEngine.captureCount)")
+                                    .font(.caption)
+                                    .foregroundColor(.white)
+
+                                if cameraManager.roiDetector.isROIOccupied {
+                                    let occupancy = cameraManager.roiDetector.occupancyPercentage
+                                    let occupancyText = String(format: "%.1f", occupancy)
+                                    Text("ROI: Occupied (\(occupancyText)%)")
+                                        .font(.caption)
+                                        .foregroundColor(.green)
+                                } else {
+                                    Text("ROI: Clear")
+                                        .font(.caption)
+                                        .foregroundColor(.orange)
+                                }
+                            }
+                        }
+                        .padding()
+                        .background(Color.black.opacity(0.7))
+                        .cornerRadius(8)
 
                         Spacer()
+
+                        // Background sampling button
+                        Button(action: {
+                            cameraManager.roiDetector.startBackgroundSampling()
+                        }, label: {
+                            Image(systemName: cameraManager.roiDetector.isBackgroundSampling ?
+                                  "waveform" : "brain.head.profile")
+                                .font(.title2)
+                                .foregroundColor(.white)
+                                .padding()
+                                .background(cameraManager.roiDetector.isBackgroundSampling ?
+                                           Color.orange : Color.blue)
+                                .clipShape(Circle())
+                        })
+                        .disabled(cameraManager.roiDetector.isBackgroundSampling)
 
                         // Setup button
                         Button(action: {
@@ -67,21 +103,56 @@ struct CameraView: View {
                                 .clipShape(Circle())
                         })
 
-                        // Manual capture button
+                        // Session control button
                         Button(action: {
-                            // Manual capture will be implemented in future milestones
+                            if cameraManager.triggerEngine.isIntervalCaptureActive {
+                                cameraManager.triggerEngine.stopSession()
+                            } else {
+                                cameraManager.triggerEngine.startSession()
+                            }
                         }, label: {
-                            Image(systemName: "camera.fill")
+                            Image(systemName: cameraManager.triggerEngine.isIntervalCaptureActive ?
+                                  "stop.circle.fill" : "play.circle.fill")
                                 .font(.title)
                                 .foregroundColor(.white)
                                 .padding()
-                                .background(Color.yellow)
+                                .background(cameraManager.triggerEngine.isIntervalCaptureActive ?
+                                           Color.red : Color.green)
                                 .clipShape(Circle())
                         })
                     }
                     .padding()
 
+                    // Background sampling progress
+                    if cameraManager.roiDetector.isBackgroundSampling {
+                        VStack(spacing: 8) {
+                            Text("Learning Background...")
+                                .foregroundColor(.white)
+                                .font(.headline)
+
+                            ProgressView(value: cameraManager.roiDetector.backgroundSampleProgress)
+                                .progressViewStyle(LinearProgressViewStyle(tint: .orange))
+                                .frame(width: 200)
+
+                            Text("\(Int(cameraManager.roiDetector.backgroundSampleProgress * 100))%")
+                                .foregroundColor(.white)
+                                .font(.caption)
+                        }
+                        .padding()
+                        .background(Color.black.opacity(0.8))
+                        .cornerRadius(12)
+                        .padding(.bottom, 100)
+                    }
+
                     Spacer()
+                }
+
+                // Capture flash overlay
+                if cameraManager.showCaptureFlash {
+                    Color.white
+                        .ignoresSafeArea()
+                        .opacity(0.8)
+                        .animation(.easeOut(duration: 0.1), value: cameraManager.showCaptureFlash)
                 }
             } else {
                 // Camera not authorized

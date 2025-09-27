@@ -16,6 +16,9 @@ struct FrameBoxOverlay: View {
     @State private var initialFrameRect = CGRect.zero
     @State private var showVisualFeedback = false
 
+    // ROI Detection integration
+    @ObservedObject var roiDetector: ROIDetector
+
     private let minSize: CGFloat = 100
     private let cornerSize: CGFloat = 20
 
@@ -59,6 +62,8 @@ struct FrameBoxOverlay: View {
         }
         .onAppear {
             loadFrameRect()
+            // Sync with ROI detector
+            roiDetector.updateROIRect(frameRect)
         }
     }
 
@@ -111,6 +116,9 @@ struct FrameBoxOverlay: View {
             "height": frameRect.size.height
         ]
         UserDefaults.standard.set(rectData, forKey: "frameBoxRect")
+
+        // Update ROI detector
+        roiDetector.updateROIRect(frameRect)
     }
 
     private func loadFrameRect() {
@@ -202,6 +210,6 @@ struct FrameBoxOverlay: View {
 }
 
 #Preview {
-    FrameBoxOverlay()
+    FrameBoxOverlay(roiDetector: ROIDetector())
         .ignoresSafeArea()
 }

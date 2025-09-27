@@ -23,14 +23,14 @@ Based on master-plan.md. Update by checking off completed tasks.
 - [x] **2.8** Create test shot functionality
 
 ## Milestone 3: Interval Capture with ROI Occupancy
-- [ ] **3.1** Implement ROI occupancy detection
-- [ ] **3.2** Add background sampling (1s baseline)
-- [ ] **3.3** Create foreground mask calculation
-- [ ] **3.4** Implement occupancy threshold (τ) learning
-- [ ] **3.5** Add interval timer (5s) for ROI occupied state
-- [ ] **3.6** Implement basic photo capture on interval
-- [ ] **3.7** Add capture feedback (flash/sound)
-- [ ] **3.8** Test interval capture with mock vehicle
+- [x] **3.1** Implement ROI occupancy detection
+- [x] **3.2** Add background sampling (1s baseline)
+- [x] **3.3** Create foreground mask calculation
+- [x] **3.4** Implement occupancy threshold (τ) learning
+- [x] **3.5** Add interval timer (5s) for ROI occupied state
+- [x] **3.6** Implement basic photo capture on interval
+- [x] **3.7** Add capture feedback (flash/sound)
+- [x] **3.8** Test interval capture with mock vehicle
 
 ## Milestone 4: Stop-Based Capture Working
 - [ ] **4.1** Implement optical flow calculation
@@ -125,5 +125,10 @@ Based on master-plan.md. Update by checking off completed tasks.
 - Granular plan: ✅ Complete
 - Milestone 1 progress: 8/8 tasks completed ✅
 - Milestone 2 progress: 8/8 tasks completed ✅
+- Milestone 3 progress: 8/8 tasks completed ✅
 - Authentication gate: ✅ Basic mock auth implemented
-- Next focus: Begin Milestone 3 - Interval Capture with ROI Occupancy Detection
+- ROI occupancy detection: ✅ Implemented with Vision framework
+- Interval capture system: ✅ Working with 5s timer and debounce
+- Background learning: ✅ 1s baseline sampling with progress UI
+- Capture feedback: ✅ Flash, haptic, and sound feedback
+- Next focus: Begin Milestone 4 - Stop-Based Capture Working
