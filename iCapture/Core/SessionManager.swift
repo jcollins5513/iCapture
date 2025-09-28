@@ -228,6 +228,12 @@ class SessionManager: ObservableObject {
         let exportURL = exportPath.appendingPathComponent(
             "\(session.stockNumber)_\(session.id)"
         )
+        
+        // Remove existing export directory if it exists
+        if fileManager.fileExists(atPath: exportURL.path) {
+            try fileManager.removeItem(at: exportURL)
+        }
+        
         try fileManager.createDirectory(
             at: exportURL,
             withIntermediateDirectories: true
@@ -236,11 +242,21 @@ class SessionManager: ObservableObject {
         // Copy session.json
         let sessionJSONURL = sessionURL.appendingPathComponent("session.json")
         let exportSessionJSONURL = exportURL.appendingPathComponent("session.json")
-        try fileManager.copyItem(at: sessionJSONURL, to: exportSessionJSONURL)
+        
+        if fileManager.fileExists(atPath: sessionJSONURL.path) {
+            try fileManager.copyItem(at: sessionJSONURL, to: exportSessionJSONURL)
+        } else {
+            print("SessionManager: Warning - session.json not found at \(sessionJSONURL.path)")
+        }
 
         // Copy all assets
         for asset in sessionAssets {
-            try asset.copyToExportDirectory(exportURL: exportURL)
+            do {
+                try asset.copyToExportDirectory(exportURL: exportURL)
+            } catch {
+                print("SessionManager: Failed to copy asset \(asset.filename): \(error)")
+                // Continue with other assets even if one fails
+            }
         }
 
         print("SessionManager: Created export bundle at \(exportURL.path)")

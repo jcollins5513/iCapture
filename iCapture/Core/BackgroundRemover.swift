@@ -56,11 +56,11 @@ class BackgroundRemover: ObservableObject {
                 return
             }
             
-            // Convert back to Data (HEIF format)
+            // Convert back to Data (try HEIF first, fallback to JPEG)
             if let processedData = processedImage.heifData() {
                 completion(processedData)
             } else {
-                print("BackgroundRemover: Failed to convert processed image to HEIF data")
+                print("BackgroundRemover: Failed to convert processed image to HEIF/JPEG data")
                 completion(nil)
             }
         }
@@ -182,19 +182,24 @@ extension UIImage {
     func heifData() -> Data? {
         guard let cgImage = self.cgImage else { return nil }
         
+        // Try HEIF first, fallback to JPEG if it fails
         let data = NSMutableData()
-        guard let destination = CGImageDestinationCreateWithData(data, "public.heif" as CFString, 1, nil) else {
-            return nil
+        
+        // Try HEIF format first
+        if let destination = CGImageDestinationCreateWithData(data, "public.heif" as CFString, 1, nil) {
+            let options: [CFString: Any] = [
+                kCGImageDestinationLossyCompressionQuality: 0.9,
+                kCGImagePropertyHasAlpha: true
+            ]
+            
+            CGImageDestinationAddImage(destination, cgImage, options as CFDictionary)
+            CGImageDestinationFinalize(destination)
+            
+            return data as Data
+        } else {
+            // Fallback to JPEG if HEIF is not supported
+            print("BackgroundRemover: HEIF not supported, falling back to JPEG")
+            return self.jpegData(compressionQuality: 0.9)
         }
-        
-        let options: [CFString: Any] = [
-            kCGImageDestinationLossyCompressionQuality: 0.9,
-            kCGImagePropertyHasAlpha: true
-        ]
-        
-        CGImageDestinationAddImage(destination, cgImage, options as CFDictionary)
-        CGImageDestinationFinalize(destination)
-        
-        return data as Data
     }
 }

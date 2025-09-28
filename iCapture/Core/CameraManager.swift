@@ -37,6 +37,11 @@ class CameraManager: NSObject, ObservableObject {
     @Published var triggerEngine = TriggerEngine()
     @Published var backgroundRemover = BackgroundRemover()
     
+    // LiDAR-based detection (preferred when available)
+    @Published var lidarDetector = LiDARDetector()
+    @Published var lidarBackgroundRemover = LiDARBackgroundRemover()
+    @Published var useLiDARDetection = false
+    
     // Background removal settings
     @Published var backgroundRemovalEnabled = false
 
@@ -62,6 +67,9 @@ class CameraManager: NSObject, ObservableObject {
 
         // Configure video recording manager
         videoRecordingManager.configure(sessionManager: sessionManager, roiDetector: roiDetector)
+        
+        // Initialize LiDAR detection if available
+        initializeLiDARDetection()
     }
 
     @MainActor
@@ -190,6 +198,11 @@ class CameraManager: NSObject, ObservableObject {
                     print("CameraManager: WARNING - Preview layer is nil!")
                 }
                 
+                // Start LiDAR detection if available
+                if self.useLiDARDetection {
+                    self.lidarDetector.startLiDARDetection()
+                }
+                
                 // Start debugging if enabled
                 if self.cameraDebugger.isDebugMode {
                     self.cameraDebugger.startDebugging(cameraManager: self)
@@ -207,6 +220,11 @@ class CameraManager: NSObject, ObservableObject {
             self.captureSession.stopRunning()
             DispatchQueue.main.async {
                 self.isSessionRunning = self.captureSession.isRunning
+                
+                // Stop LiDAR detection
+                if self.useLiDARDetection {
+                    self.lidarDetector.stopLiDARDetection()
+                }
                 
                 // Stop debugging
                 self.cameraDebugger.stopDebugging()
@@ -380,9 +398,17 @@ extension CameraManager: AVCaptureVideoDataOutputSampleBufferDelegate {
             // Record frame for performance monitoring
             self.performanceMonitor.recordFrame()
 
-            self.roiDetector.processFrame(pixelBuffer)
-            self.motionDetector.processFrame(pixelBuffer)
-            self.vehicleDetector.processFrame(pixelBuffer)
+            // Use LiDAR detection if available, otherwise fallback to traditional methods
+            if self.useLiDARDetection && self.lidarDetector.isLiDARAvailable {
+                // LiDAR handles ROI detection and vehicle detection automatically
+                // No need to process frames with traditional methods
+                print("CameraManager: Using LiDAR detection for frame processing")
+            } else {
+                // Traditional frame processing
+                self.roiDetector.processFrame(pixelBuffer)
+                self.motionDetector.processFrame(pixelBuffer)
+                self.vehicleDetector.processFrame(pixelBuffer)
+            }
         }
     }
 }
@@ -733,24 +759,74 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
     private func processBackgroundRemoval(imageData: Data, filename: String) {
         print("CameraManager: Starting background removal for \(filename)")
         
-        backgroundRemover.removeBackgroundFromPhotoData(imageData) { [weak self] processedData in
+        // Use LiDAR-based background removal if available
+        if useLiDARDetection && lidarDetector.isLiDARAvailable {
+            processLiDARBackgroundRemoval(imageData: imageData, filename: filename)
+        } else {
+            // Fallback to traditional background removal
+            backgroundRemover.removeBackgroundFromPhotoData(imageData) { [weak self] processedData in
+                guard let self = self, let processedData = processedData else {
+                    print("CameraManager: Background removal failed for \(filename)")
+                    // Fallback to saving original to photo library
+                    self?.saveToPhotoLibrary(imageData: imageData)
+                    return
+                }
+                
+                print("CameraManager: Background removal completed for \(filename)")
+                
+                // Save processed version to photo library
+                if let processedImage = UIImage(data: processedData) {
+                    UIImageWriteToSavedPhotosAlbum(processedImage, nil, nil, nil)
+                    print("CameraManager: Processed photo saved to photo library")
+                }
+                
+                // Also save original to photo library for comparison
+                self.saveToPhotoLibrary(imageData: imageData)
+            }
+        }
+    }
+    
+    private func processLiDARBackgroundRemoval(imageData: Data, filename: String) {
+        guard let image = UIImage(data: imageData),
+              let depthData = lidarDetector.depthData else {
+            print("CameraManager: LiDAR background removal failed - no depth data")
+            saveToPhotoLibrary(imageData: imageData)
+            return
+        }
+        
+        lidarBackgroundRemover.removeBackgroundFromPhotoDataWithLiDAR(
+            imageData: imageData,
+            depthData: depthData
+        ) { [weak self] processedData in
             guard let self = self, let processedData = processedData else {
-                print("CameraManager: Background removal failed for \(filename)")
-                // Fallback to saving original to photo library
+                print("CameraManager: LiDAR background removal failed for \(filename)")
                 self?.saveToPhotoLibrary(imageData: imageData)
                 return
             }
             
-            print("CameraManager: Background removal completed for \(filename)")
+            print("CameraManager: LiDAR background removal completed for \(filename)")
             
             // Save processed version to photo library
             if let processedImage = UIImage(data: processedData) {
                 UIImageWriteToSavedPhotosAlbum(processedImage, nil, nil, nil)
-                print("CameraManager: Processed photo saved to photo library")
+                print("CameraManager: LiDAR processed photo saved to photo library")
             }
             
             // Also save original to photo library for comparison
             self.saveToPhotoLibrary(imageData: imageData)
+        }
+    }
+    
+    // MARK: - LiDAR Initialization
+    
+    private func initializeLiDARDetection() {
+        // Check if LiDAR is available and enable it
+        if lidarDetector.isLiDARAvailable {
+            useLiDARDetection = true
+            print("CameraManager: LiDAR detection enabled")
+        } else {
+            useLiDARDetection = false
+            print("CameraManager: LiDAR not available, using traditional detection")
         }
     }
 }
