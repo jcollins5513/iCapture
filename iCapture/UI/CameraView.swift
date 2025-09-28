@@ -68,6 +68,20 @@ struct CameraView: View {
                                         .font(.caption)
                                         .foregroundColor(.orange)
                                 }
+                                
+                                // Motion detection status
+                                if cameraManager.motionDetector.isVehicleStopped {
+                                    Text("Vehicle: STOPPED")
+                                        .font(.caption)
+                                        .foregroundColor(.red)
+                                        .fontWeight(.bold)
+                                } else {
+                                    let motion = cameraManager.motionDetector.motionMagnitude
+                                    let motionText = String(format: "%.3f", motion)
+                                    Text("Motion: \(motionText)")
+                                        .font(.caption)
+                                        .foregroundColor(.yellow)
+                                }
                             }
                         }
                         .padding()

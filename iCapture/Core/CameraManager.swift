@@ -27,8 +27,9 @@ class CameraManager: NSObject, ObservableObject {
     private let videoDataQueue = DispatchQueue(label: "camera.video.data.queue")
     private let photoQueue = DispatchQueue(label: "camera.photo.queue")
 
-    // ROI Detection and Trigger Engine
+    // ROI Detection, Motion Detection and Trigger Engine
     @Published var roiDetector = ROIDetector()
+    @Published var motionDetector = MotionDetector()
     @Published var triggerEngine = TriggerEngine()
 
     override init() {
@@ -36,7 +37,7 @@ class CameraManager: NSObject, ObservableObject {
         checkAuthorization()
 
         // Configure trigger engine with dependencies
-        triggerEngine.configure(cameraManager: self, roiDetector: roiDetector)
+        triggerEngine.configure(cameraManager: self, roiDetector: roiDetector, motionDetector: motionDetector)
     }
 
     func checkAuthorization() {
@@ -186,6 +187,7 @@ extension CameraManager: AVCaptureVideoDataOutputSampleBufferDelegate {
 
         Task { @MainActor in
             roiDetector.processFrame(pixelBuffer)
+            motionDetector.processFrame(pixelBuffer)
         }
     }
 }

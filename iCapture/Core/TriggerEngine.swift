@@ -11,6 +11,7 @@ import Foundation
 @MainActor
 class TriggerEngine: ObservableObject {
     @Published var isIntervalCaptureActive = false
+    @Published var isStopCaptureActive = false
     @Published var lastCaptureTime: Date?
     @Published var captureCount = 0
     @Published var sessionStartTime: Date?
@@ -27,6 +28,7 @@ class TriggerEngine: ObservableObject {
     // Dependencies
     private weak var cameraManager: CameraManager?
     private weak var roiDetector: ROIDetector?
+    private weak var motionDetector: MotionDetector?
 
     // Cancellables for Combine subscriptions
     private var cancellables = Set<AnyCancellable>()
@@ -35,9 +37,10 @@ class TriggerEngine: ObservableObject {
         // Will be configured with dependencies after initialization
     }
 
-    func configure(cameraManager: CameraManager, roiDetector: ROIDetector) {
+    func configure(cameraManager: CameraManager, roiDetector: ROIDetector, motionDetector: MotionDetector) {
         self.cameraManager = cameraManager
         self.roiDetector = roiDetector
+        self.motionDetector = motionDetector
 
         // Subscribe to ROI occupancy changes
         roiDetector.$isROIOccupied
@@ -45,23 +48,32 @@ class TriggerEngine: ObservableObject {
                 self?.handleROIOccupancyChange(isOccupied)
             }
             .store(in: &cancellables)
+        
+        // Subscribe to motion detector changes
+        motionDetector.$isVehicleStopped
+            .sink { [weak self] isStopped in
+                self?.handleVehicleStopChange(isStopped)
+            }
+            .store(in: &cancellables)
     }
 
     func startSession() {
-        guard !isIntervalCaptureActive else { return }
+        guard !isIntervalCaptureActive && !isStopCaptureActive else { return }
 
         isIntervalCaptureActive = true
+        isStopCaptureActive = true
         sessionStartTime = Date()
         captureCount = 0
         lastDebounceTime = nil
 
-        print("TriggerEngine: Session started")
+        print("TriggerEngine: Session started (interval + stop detection)")
     }
 
     func stopSession() {
-        guard isIntervalCaptureActive else { return }
+        guard isIntervalCaptureActive || isStopCaptureActive else { return }
 
         isIntervalCaptureActive = false
+        isStopCaptureActive = false
         intervalTimer?.invalidate()
         intervalTimer = nil
 
@@ -74,6 +86,7 @@ class TriggerEngine: ObservableObject {
         sessionStartTime = nil
         lastCaptureTime = nil
         lastDebounceTime = nil
+        isStopCaptureActive = false
     }
 
     func canCapture() -> Bool {
@@ -100,6 +113,15 @@ class TriggerEngine: ObservableObject {
             startIntervalTimer()
         } else {
             stopIntervalTimer()
+        }
+    }
+    
+    private func handleVehicleStopChange(_ isStopped: Bool) {
+        guard isStopCaptureActive else { return }
+        
+        if isStopped {
+            // Vehicle has stopped, trigger capture
+            triggerStopCapture()
         }
     }
 
@@ -137,6 +159,21 @@ class TriggerEngine: ObservableObject {
         }
 
         // Perform capture
+        performCapture()
+    }
+    
+    private func triggerStopCapture() {
+        guard canCapture() else {
+            print("TriggerEngine: Stop capture blocked (debounce or limit)")
+            return
+        }
+
+        guard let roiDetector = roiDetector, roiDetector.isROIOccupied else {
+            print("TriggerEngine: ROI not occupied - skipping stop capture")
+            return
+        }
+
+        // Perform stop-based capture
         performCapture()
     }
 
