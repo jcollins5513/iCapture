@@ -5,19 +5,24 @@ Continue development on iCapture project.
 **Current Status:**
 - Milestone 1: Project Bootstrap + Toolchain Pass - 8/8 tasks completed ✅
 - Milestone 2: Camera Preview + Frame Box Overlay - 8/8 tasks completed ✅
+- Milestone 3: Interval Capture with ROI Occupancy - 8/8 tasks completed ✅
 - Authentication gate: ✅ Basic mock auth implemented
 - Git version control: ✅ Fully configured with quality gates
-- Next focus: Begin Milestone 3 - Interval Capture with ROI Occupancy Detection
+- ROI occupancy detection: ✅ Implemented with Vision framework
+- Interval capture system: ✅ Working with 5s timer and debounce
+- Background learning: ✅ 1s baseline sampling with progress UI
+- Capture feedback: ✅ Flash, haptic, and sound feedback
+- Next focus: Begin Milestone 4 - Stop-Based Capture Working
 
 **Immediate Next Steps:**
-1. Complete task 3.1: Implement ROI occupancy detection
-2. Complete task 3.2: Add background sampling (1s baseline)
-3. Complete task 3.3: Create foreground mask calculation
-4. Complete task 3.4: Implement occupancy threshold (τ) learning
-5. Complete task 3.5: Add interval timer (5s) for ROI occupied state
-6. Complete task 3.6: Implement basic photo capture on interval
-7. Complete task 3.7: Add capture feedback (flash/sound)
-8. Complete task 3.8: Test interval capture with mock vehicle
+1. Complete task 4.1: Implement optical flow calculation
+2. Complete task 4.2: Add motion magnitude computation over ROI
+3. Complete task 4.3: Create sliding window for motion history (15 frames)
+4. Complete task 4.4: Implement median filter for motion stability
+5. Complete task 4.5: Add stop detection logic (motion < ε for 0.7s)
+6. Complete task 4.6: Integrate stop detection with ROI occupancy
+7. Complete task 4.7: Add debounce mechanism (1.2s between shots)
+8. Complete task 4.8: Test stop-based capture with real motion
 
 **Project Context:**
 - Hands-free vehicle photo capture app for iPhone 15 Pro+
@@ -28,16 +33,21 @@ Continue development on iCapture project.
 - Interactive frame box with drag/resize functionality
 - Setup wizard with test shot capability
 - Git repository with quality gates and pre-commit hooks
+- ROI occupancy detection with background learning
+- Interval capture system with 5s timer and debounce
+- Visual, haptic, and audio capture feedback
 
 **Key Files:**
-- `Docs/granular-plan.md` - Detailed implementation roadmap (Milestone 3 ready)
+- `Docs/granular-plan.md` - Detailed implementation roadmap (Milestone 4 ready)
 - `Docs/master-plan.md` - Project specifications
 - `Docs/git-workflow.md` - Git development guidelines
 - `iCapture/ContentView.swift` - Main UI router (auth gate)
 - `iCapture/UI/AuthView.swift` - Authentication interface
-- `iCapture/UI/CameraView.swift` - Camera functionality
+- `iCapture/UI/CameraView.swift` - Camera functionality with ROI status
 - `iCapture/Core/AuthManager.swift` - Authentication state management
-- `iCapture/Core/CameraManager.swift` - AVFoundation camera control
+- `iCapture/Core/CameraManager.swift` - AVFoundation camera control with ROI integration
+- `iCapture/Core/ROIDetector.swift` - ROI occupancy detection with Vision framework
+- `iCapture/Core/TriggerEngine.swift` - Interval capture system with debounce
 - `iCapture/UI/FrameBoxOverlay.swift` - ROI selection component (fully interactive)
 - `iCapture/UI/FrameBoxSetupWizard.swift` - Setup wizard with test shots
 
@@ -55,13 +65,13 @@ Continue development on iCapture project.
 - test / test123 (Test User)
 
 **Git Status:**
-- Repository: 2 commits, clean working tree
+- Repository: Clean working tree, all linting issues resolved
 - Pre-commit hooks: Active (linting + build validation)
-- Branch: main (ready for feature/milestone3)
+- Branch: main (ready for feature/milestone4)
 
-**Ready to begin Milestone 3: Interval Capture with ROI Occupancy Detection!**
+**Ready to begin Milestone 4: Stop-Based Capture Working!**
 
 ---
 
 **TLDR/Previous Session:**
-Completed Milestone 2 with full frame box interaction (drag/resize), visual feedback, persistence, setup wizard, and test shot functionality. Set up comprehensive Git repository with quality gates, pre-commit hooks, and workflow documentation. All code passes linting and builds successfully.
+Completed Milestone 3 with full ROI occupancy detection, background learning, interval capture system, and capture feedback. Implemented Vision framework integration for ROI detection, 5-second interval timer with debounce, visual/haptic/audio feedback, and comprehensive UI integration. All code passes linting and builds successfully. Ready for Milestone 4: Stop-Based Capture Working.
