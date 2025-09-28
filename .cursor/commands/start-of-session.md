@@ -8,6 +8,7 @@ Continue development on iCapture project.
 - Milestone 3: Interval Capture with ROI Occupancy - 8/8 tasks completed ✅
 - Milestone 4: Stop-Based Capture Working - 8/8 tasks completed ✅
 - Milestone 5: Session Storage + Per-Stock Folders + JSON Export - 10/10 tasks completed ✅
+- Milestone 6: Video Recording Toggle During Rotation - 7/7 tasks completed ✅
 - Authentication gate: ✅ Basic mock auth implemented
 - Git version control: ✅ Fully configured with quality gates
 - ROI occupancy detection: ✅ Implemented with Vision framework
@@ -20,18 +21,19 @@ Continue development on iCapture project.
 - Stock number input: ✅ UI for starting new sessions with stock number validation
 - Asset tracking: ✅ CaptureAsset model with metadata and file management
 - Export functionality: ✅ Automatic export bundle creation with organized assets
+- Video recording: ✅ 1080p30 H.264 video capture with rotation detection
+- Video UI: ✅ Toggle button and recording status display
+- Video metadata: ✅ Automatic video asset tracking and session JSON integration
 - Code quality: ✅ All SwiftLint violations resolved (0 violations)
 - Build status: ✅ All code compiles successfully with only warnings
-- Next focus: Begin Milestone 6 - Video Recording Toggle During Rotation
+- Next focus: Begin Milestone 7 - Auth Gate + Stock Number Intake Flow
 
 **Immediate Next Steps:**
-1. Complete task 6.1: Add video recording toggle UI
-2. Complete task 6.2: Implement AVFoundation video capture
-3. Complete task 6.3: Configure 1080p30 H.264 encoding
-4. Complete task 6.4: Add video file naming (turn.MOV)
-5. Complete task 6.5: Implement video start/stop with rotation
-6. Complete task 6.6: Add video metadata to session JSON
-7. Complete task 6.7: Test video recording during vehicle rotation
+1. Complete task 7.1: Add Firebase Auth dependency via SPM
+2. Complete task 7.4: Add stock number input validation
+3. Complete task 7.5: Implement session creation with stock number
+4. Complete task 7.7: Create onboarding flow
+5. Complete task 7.8: Test complete auth + capture workflow
 
 **Project Context:**
 - Hands-free vehicle photo capture app for iPhone 15 Pro+
@@ -86,9 +88,12 @@ Continue development on iCapture project.
 - Branch: main (ready for feature/milestone5)
 - SwiftLint: 0 violations across all 12 Swift files
 
-**Ready to begin Milestone 6: Video Recording Toggle During Rotation!**
+**Ready to begin Milestone 7: Auth Gate + Stock Number Intake Flow!**
 
 ---
 
 **TLDR/Previous Session:**
-Completed Milestone 5 with full session storage and asset management system. Implemented VehicleSession and CaptureAsset data models with comprehensive metadata tracking. Created SessionManager with automatic folder structure creation (/Documents/Captures/<STOCK_ID>/ with photos/ and video/ subdirectories). Added StockNumberInputView UI for session creation with validation. Integrated session management with CameraManager for automatic asset tracking and export bundle creation. Enhanced CameraView with session status display and controls. All code compiles successfully with 0 SwiftLint violations. Ready for Milestone 6: Video Recording Toggle During Rotation.
+Completed Milestone 6 with full video recording functionality. Implemented VideoRecordingManager class with 1080p30 H.264 video capture, automatic rotation detection, and video metadata tracking. Added video recording toggle UI to CameraView with recording status display. Integrated video recording with TriggerEngine for automatic start/stop during ROI occupancy changes. Created modular architecture by extracting video logic from CameraManager to avoid file length violations. All video assets are automatically tracked and included in session JSON exports. Build succeeds with 0 SwiftLint violations. Ready for Milestone 7: Auth Gate + Stock Number Intake Flow.
+
+**TLDR/Previous Session (Milestone 5):**
+Completed Milestone 5 with full session storage and asset management system. Implemented VehicleSession and CaptureAsset data models with comprehensive metadata tracking. Created SessionManager with automatic folder structure creation (/Documents/Captures/<STOCK_ID>/ with photos/ and video/ subdirectories). Added StockNumberInputView UI for session creation with validation. Integrated session management with CameraManager for automatic asset tracking and export bundle creation. Enhanced CameraView with session status display and controls. All code compiles successfully with 0 SwiftLint violations.

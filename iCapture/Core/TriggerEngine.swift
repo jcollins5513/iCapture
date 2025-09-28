@@ -111,8 +111,12 @@ class TriggerEngine: ObservableObject {
 
         if isOccupied {
             startIntervalTimer()
+            // Start video recording when vehicle enters ROI
+            startVideoRecordingIfNeeded()
         } else {
             stopIntervalTimer()
+            // Stop video recording when vehicle leaves ROI
+            stopVideoRecordingIfNeeded()
         }
     }
 
@@ -263,5 +267,53 @@ class TriggerEngine: ObservableObject {
     func setMaxCapturesPerSession(_ max: Int) {
         // This would require checking against the new limit
         // For now, we'll keep it constant as per the specification
+    }
+
+    // MARK: - Video Recording During Rotation
+
+    func startVideoRecording() {
+        guard let cameraManager = cameraManager else {
+            print("TriggerEngine: No camera manager available for video recording")
+            return
+        }
+
+        cameraManager.startVideoRecording()
+        print("TriggerEngine: Started video recording during rotation")
+    }
+
+    func stopVideoRecording() {
+        guard let cameraManager = cameraManager else {
+            print("TriggerEngine: No camera manager available for video recording")
+            return
+        }
+
+        cameraManager.stopVideoRecording()
+        print("TriggerEngine: Stopped video recording")
+    }
+
+    func isVideoRecording() -> Bool {
+        return cameraManager?.isVideoRecording ?? false
+    }
+
+    // MARK: - Video Recording with Rotation Detection
+
+    private func startVideoRecordingIfNeeded() {
+        guard let cameraManager = cameraManager else { return }
+
+        // Only start video recording if not already recording
+        if !cameraManager.isVideoRecording {
+            cameraManager.startVideoRecording()
+            print("TriggerEngine: Auto-started video recording for rotation")
+        }
+    }
+
+    private func stopVideoRecordingIfNeeded() {
+        guard let cameraManager = cameraManager else { return }
+
+        // Only stop video recording if currently recording
+        if cameraManager.isVideoRecording {
+            cameraManager.stopVideoRecording()
+            print("TriggerEngine: Auto-stopped video recording after rotation")
+        }
     }
 }

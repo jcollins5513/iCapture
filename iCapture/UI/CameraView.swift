@@ -67,6 +67,18 @@ struct CameraView: View {
                                     Text("Captures: \(sessionManager.getAssetCount())")
                                         .font(.caption)
                                         .foregroundColor(.white)
+
+                                    // Video recording status
+                                    if cameraManager.isVideoRecording {
+                                        Text("Video: Recording (\(cameraManager.getFormattedVideoDuration()))")
+                                            .font(.caption)
+                                            .foregroundColor(.red)
+                                            .fontWeight(.semibold)
+                                    } else {
+                                        Text("Video: Ready")
+                                            .font(.caption)
+                                            .foregroundColor(.purple)
+                                    }
                                 }
                             } else {
                                 Text("No Session")
@@ -134,6 +146,26 @@ struct CameraView: View {
                                 .background(Color.blue)
                                 .clipShape(Circle())
                         })
+
+                        // Video recording toggle button
+                        if sessionManager.isSessionActive {
+                            Button(action: {
+                                if cameraManager.isVideoRecording {
+                                    cameraManager.stopVideoRecording()
+                                } else {
+                                    cameraManager.startVideoRecording()
+                                }
+                            }, label: {
+                                Image(systemName: cameraManager.isVideoRecording ?
+                                      "stop.circle.fill" : "video.circle.fill")
+                                    .font(.title2)
+                                    .foregroundColor(.white)
+                                    .padding()
+                                    .background(cameraManager.isVideoRecording ?
+                                               Color.red : Color.purple)
+                                    .clipShape(Circle())
+                            })
+                        }
 
                         // Session control button
                         Button(action: {
@@ -221,6 +253,11 @@ struct CameraView: View {
             cameraManager.startSession()
             // Connect session manager to camera manager
             cameraManager.sessionManager = sessionManager
+            // Connect session manager to video recording manager
+            cameraManager.videoRecordingManager.configure(
+                sessionManager: sessionManager,
+                roiDetector: cameraManager.roiDetector
+            )
         }
         .onDisappear {
             cameraManager.stopSession()

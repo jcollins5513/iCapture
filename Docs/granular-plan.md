@@ -55,13 +55,13 @@ Based on master-plan.md. Update by checking off completed tasks.
 - [x] **5.10** Implement session start/end workflow
 
 ## Milestone 6: Video Recording Toggle During Rotation
-- [ ] **6.1** Add video recording toggle UI
-- [ ] **6.2** Implement AVFoundation video capture
-- [ ] **6.3** Configure 1080p30 H.264 encoding
-- [ ] **6.4** Add video file naming (turn.MOV)
-- [ ] **6.5** Implement video start/stop with rotation
-- [ ] **6.6** Add video metadata to session JSON
-- [ ] **6.7** Test video recording during vehicle rotation
+- [x] **6.1** Add video recording toggle UI
+- [x] **6.2** Implement AVFoundation video capture
+- [x] **6.3** Configure 1080p30 H.264 encoding
+- [x] **6.4** Add video file naming (turn.MOV)
+- [x] **6.5** Implement video start/stop with rotation
+- [x] **6.6** Add video metadata to session JSON
+- [x] **6.7** Test video recording during vehicle rotation
 
 ## Milestone 7: Auth Gate + Stock Number Intake Flow
 - [ ] **7.1** Add Firebase Auth dependency via SPM
@@ -128,6 +128,7 @@ Based on master-plan.md. Update by checking off completed tasks.
 - Milestone 3 progress: 8/8 tasks completed ✅
 - Milestone 4 progress: 8/8 tasks completed ✅
 - Milestone 5 progress: 10/10 tasks completed ✅
+- Milestone 6 progress: 7/7 tasks completed ✅
 - Authentication gate: ✅ Basic mock auth implemented
 - ROI occupancy detection: ✅ Implemented with Vision framework
 - Interval capture system: ✅ Working with 5s timer and debounce
@@ -139,4 +140,7 @@ Based on master-plan.md. Update by checking off completed tasks.
 - Stock number input: ✅ UI for starting new sessions with stock number validation
 - Asset tracking: ✅ CaptureAsset model with metadata and file management
 - Export functionality: ✅ Automatic export bundle creation with organized assets
-- Next focus: Begin Milestone 6 - Video Recording Toggle During Rotation
+- Video recording: ✅ 1080p30 H.264 video capture with rotation detection
+- Video UI: ✅ Toggle button and recording status display
+- Video metadata: ✅ Automatic video asset tracking and session JSON integration
+- Next focus: Begin Milestone 7 - Auth Gate + Stock Number Intake Flow
