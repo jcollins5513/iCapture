@@ -30,11 +30,18 @@ class PerformanceMonitor: ObservableObject {
     @Published var isQAMode: Bool = false
     @Published var qaMetrics: QAMetrics = QAMetrics()
 
+    // Thermal management
+    @Published var thermalEvents: [ThermalEvent] = []
+    @Published var isThermalThrottling: Bool = false
+    @Published var thermalRecoveryTime: TimeInterval = 0.0
+
     private var monitoringTimer: Timer?
     private var captureStartTime: Date?
     private var sessionStartTime: Date?
     private var frameCount: Int = 0
     private var lastFrameTime: Date?
+    private var lastThermalState: ProcessInfo.ThermalState = .nominal
+    private var thermalThrottlingStartTime: Date?
 
     // Memory monitoring
     private var memoryInfo = mach_task_basic_info()
@@ -46,9 +53,8 @@ class PerformanceMonitor: ObservableObject {
     }
 
     deinit {
-        Task { @MainActor in
-            stopMonitoring()
-        }
+        monitoringTimer?.invalidate()
+        monitoringTimer = nil
     }
 
     // MARK: - Public Interface
@@ -139,6 +145,61 @@ class PerformanceMonitor: ObservableObject {
 
         return report
     }
+    
+    // MARK: - Thermal Management
+    
+    func getThermalManagementRecommendations() -> [String] {
+        var recommendations: [String] = []
+        
+        switch thermalState {
+        case .nominal:
+            recommendations.append("Thermal state is normal - optimal performance")
+        case .fair:
+            recommendations.append("Thermal state is fair - monitor for changes")
+            recommendations.append("Consider reducing capture frequency if needed")
+        case .serious:
+            recommendations.append("Thermal throttling active - performance may be reduced")
+            recommendations.append("Reduce capture frequency to 10s intervals")
+            recommendations.append("Consider stopping video recording")
+        case .critical:
+            recommendations.append("Critical thermal state - immediate action required")
+            recommendations.append("Stop all capture activities")
+            recommendations.append("Allow device to cool down")
+        @unknown default:
+            recommendations.append("Unknown thermal state - monitor closely")
+        }
+        
+        return recommendations
+    }
+    
+    func getThermalEventSummary() -> String {
+        guard !thermalEvents.isEmpty else {
+            return "No thermal events recorded"
+        }
+        
+        var summary = "Thermal Events (\(thermalEvents.count)):\n"
+        for event in thermalEvents.suffix(5) { // Show last 5 events
+            summary += "• \(event.description)\n"
+        }
+        
+        if isThermalThrottling {
+            summary += "\n⚠️ Currently experiencing thermal throttling"
+        }
+        
+        return summary
+    }
+    
+    func startThermalStressTest() {
+        print("PerformanceMonitor: Starting thermal stress test")
+        // In a real implementation, this would trigger intensive operations
+        // For now, we'll just enable enhanced monitoring
+        isQAMode = true
+    }
+    
+    func stopThermalStressTest() {
+        print("PerformanceMonitor: Stopping thermal stress test")
+        isQAMode = false
+    }
 
     // MARK: - Private Methods
 
@@ -200,7 +261,39 @@ class PerformanceMonitor: ObservableObject {
     }
 
     private func updateThermalState() {
-        thermalState = ProcessInfo.processInfo.thermalState
+        let currentThermalState = ProcessInfo.processInfo.thermalState
+        
+        // Check for thermal state changes
+        if currentThermalState != lastThermalState {
+            let event = ThermalEvent(
+                timestamp: Date(),
+                fromState: lastThermalState,
+                toState: currentThermalState,
+                sessionDuration: sessionDuration
+            )
+            
+            thermalEvents.append(event)
+            
+            // Track thermal throttling
+            if currentThermalState == .serious || currentThermalState == .critical {
+                if !isThermalThrottling {
+                    isThermalThrottling = true
+                    thermalThrottlingStartTime = Date()
+                    print("PerformanceMonitor: Thermal throttling started - State: \(thermalStateDescription)")
+                }
+            } else if isThermalThrottling && (currentThermalState == .nominal || currentThermalState == .fair) {
+                isThermalThrottling = false
+                if let startTime = thermalThrottlingStartTime {
+                    thermalRecoveryTime = Date().timeIntervalSince(startTime)
+                    print("PerformanceMonitor: Thermal throttling ended - Recovery time: \(String(format: "%.1f", thermalRecoveryTime))s")
+                }
+                thermalThrottlingStartTime = nil
+            }
+            
+            lastThermalState = currentThermalState
+        }
+        
+        thermalState = currentThermalState
     }
 
     private func updateBatteryInfo() {
@@ -259,6 +352,38 @@ struct QAMetrics: Codable {
         } catch {
             print("Failed to export QA metrics: \(error)")
             return nil
+        }
+    }
+}
+
+// MARK: - Thermal Event Structure
+struct ThermalEvent: Codable {
+    let timestamp: Date
+    let fromState: String
+    let toState: String
+    let sessionDuration: TimeInterval
+    
+    init(timestamp: Date, fromState: ProcessInfo.ThermalState, toState: ProcessInfo.ThermalState, sessionDuration: TimeInterval) {
+        self.timestamp = timestamp
+        self.fromState = ThermalEvent.thermalStateText(fromState)
+        self.toState = ThermalEvent.thermalStateText(toState)
+        self.sessionDuration = sessionDuration
+    }
+    
+    var description: String {
+        let formatter = DateFormatter()
+        formatter.timeStyle = .medium
+        
+        return "\(formatter.string(from: timestamp)): \(fromState) → \(toState)"
+    }
+    
+    private static func thermalStateText(_ state: ProcessInfo.ThermalState) -> String {
+        switch state {
+        case .nominal: return "Nominal"
+        case .fair: return "Fair"
+        case .serious: return "Serious"
+        case .critical: return "Critical"
+        @unknown default: return "Unknown"
         }
     }
 }

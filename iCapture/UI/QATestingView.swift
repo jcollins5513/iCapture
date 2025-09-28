@@ -10,9 +10,11 @@ import SwiftUI
 struct QATestingView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var performanceMonitor = PerformanceMonitor()
+    @StateObject private var cameraManager = CameraManager()
     @State private var showingPerformanceReport = false
     @State private var performanceReport = ""
     @State private var isQAModeActive = false
+    @State private var photoCaptureResults: [PhotoCaptureResult] = []
 
     var body: some View {
         NavigationView {
@@ -184,6 +186,87 @@ struct QATestingView: View {
 
                 Spacer()
 
+                // 48MP Capture Testing
+                VStack(alignment: .leading, spacing: 16) {
+                    Text("48MP Capture Testing")
+                        .font(.headline)
+
+                    let photoInfo = cameraManager.getPhotoCaptureInfo()
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Current Settings:")
+                            .font(.subheadline)
+                            .fontWeight(.semibold)
+                        
+                        Text("Resolution: \(Int(photoInfo.resolution.width)) × \(Int(photoInfo.resolution.height))")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                        
+                        Text("Format: \(photoInfo.format)")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                        
+                        Text("48MP Supported: \(photoInfo.is48MPSupported ? "Yes" : "No")")
+                            .font(.caption)
+                            .foregroundColor(photoInfo.is48MPSupported ? .green : .orange)
+                    }
+                    .padding()
+                    .background(Color.blue.opacity(0.1))
+                    .cornerRadius(8)
+
+                    Button("Test 48MP Capture") {
+                        test48MPCapture()
+                    }
+                    .buttonStyle(.bordered)
+                    .frame(maxWidth: .infinity)
+                    .disabled(!photoInfo.is48MPSupported)
+                }
+                .padding()
+                .background(Color.gray.opacity(0.1))
+                .cornerRadius(8)
+
+                // Thermal Testing
+                VStack(alignment: .leading, spacing: 16) {
+                    Text("Thermal Testing")
+                        .font(.headline)
+
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Current Thermal State: \(thermalStateDescription)")
+                            .font(.subheadline)
+                            .fontWeight(.semibold)
+                            .foregroundColor(thermalStateColor)
+                        
+                        if performanceMonitor.isThermalThrottling {
+                            Text("⚠️ Thermal Throttling Active")
+                                .font(.caption)
+                                .foregroundColor(.red)
+                                .fontWeight(.semibold)
+                        }
+                        
+                        Text("Thermal Events: \(performanceMonitor.thermalEvents.count)")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    .padding()
+                    .background(Color.orange.opacity(0.1))
+                    .cornerRadius(8)
+
+                    Button("Start Thermal Stress Test") {
+                        performanceMonitor.startThermalStressTest()
+                    }
+                    .buttonStyle(.bordered)
+                    .frame(maxWidth: .infinity)
+                    .disabled(performanceMonitor.isThermalThrottling)
+
+                    Button("View Thermal Events") {
+                        showThermalEvents()
+                    }
+                    .buttonStyle(.bordered)
+                    .frame(maxWidth: .infinity)
+                }
+                .padding()
+                .background(Color.gray.opacity(0.1))
+                .cornerRadius(8)
+
                 // Action Buttons
                 VStack(spacing: 12) {
                     Button("Generate Performance Report") {
@@ -274,6 +357,34 @@ struct QATestingView: View {
         // For now, we'll just show an alert
         // In a real app, you'd implement proper file sharing
     }
+    
+    private func test48MPCapture() {
+        let photoInfo = cameraManager.getPhotoCaptureInfo()
+        let startTime = Date()
+        
+        // Capture test photo
+        cameraManager.captureTestShot()
+        
+        // Record test result
+        let result = PhotoCaptureResult(
+            timestamp: startTime,
+            resolution: photoInfo.resolution,
+            format: photoInfo.format,
+            is48MP: photoInfo.is48MPSupported,
+            captureLatency: performanceMonitor.captureLatency
+        )
+        
+        photoCaptureResults.append(result)
+        
+        print("QA Testing: 48MP capture test completed - \(result)")
+    }
+    
+    private func showThermalEvents() {
+        let thermalSummary = performanceMonitor.getThermalEventSummary()
+        print("QA Testing: Thermal Events Summary")
+        print(thermalSummary)
+    }
+    
 }
 
 struct MetricCard: View {
@@ -320,6 +431,20 @@ struct PerformanceReportView: View {
                 }
             }
         }
+    }
+}
+
+// MARK: - Photo Capture Result
+struct PhotoCaptureResult {
+    let timestamp: Date
+    let resolution: CGSize
+    let format: String
+    let is48MP: Bool
+    let captureLatency: TimeInterval
+    
+    var description: String {
+        let resolutionText = is48MP ? "48MP" : "12MP"
+        return "\(resolutionText) \(format) - \(Int(resolution.width))×\(Int(resolution.height)) - \(String(format: "%.3f", captureLatency))s"
     }
 }
 

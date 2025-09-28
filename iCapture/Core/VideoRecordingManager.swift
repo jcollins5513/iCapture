@@ -165,15 +165,21 @@ extension VideoRecordingManager: AVCaptureFileOutputRecordingDelegate {
         }
 
         do {
+            // Verify the file exists at the expected location
+            guard FileManager.default.fileExists(atPath: fileURL.path) else {
+                print("Video file not found at: \(fileURL.path)")
+                return
+            }
+
             // Get video file attributes
             let attributes = try FileManager.default.attributesOfItem(atPath: fileURL.path)
             _ = attributes[.size] as? Int64 ?? 0
 
-            // Create video asset
+            // Create video asset with correct file path
             let asset = CaptureAsset(
                 sessionId: session.id,
                 type: .video,
-                filename: "turn.MOV",
+                filename: fileURL.lastPathComponent, // Use actual filename
                 width: 1920, // 1080p width
                 height: 1080, // 1080p height
                 roiRect: roiDetector?.getROIRect() ?? CGRect.zero,
@@ -183,7 +189,7 @@ extension VideoRecordingManager: AVCaptureFileOutputRecordingDelegate {
             // Add asset to session
             try sessionManager.addAsset(asset)
 
-            print("Video saved to session: turn.MOV")
+            print("Video saved to session: \(fileURL.lastPathComponent)")
 
         } catch {
             print("Failed to save video to session: \(error)")

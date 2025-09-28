@@ -112,12 +112,8 @@ class CameraManager: NSObject, ObservableObject {
             // Add photo output
             if self.captureSession.canAddOutput(self.photoOutput) {
                 self.captureSession.addOutput(self.photoOutput)
-                // Configure for high quality photos
-                if self.photoOutput.availablePhotoCodecTypes.contains(.hevc) {
-                    self.photoOutput.setPreparedPhotoSettingsArray([
-                        AVCapturePhotoSettings(format: [AVVideoCodecKey: AVVideoCodecType.hevc])
-                    ])
-                }
+                // Configure for high quality photos with 48MP support
+                self.configurePhotoOutputForHighResolution()
             }
 
             // Add movie file output for video recording
@@ -168,12 +164,24 @@ class CameraManager: NSObject, ObservableObject {
 
             let photoSettings: AVCapturePhotoSettings
 
-            // Configure for high quality
+            // Configure for high quality with 48MP support
             if self.photoOutput.availablePhotoCodecTypes.contains(.hevc) {
                 photoSettings = AVCapturePhotoSettings(format: [AVVideoCodecKey: AVVideoCodecType.hevc])
             } else {
                 photoSettings = AVCapturePhotoSettings()
             }
+            
+            // Enable high resolution capture if supported
+        if #available(iOS 16.0, *) {
+            if let device = self.captureDevice, 
+               let maxDimensions = device.activeFormat.supportedMaxPhotoDimensions.max(by: { $0.width * $0.height < $1.width * $1.height }),
+               maxDimensions.width >= 8000 {
+                photoSettings.maxPhotoDimensions = maxDimensions
+                print("CameraManager: Capturing 48MP high-resolution photo")
+            } else {
+                print("CameraManager: Capturing standard resolution photo")
+            }
+        }
 
             // Add metadata
             photoSettings.metadata = [
@@ -220,6 +228,70 @@ class CameraManager: NSObject, ObservableObject {
 
     func getFormattedVideoDuration() -> String {
         return videoRecordingManager.getFormattedVideoDuration()
+    }
+
+    // MARK: - High-Resolution Photo Configuration
+
+    private func configurePhotoOutputForHighResolution() {
+        // Check if device supports 48MP capture (iPhone 15 Pro and Pro Max)
+        let deviceModel = UIDevice.current.model
+        let systemVersion = UIDevice.current.systemVersion
+        
+        // Configure photo settings for maximum resolution
+        var photoSettings: AVCapturePhotoSettings
+        
+        if photoOutput.availablePhotoCodecTypes.contains(.hevc) {
+            // Use HEVC/HEIF format for better compression
+            photoSettings = AVCapturePhotoSettings(format: [AVVideoCodecKey: AVVideoCodecType.hevc])
+        } else {
+            // Fallback to standard format
+            photoSettings = AVCapturePhotoSettings()
+        }
+        
+        // Enable high resolution capture if supported
+        if #available(iOS 16.0, *) {
+            // Check if 48MP is available
+            if let device = captureDevice,
+               let maxDimensions = device.activeFormat.supportedMaxPhotoDimensions.max(by: { $0.width * $0.height < $1.width * $1.height }),
+               maxDimensions.width >= 8000 {
+                photoSettings.maxPhotoDimensions = maxDimensions
+                print("CameraManager: 48MP high-resolution capture enabled")
+            } else {
+                print("CameraManager: 48MP capture not available, using standard resolution")
+            }
+        }
+        
+        // Set up prepared photo settings for optimal performance
+        photoOutput.setPreparedPhotoSettingsArray([photoSettings])
+        
+        print("CameraManager: Photo output configured for high-resolution capture")
+    }
+    
+    func getMaxPhotoResolution() -> CGSize {
+        guard let device = captureDevice else {
+            return CGSize(width: 4032, height: 3024) // Default 12MP
+        }
+        
+        // Return the maximum supported resolution
+        if #available(iOS 16.0, *), 
+           let maxDimensions = device.activeFormat.supportedMaxPhotoDimensions.max(by: { $0.width * $0.height < $1.width * $1.height }),
+           maxDimensions.width >= 8000 {
+            return CGSize(width: 8064, height: 6048) // 48MP
+        } else {
+            return CGSize(width: 4032, height: 3024) // 12MP
+        }
+    }
+    
+    func getCurrentPhotoResolution() -> CGSize {
+        return getMaxPhotoResolution()
+    }
+    
+    func getPhotoCaptureInfo() -> (resolution: CGSize, format: String, is48MPSupported: Bool) {
+        let resolution = getCurrentPhotoResolution()
+        let format = photoOutput.availablePhotoCodecTypes.contains(.hevc) ? "HEIF" : "JPEG"
+        let is48MPSupported = (resolution.width >= 8000 || resolution.height >= 6000)
+        
+        return (resolution: resolution, format: format, is48MPSupported: is48MPSupported)
     }
 }
 
@@ -282,9 +354,23 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
             // Get ROI rectangle
             let roiRect = self.roiDetector.getROIRect()
 
-            // Create filename with timestamp
+            // Create filename with timestamp and resolution info
             let timestamp = Date().timeIntervalSince1970
-            let filename = "photo_\(Int(timestamp)).heic"
+            let resolutionSuffix = (width >= 8000 || height >= 6000) ? "_48MP" : "_12MP"
+            let filename = "photo_\(Int(timestamp))\(resolutionSuffix).heic"
+            
+            // Log photo capture details and validate file size
+            let fileSizeMB = Double(imageData.count) / (1024 * 1024)
+            let isHighResolution = (width >= 8000 || height >= 6000)
+            let maxSizeMB = isHighResolution ? 15.0 : 5.0
+            
+            print("CameraManager: Captured photo - Resolution: \(width)x\(height), Size: \(String(format: "%.2f", fileSizeMB))MB")
+            
+            if fileSizeMB > maxSizeMB {
+                print("CameraManager: WARNING - Photo size (\(String(format: "%.2f", fileSizeMB))MB) exceeds target (\(maxSizeMB)MB)")
+            } else {
+                print("CameraManager: Photo size within target limits")
+            }
 
             // Save to session directory if session is active, otherwise to test shots
             if let sessionManager = self.sessionManager, sessionManager.isSessionActive {
