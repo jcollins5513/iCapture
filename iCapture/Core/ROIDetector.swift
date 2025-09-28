@@ -16,11 +16,11 @@ class ROIDetector: ObservableObject {
     @Published var occupancyPercentage: Double = 0.0
     @Published var isBackgroundSampling = false
     @Published var backgroundSampleProgress: Double = 0.0
+    @Published private(set) var isBackgroundLearned = false
 
     private var backgroundBuffer: CVPixelBuffer?
     private var backgroundMask: CVPixelBuffer?
     private var occupancyThreshold: Double = 0.15 // τ threshold (15% by default)
-    private var isBackgroundLearned = false
 
     // Background sampling parameters
     private let backgroundSampleDuration: TimeInterval = 1.0 // 1 second baseline
@@ -135,6 +135,7 @@ class ROIDetector: ObservableObject {
         }
 
         print("ROIDetector: Background sampling complete. Threshold: \(occupancyThreshold)")
+        NotificationCenter.default.post(name: .BackgroundSamplingCompleted, object: self)
     }
 
     private func createBackgroundMask() {
@@ -167,7 +168,7 @@ class ROIDetector: ObservableObject {
         Task { @MainActor in
             self.occupancyPercentage = occupancy * 100
             self.isROIOccupied = isOccupied
-            
+
             // Debug logging every 30 frames (about once per second at 30fps)
             if self.occupancyPercentage > 0 {
                 print("ROIDetector: Occupancy: \(String(format: "%.1f", self.occupancyPercentage))%, Threshold: \(String(format: "%.1f", self.occupancyThreshold * 100))%, Occupied: \(isOccupied)")
@@ -182,7 +183,7 @@ class ROIDetector: ObservableObject {
 
         // Get the screen bounds to properly convert coordinates
         let screenBounds = UIScreen.main.bounds
-        
+
         // Convert screen coordinates to buffer coordinates
         // Note: This assumes the preview layer fills the screen
         let roiInBuffer = CGRect(
@@ -262,7 +263,7 @@ class ROIDetector: ObservableObject {
 
         return normalizedVariance
     }
-    
+
     private func calculateForegroundOccupancy(currentFrame: CVPixelBuffer, backgroundFrame: CVPixelBuffer, roi: CGRect) -> Double {
         // Lock both pixel buffers
         CVPixelBufferLockBaseAddress(currentFrame, .readOnly)
@@ -271,32 +272,32 @@ class ROIDetector: ObservableObject {
             CVPixelBufferUnlockBaseAddress(currentFrame, .readOnly)
             CVPixelBufferUnlockBaseAddress(backgroundFrame, .readOnly)
         }
-        
+
         guard let currentBaseAddress = CVPixelBufferGetBaseAddress(currentFrame),
               let backgroundBaseAddress = CVPixelBufferGetBaseAddress(backgroundFrame) else {
             return 0.0
         }
-        
+
         let width = CVPixelBufferGetWidth(currentFrame)
         let height = CVPixelBufferGetHeight(currentFrame)
         let bytesPerRow = CVPixelBufferGetBytesPerRow(currentFrame)
-        
+
         // Convert to 8-bit grayscale for analysis
         let currentPixels = currentBaseAddress.assumingMemoryBound(to: UInt8.self)
         let backgroundPixels = backgroundBaseAddress.assumingMemoryBound(to: UInt8.self)
-        
+
         // Calculate bounds within the ROI
         let startX = max(0, Int(roi.origin.x))
         let startY = max(0, Int(roi.origin.y))
         let endX = min(width, Int(roi.origin.x + roi.width))
         let endY = min(height, Int(roi.origin.y + roi.height))
-        
+
         guard startX < endX && startY < endY else { return 0.0 }
-        
+
         var foregroundPixels = 0
         var totalPixels = 0
         let threshold = 30 // Intensity difference threshold for foreground detection
-        
+
         // Sample pixels in the ROI (every 2nd pixel for performance)
         for rowY in stride(from: startY, to: endY, by: 2) {
             for colX in stride(from: startX, to: endX, by: 2) {
@@ -305,7 +306,7 @@ class ROIDetector: ObservableObject {
                     let currentIntensity = Int(currentPixels[pixelIndex])
                     let backgroundIntensity = Int(backgroundPixels[pixelIndex])
                     let difference = abs(currentIntensity - backgroundIntensity)
-                    
+
                     if difference > threshold {
                         foregroundPixels += 1
                     }
@@ -313,9 +314,9 @@ class ROIDetector: ObservableObject {
                 }
             }
         }
-        
+
         guard totalPixels > 0 else { return 0.0 }
-        
+
         // Return the percentage of foreground pixels
         return Double(foregroundPixels) / Double(totalPixels)
     }

@@ -468,10 +468,9 @@ struct CameraView: View {
         }
         .onChange(of: sessionManager.isSessionActive) { _, isActive in
             if isActive {
-                // Start trigger engine when session becomes active
-                cameraManager.triggerEngine.startSession()
+                cameraManager.beginAutomaticCaptureWorkflow()
             } else {
-                // Stop trigger engine when session ends
+                cameraManager.cancelAutomaticCaptureWorkflow()
                 cameraManager.triggerEngine.stopSession()
             }
         }

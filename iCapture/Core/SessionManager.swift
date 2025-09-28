@@ -76,6 +76,7 @@ class SessionManager: ObservableObject {
         try cleanupOldSessions()
 
         print("SessionManager: Started session for stock \(stockNumber)")
+        NotificationCenter.default.post(name: .sessionDidStart, object: self)
     }
 
     func endSession() throws {
@@ -102,6 +103,7 @@ class SessionManager: ObservableObject {
         self.sessionDirectory = nil
 
         print("SessionManager: Ended session for stock \(session.stockNumber). Total captures: \(totalCaptures)")
+        NotificationCenter.default.post(name: .sessionDidEnd, object: self)
     }
 
     func cancelSession() throws {
@@ -446,4 +448,9 @@ enum SessionError: LocalizedError {
             return "File operation failed"
         }
     }
+}
+
+extension Notification.Name {
+    static let sessionDidStart = Notification.Name("SessionDidStart")
+    static let sessionDidEnd = Notification.Name("SessionDidEnd")
 }

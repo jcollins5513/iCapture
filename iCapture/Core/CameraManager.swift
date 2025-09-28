@@ -10,6 +10,7 @@ import Combine
 import SwiftUI
 import AudioToolbox
 import Photos
+import ImageIO
 
 class CameraManager: NSObject, ObservableObject {
     @Published var isAuthorized = false
@@ -57,7 +58,16 @@ class CameraManager: NSObject, ObservableObject {
     // Orientation handling
     private var lastVideoOrientation: AVCaptureVideoOrientation?
     private var orientationUpdateTimer: Timer?
-    private var lastLiDARProcessingState: Bool?
+    fileprivate var lastLiDARProcessingState: Bool?
+    fileprivate enum AutoCaptureWorkflowState {
+        case idle
+        case waitingForLiDAR
+        case waitingForBackground
+    }
+    fileprivate var autoCaptureState: AutoCaptureWorkflowState = .idle
+    fileprivate var shouldAutoStartTriggers = false
+    fileprivate var backgroundSamplingWorkItem: DispatchWorkItem?
+    private var pendingTriggerType: TriggerType = .manual
 
     override init() {
         super.init()
@@ -86,6 +96,20 @@ class CameraManager: NSObject, ObservableObject {
             name: .LiDARScanCompleted,
             object: nil
         )
+
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleBackgroundSamplingCompleted(_:)),
+            name: .BackgroundSamplingCompleted,
+            object: nil
+        )
+
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleSessionDidStart(_:)),
+            name: .sessionDidStart,
+            object: nil
+        )
     }
 
     deinit {
@@ -95,20 +119,6 @@ class CameraManager: NSObject, ObservableObject {
     @objc private func handleLiDARTimeout() {
         print("CameraManager: LiDAR detection timeout - disabling LiDAR and switching to traditional detection")
         disableLiDARDetection()
-    }
-
-    @objc private func handleLiDARScanCompleted(_ notification: Notification) {
-        print("CameraManager: LiDAR environment scan completed - resuming camera capture workflow")
-
-        if lidarDetector.isSessionRunning {
-            stopLiDARDetection()
-        } else {
-            restartCaptureSessionIfNeeded()
-        }
-
-        useLiDARDetection = true
-        lastLiDARProcessingState = nil
-        print("CameraManager: LiDAR depth data cached for background removal")
     }
 
     @MainActor
@@ -173,6 +183,12 @@ class CameraManager: NSObject, ObservableObject {
             // Add photo output
             if self.captureSession.canAddOutput(self.photoOutput) {
                 self.captureSession.addOutput(self.photoOutput)
+                if self.photoOutput.isDepthDataDeliverySupported {
+                    self.photoOutput.isDepthDataDeliveryEnabled = true
+                    print("CameraManager: Depth data delivery enabled for photo output")
+                } else {
+                    print("CameraManager: Depth data delivery not supported")
+                }
                 print("CameraManager: Photo output added successfully")
             } else {
                 print("CameraManager: WARNING - Cannot add photo output")
@@ -279,6 +295,8 @@ class CameraManager: NSObject, ObservableObject {
         // Record capture start for performance monitoring
         performanceMonitor.recordCaptureStart()
 
+        pendingTriggerType = triggerType
+
         sessionQueue.async { [weak self] in
             guard let self = self, self.captureSession.isRunning else { return }
 
@@ -296,8 +314,9 @@ class CameraManager: NSObject, ObservableObject {
             if let device = self.captureDevice,
                let maxDimensions = device.activeFormat.supportedMaxPhotoDimensions.max(by: { $0.width * $0.height < $1.width * $1.height }),
                maxDimensions.width >= 8000 {
-                // Check if the photo output supports this resolution
-                if self.photoOutput.maxPhotoDimensions.width >= maxDimensions.width {
+                if self.photoOutput.isDepthDataDeliveryEnabled {
+                    print("CameraManager: Depth data enabled - using standard resolution for compatibility")
+                } else if self.photoOutput.maxPhotoDimensions.width >= maxDimensions.width {
                     photoSettings.maxPhotoDimensions = maxDimensions
                     print("CameraManager: Capturing 48MP high-resolution photo")
                 } else {
@@ -310,6 +329,13 @@ class CameraManager: NSObject, ObservableObject {
 
             // Note: Custom metadata keys are not allowed by AVFoundation
             // We'll store trigger info in session data instead
+
+            if self.photoOutput.isDepthDataDeliveryEnabled {
+                photoSettings.isDepthDataDeliveryEnabled = true
+                if #available(iOS 16.0, *) {
+                    photoSettings.isDepthDataFiltered = true
+                }
+            }
 
             self.photoOutput.capturePhoto(with: photoSettings, delegate: self)
         }
@@ -481,30 +507,31 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
         // Save photo to appropriate directory
         photoQueue.async { [weak self] in
             guard let self = self else { return }
+            let triggerType = self.pendingTriggerType
+            defer { self.pendingTriggerType = .manual }
 
             guard let imageData = photo.fileDataRepresentation() else {
                 print("Failed to get image data")
                 return
             }
 
-            // Use manual trigger type since custom metadata is not supported
-            let triggerType: TriggerType = .manual
-
-            // Get image dimensions
             let width = photo.resolvedSettings.photoDimensions.width
             let height = photo.resolvedSettings.photoDimensions.height
 
-            // Get ROI rectangle - we'll get this on the main thread
             let roiRect = DispatchQueue.main.sync {
-                return self.roiDetector.getROIRect()
+                self.roiDetector.getROIRect()
             }
 
-            // Create filename with timestamp and resolution info
+            var depthData = photo.depthData?.converting(toDepthDataType: kCVPixelFormatType_DepthFloat32)
+            if let orientationValue = photo.metadata[kCGImagePropertyOrientation as String] as? UInt32,
+               let orientation = CGImagePropertyOrientation(rawValue: orientationValue) {
+                depthData = depthData?.applyingExifOrientation(orientation)
+            }
+
             let timestamp = Date().timeIntervalSince1970
             let resolutionSuffix = (width >= 8000 || height >= 6000) ? "_48MP" : "_12MP"
             let filename = "photo_\(Int(timestamp))\(resolutionSuffix).heic"
 
-            // Log photo capture details and validate file size
             let fileSizeMB = Double(imageData.count) / (1024 * 1024)
             let isHighResolution = (width >= 8000 || height >= 6000)
             let maxSizeMB = isHighResolution ? 15.0 : 5.0
@@ -517,9 +544,8 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
                 print("CameraManager: Photo size within target limits")
             }
 
-            // Save to session directory if session is active, otherwise to test shots
             let isSessionActive = DispatchQueue.main.sync {
-                return self.sessionManager?.isSessionActive ?? false
+                self.sessionManager?.isSessionActive ?? false
             }
 
             if isSessionActive {
@@ -529,7 +555,8 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
                     width: Int(width),
                     height: Int(height),
                     roiRect: roiRect,
-                    triggerType: triggerType
+                    triggerType: triggerType,
+                    depthData: depthData
                 )
                 DispatchQueue.main.async {
                     self.savePhotoToSession(params)
@@ -549,6 +576,7 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
         let height: Int
         let roiRect: CGRect
         let triggerType: TriggerType
+        let depthData: AVDepthData?
     }
 
     @MainActor
@@ -591,7 +619,11 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
 
             // Process background removal if enabled
             if self.backgroundRemovalEnabled {
-                self.processBackgroundRemoval(imageData: params.imageData, filename: params.filename)
+                self.processBackgroundRemoval(
+                    imageData: params.imageData,
+                    filename: params.filename,
+                    depthData: params.depthData
+                )
             } else {
                 // Also save to photo library if user has granted permission
                 self.saveToPhotoLibrary(imageData: params.imageData)
@@ -771,7 +803,7 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
         }
     }
 
-    private func saveToPhotoLibrary(imageData: Data) {
+    func saveToPhotoLibrary(imageData: Data) {
         // Check photo library authorization status
         let status = PHPhotoLibrary.authorizationStatus()
 
@@ -803,94 +835,6 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
             print("CameraManager: Photo library access denied or restricted")
         @unknown default:
             print("CameraManager: Unknown photo library authorization status")
-        }
-    }
-
-    private func processBackgroundRemoval(imageData: Data, filename: String) {
-        print("CameraManager: Starting background removal for \(filename)")
-
-        // Use LiDAR-based background removal if available
-        if useLiDARDetection && lidarDetector.isLiDARAvailable {
-            processLiDARBackgroundRemoval(imageData: imageData, filename: filename)
-        } else {
-            // Fallback to traditional background removal
-            backgroundRemover.removeBackgroundFromPhotoData(imageData) { [weak self] processedData in
-                guard let self = self, let processedData = processedData else {
-                    print("CameraManager: Background removal failed for \(filename)")
-                    // Fallback to saving original to photo library
-                    self?.saveToPhotoLibrary(imageData: imageData)
-                    return
-                }
-
-                print("CameraManager: Background removal completed for \(filename)")
-
-                // Save processed version to photo library
-                if let processedImage = UIImage(data: processedData) {
-                    UIImageWriteToSavedPhotosAlbum(processedImage, nil, nil, nil)
-                    print("CameraManager: Processed photo saved to photo library")
-                }
-
-                // Also save original to photo library for comparison
-                self.saveToPhotoLibrary(imageData: imageData)
-            }
-        }
-    }
-
-    private func processLiDARBackgroundRemoval(imageData: Data, filename: String) {
-        guard let image = UIImage(data: imageData) else {
-            print("CameraManager: LiDAR background removal failed - invalid image data")
-            saveToPhotoLibrary(imageData: imageData)
-            return
-        }
-
-        guard let depthData = lidarDetector.latestDepthData else {
-            print("CameraManager: LiDAR background removal failed - no depth data available")
-            print("CameraManager: Falling back to traditional background removal")
-
-            // Fallback to traditional background removal
-            backgroundRemover.removeBackgroundFromPhotoData(imageData) { [weak self] processedData in
-                guard let self = self, let processedData = processedData else {
-                    print("CameraManager: Traditional background removal also failed for \(filename)")
-                    self?.saveToPhotoLibrary(imageData: imageData)
-                    return
-                }
-
-                print("CameraManager: Traditional background removal completed for \(filename)")
-
-                // Save processed version to photo library
-                if let processedImage = UIImage(data: processedData) {
-                    UIImageWriteToSavedPhotosAlbum(processedImage, nil, nil, nil)
-                    print("CameraManager: Traditional processed photo saved to photo library")
-                }
-
-                // Also save original to photo library for comparison
-                self.saveToPhotoLibrary(imageData: imageData)
-            }
-            return
-        }
-
-        print("CameraManager: Using cached LiDAR depth data for background removal")
-
-        lidarBackgroundRemover.removeBackgroundFromPhotoDataWithLiDAR(
-            imageData: imageData,
-            depthData: depthData
-        ) { [weak self] processedData in
-            guard let self = self, let processedData = processedData else {
-                print("CameraManager: LiDAR background removal failed for \(filename)")
-                self?.saveToPhotoLibrary(imageData: imageData)
-                return
-            }
-
-            print("CameraManager: LiDAR background removal completed for \(filename)")
-
-            // Save processed version to photo library
-            if let processedImage = UIImage(data: processedData) {
-                UIImageWriteToSavedPhotosAlbum(processedImage, nil, nil, nil)
-                print("CameraManager: LiDAR processed photo saved to photo library")
-            }
-
-            // Also save original to photo library for comparison
-            self.saveToPhotoLibrary(imageData: imageData)
         }
     }
 
@@ -983,7 +927,10 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
         }
     }
 
-    private func restartCaptureSessionIfNeeded() {
+    // MARK: - Automatic Capture Workflow
+
+
+    func restartCaptureSessionIfNeeded() {
         sessionQueue.async { [weak self] in
             guard let self = self else { return }
 

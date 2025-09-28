@@ -139,7 +139,7 @@ class LiDARDetector: NSObject, ObservableObject {
 
         arSession?.pause()
         isSessionRunning = false
-        depthData = nil
+        depthData = latestDepthData
         stopDepthDataTimeout()
         print("LiDARDetector: Stopped LiDAR detection")
     }
@@ -497,4 +497,5 @@ struct VehicleInfo {
 
 extension Notification.Name {
     static let LiDARScanCompleted = Notification.Name("LiDARScanCompleted")
+    static let BackgroundSamplingCompleted = Notification.Name("BackgroundSamplingCompleted")
 }
