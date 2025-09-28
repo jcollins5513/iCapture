@@ -33,14 +33,14 @@ Based on master-plan.md. Update by checking off completed tasks.
 - [x] **3.8** Test interval capture with mock vehicle
 
 ## Milestone 4: Stop-Based Capture Working
-- [ ] **4.1** Implement optical flow calculation
-- [ ] **4.2** Add motion magnitude computation over ROI
-- [ ] **4.3** Create sliding window for motion history (15 frames)
-- [ ] **4.4** Implement median filter for motion stability
-- [ ] **4.5** Add stop detection logic (motion < ε for 0.7s)
-- [ ] **4.6** Integrate stop detection with ROI occupancy
-- [ ] **4.7** Add debounce mechanism (1.2s between shots)
-- [ ] **4.8** Test stop-based capture with real motion
+- [x] **4.1** Implement optical flow calculation
+- [x] **4.2** Add motion magnitude computation over ROI
+- [x] **4.3** Create sliding window for motion history (15 frames)
+- [x] **4.4** Implement median filter for motion stability
+- [x] **4.5** Add stop detection logic (motion < ε for 0.7s)
+- [x] **4.6** Integrate stop detection with ROI occupancy
+- [x] **4.7** Add debounce mechanism (1.2s between shots)
+- [x] **4.8** Test stop-based capture with real motion
 
 ## Milestone 5: Session Storage + Per-Stock Folders + JSON Export
 - [ ] **5.1** Create VehicleSession data model
@@ -126,9 +126,12 @@ Based on master-plan.md. Update by checking off completed tasks.
 - Milestone 1 progress: 8/8 tasks completed ✅
 - Milestone 2 progress: 8/8 tasks completed ✅
 - Milestone 3 progress: 8/8 tasks completed ✅
+- Milestone 4 progress: 8/8 tasks completed ✅
 - Authentication gate: ✅ Basic mock auth implemented
 - ROI occupancy detection: ✅ Implemented with Vision framework
 - Interval capture system: ✅ Working with 5s timer and debounce
 - Background learning: ✅ 1s baseline sampling with progress UI
 - Capture feedback: ✅ Flash, haptic, and sound feedback
-- Next focus: Begin Milestone 4 - Stop-Based Capture Working
+- Motion detection: ✅ Optical flow calculation with stop detection
+- Stop-based capture: ✅ Integrated with ROI occupancy and debounce
+- Next focus: Begin Milestone 5 - Session Storage + Per-Stock Folders + JSON Export
