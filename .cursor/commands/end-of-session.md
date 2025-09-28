@@ -1,5 +1,7 @@
 Generate Next session Prompt and include it in chat.
 
+-always Run swiftlint and commit changes
+
 - Provide a clean cursor-ready prompt I can use at the start of my next conversation.
 - The prompt should be included in the start-of-session.md file.
   - Reference the updated section of `granular-plan.md`
