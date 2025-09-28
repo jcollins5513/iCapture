@@ -7,6 +7,7 @@
 
 import Combine
 import Foundation
+import SwiftUI
 
 @MainActor
 class TriggerEngine: ObservableObject {
@@ -133,8 +134,18 @@ class TriggerEngine: ObservableObject {
         guard isStopCaptureActive else { return }
 
         if isStopped {
-            // Vehicle has stopped, trigger capture
-            triggerStopCapture()
+            // Vehicle has stopped, trigger capture with additional debouncing
+            // Only trigger if we haven't captured recently
+            if let lastDebounce = lastDebounceTime {
+                let timeSinceLastCapture = Date().timeIntervalSince(lastDebounce)
+                if timeSinceLastCapture >= debounceDuration {
+                    triggerStopCapture()
+                } else {
+                    print("TriggerEngine: Stop capture skipped - too soon after last capture")
+                }
+            } else {
+                triggerStopCapture()
+            }
         }
     }
     
@@ -211,6 +222,13 @@ class TriggerEngine: ObservableObject {
             return
         }
 
+        // Check capture limit before proceeding
+        if captureCount >= maxCapturesPerSession {
+            print("TriggerEngine: Capture limit reached (\(maxCapturesPerSession)), stopping session")
+            stopSession()
+            return
+        }
+
         print("TriggerEngine: Triggering interval capture #\(captureCount + 1)")
 
         // Update capture tracking
@@ -224,7 +242,7 @@ class TriggerEngine: ObservableObject {
         // Trigger capture feedback
         cameraManager.triggerCaptureFeedback()
 
-        // Check if we've reached the capture limit
+        // Check if we've reached the capture limit after this capture
         if captureCount >= maxCapturesPerSession {
             print("TriggerEngine: Reached capture limit (\(maxCapturesPerSession))")
             stopSession()
@@ -234,6 +252,13 @@ class TriggerEngine: ObservableObject {
     private func performStopCapture() {
         guard let cameraManager = cameraManager else {
             print("TriggerEngine: No camera manager available")
+            return
+        }
+
+        // Check capture limit before proceeding
+        if captureCount >= maxCapturesPerSession {
+            print("TriggerEngine: Capture limit reached (\(maxCapturesPerSession)), stopping session")
+            stopSession()
             return
         }
 
@@ -250,7 +275,7 @@ class TriggerEngine: ObservableObject {
         // Trigger capture feedback
         cameraManager.triggerCaptureFeedback()
 
-        // Check if we've reached the capture limit
+        // Check if we've reached the capture limit after this capture
         if captureCount >= maxCapturesPerSession {
             print("TriggerEngine: Reached capture limit (\(maxCapturesPerSession))")
             stopSession()

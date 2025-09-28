@@ -127,6 +127,23 @@ struct CameraView: View {
                                 Text("Photo: \(resolutionText) \(photoInfo.format)")
                                     .font(.caption)
                                     .foregroundColor(.cyan)
+                                
+                                // LiDAR status
+                                if cameraManager.useLiDARDetection {
+                                    if cameraManager.lidarDetector.isLiDARAvailable {
+                                        Text("LiDAR: Active")
+                                            .font(.caption)
+                                            .foregroundColor(.green)
+                                    } else {
+                                        Text("LiDAR: Unavailable")
+                                            .font(.caption)
+                                            .foregroundColor(.red)
+                                    }
+                                } else {
+                                    Text("Detection: Traditional")
+                                        .font(.caption)
+                                        .foregroundColor(.yellow)
+                                }
                             }
                         }
                         .padding()
@@ -151,17 +168,23 @@ struct CameraView: View {
 
                         Spacer()
 
-                        // Background sampling button
+                        // Background sampling button (LiDAR or traditional)
                         Button(action: {
-                            cameraManager.roiDetector.startBackgroundSampling()
+                            if cameraManager.useLiDARDetection && cameraManager.lidarDetector.isLiDARAvailable {
+                                cameraManager.lidarDetector.learnBackground()
+                            } else {
+                                cameraManager.roiDetector.startBackgroundSampling()
+                            }
                         }, label: {
-                            Image(systemName: cameraManager.roiDetector.isBackgroundSampling ?
-                                  "waveform" : "brain.head.profile")
+                            Image(systemName: cameraManager.useLiDARDetection ? 
+                                  "sensor.tag.radiowaves.forward.fill" : 
+                                  (cameraManager.roiDetector.isBackgroundSampling ? "waveform" : "brain.head.profile"))
                                 .font(.title2)
                                 .foregroundColor(.white)
                                 .padding()
-                                .background(cameraManager.roiDetector.isBackgroundSampling ?
-                                           Color.orange : Color.blue)
+                                .background(cameraManager.useLiDARDetection ? 
+                                           (cameraManager.lidarDetector.isBackgroundLearned ? Color.green : Color.purple) :
+                                           (cameraManager.roiDetector.isBackgroundSampling ? Color.orange : Color.blue))
                                 .clipShape(Circle())
                         })
                         .disabled(cameraManager.roiDetector.isBackgroundSampling)
