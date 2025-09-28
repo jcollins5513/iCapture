@@ -68,7 +68,7 @@ struct CameraView: View {
                                         .font(.caption)
                                         .foregroundColor(.orange)
                                 }
-                                
+
                                 // Motion detection status
                                 if cameraManager.motionDetector.isVehicleStopped {
                                     Text("Vehicle: STOPPED")

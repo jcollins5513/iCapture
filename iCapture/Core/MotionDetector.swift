@@ -15,55 +15,63 @@ class MotionDetector: ObservableObject {
     @Published var motionMagnitude: Double = 0.0
     @Published var isVehicleStopped = false
     @Published var motionHistory: [Double] = []
-    
+
     // Motion detection parameters
     private let motionThreshold: Double = 0.1 // ε threshold for stop detection
     private let stopDetectionDuration: TimeInterval = 0.7 // 0.7 seconds of low motion
     private let historyWindowSize = 15 // 15 frames at 30fps
-    
+
     // Frame history for optical flow calculation
     private var previousFrame: CVPixelBuffer?
     private var motionHistoryBuffer: [Double] = []
     private var stopDetectionStartTime: Date?
-    
+
     // ROI configuration
     private var roiRect: CGRect = CGRect(x: 50, y: 200, width: 300, height: 200)
-    
+
     // Processing queue
     private let processingQueue = DispatchQueue(label: "motion.detection.queue", qos: .userInitiated)
-    
+
     init() {
         loadMotionConfiguration()
     }
-    
+
     // MARK: - Public Interface
-    
+
     func updateROIRect(_ rect: CGRect) {
         roiRect = rect
         saveMotionConfiguration()
         resetMotionDetection()
     }
-    
+
     func getROIRect() -> CGRect {
         return roiRect
     }
-    
+
     func processFrame(_ pixelBuffer: CVPixelBuffer) {
         // Get local copies of needed properties
         let localPreviousFrame = previousFrame
         let localROIRect = roiRect
-        
+
         if let previousFrame = localPreviousFrame {
             processingQueue.async { [weak self] in
                 guard let self = self else { return }
-                
+
                 // Calculate motion on background queue
+                let bufferWidth = CVPixelBufferGetWidth(pixelBuffer)
+                let bufferHeight = CVPixelBufferGetHeight(pixelBuffer)
+                let roiInBuffer = self.convertROIToBufferCoordinates(
+                    roiRect: localROIRect,
+                    bufferWidth: bufferWidth,
+                    bufferHeight: bufferHeight
+                )
+
                 let motionMag = self.calculateMotionMagnitudeInROI(
                     currentFrame: pixelBuffer,
                     previousFrame: previousFrame,
-                    roi: self.convertROIToBufferCoordinates(roiRect: localROIRect, bufferWidth: CVPixelBufferGetWidth(pixelBuffer), bufferHeight: CVPixelBufferGetHeight(pixelBuffer))
+                    roi: roiInBuffer
                 )
-                
+
                 // Update on main actor
                 Task { @MainActor in
                     self.updateMotionHistory(motionMag)
@@ -73,11 +81,11 @@ class MotionDetector: ObservableObject {
                 }
             }
         }
-        
+
         // Store current frame for next calculation
         previousFrame = pixelBuffer
     }
-    
+
     func resetMotionDetection() {
         previousFrame = nil
         motionHistoryBuffer.removeAll()
@@ -86,20 +94,20 @@ class MotionDetector: ObservableObject {
         stopDetectionStartTime = nil
         motionMagnitude = 0.0
     }
-    
+
     func setMotionThreshold(_ threshold: Double) {
         // Clamp threshold between 0.01 and 1.0
-        let _ = max(0.01, min(1.0, threshold))
+        _ = max(0.01, min(1.0, threshold))
         // Note: This would require updating the stored configuration
         // For now, we'll keep it constant as per the specification
     }
-    
+
     func getMotionThreshold() -> Double {
         return motionThreshold
     }
-    
+
     // MARK: - Private Methods
-    
+
     private func convertROIToBufferCoordinates(roiRect: CGRect, bufferWidth: Int, bufferHeight: Int) -> CGRect {
         return CGRect(
             x: roiRect.origin.x * CGFloat(bufferWidth) / 400, // Assuming 400pt screen width
@@ -108,7 +116,7 @@ class MotionDetector: ObservableObject {
             height: roiRect.height * CGFloat(bufferHeight) / 800
         )
     }
-    
+
     private func calculateMotionMagnitudeInROI(
         currentFrame: CVPixelBuffer,
         previousFrame: CVPixelBuffer,
@@ -121,31 +129,31 @@ class MotionDetector: ObservableObject {
             CVPixelBufferUnlockBaseAddress(currentFrame, .readOnly)
             CVPixelBufferUnlockBaseAddress(previousFrame, .readOnly)
         }
-        
+
         guard let currentBaseAddress = CVPixelBufferGetBaseAddress(currentFrame),
               let previousBaseAddress = CVPixelBufferGetBaseAddress(previousFrame) else {
             return 0.0
         }
-        
+
         let width = CVPixelBufferGetWidth(currentFrame)
         let height = CVPixelBufferGetHeight(currentFrame)
         let bytesPerRow = CVPixelBufferGetBytesPerRow(currentFrame)
-        
+
         // Convert to 8-bit grayscale for analysis
         let currentPixels = currentBaseAddress.assumingMemoryBound(to: UInt8.self)
         let previousPixels = previousBaseAddress.assumingMemoryBound(to: UInt8.self)
-        
+
         // Calculate bounds within the ROI
         let startX = max(0, Int(roi.origin.x))
         let startY = max(0, Int(roi.origin.y))
         let endX = min(width, Int(roi.origin.x + roi.width))
         let endY = min(height, Int(roi.origin.y + roi.height))
-        
+
         guard startX < endX && startY < endY else { return 0.0 }
-        
+
         var totalMotion: Double = 0
         var pixelCount = 0
-        
+
         // Sample pixels in the ROI (every 4th pixel for performance)
         for rowY in stride(from: startY, to: endY, by: 4) {
             for colX in stride(from: startX, to: endX, by: 4) {
@@ -153,7 +161,7 @@ class MotionDetector: ObservableObject {
                 if pixelIndex < bytesPerRow * height {
                     let currentIntensity = Double(currentPixels[pixelIndex])
                     let previousIntensity = Double(previousPixels[pixelIndex])
-                    
+
                     // Calculate pixel-level motion (intensity difference)
                     let pixelMotion = abs(currentIntensity - previousIntensity)
                     totalMotion += pixelMotion
@@ -161,34 +169,34 @@ class MotionDetector: ObservableObject {
                 }
             }
         }
-        
+
         guard pixelCount > 0 else { return 0.0 }
-        
+
         // Calculate average motion magnitude
         let averageMotion = totalMotion / Double(pixelCount)
-        
+
         // Normalize motion magnitude (0.0 to 1.0)
         let normalizedMotion = min(averageMotion / 255.0, 1.0)
-        
+
         return normalizedMotion
     }
-    
+
     private func updateMotionHistory(_ motionMag: Double) {
         motionHistoryBuffer.append(motionMag)
-        
+
         // Keep only the last 15 frames
         if motionHistoryBuffer.count > historyWindowSize {
             motionHistoryBuffer.removeFirst()
         }
     }
-    
+
     private func checkStopCondition() {
         guard motionHistoryBuffer.count >= historyWindowSize else { return }
-        
+
         // Calculate median motion over the sliding window
         let sortedMotion = motionHistoryBuffer.sorted()
         let medianMotion = sortedMotion[sortedMotion.count / 2]
-        
+
         // Check if motion is below threshold
         if medianMotion < motionThreshold {
             if stopDetectionStartTime == nil {
@@ -210,9 +218,9 @@ class MotionDetector: ObservableObject {
             }
         }
     }
-    
+
     // MARK: - Persistence
-    
+
     private func saveMotionConfiguration() {
         let motionData = [
             "x": roiRect.origin.x,
@@ -223,7 +231,7 @@ class MotionDetector: ObservableObject {
         ]
         UserDefaults.standard.set(motionData, forKey: "motionConfiguration")
     }
-    
+
     private func loadMotionConfiguration() {
         if let motionData = UserDefaults.standard.dictionary(forKey: "motionConfiguration"),
            let xValue = motionData["x"] as? CGFloat,
