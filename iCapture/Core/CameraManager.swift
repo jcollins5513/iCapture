@@ -58,16 +58,24 @@ class CameraManager: NSObject, ObservableObject {
     // Orientation handling
     private var lastVideoOrientation: AVCaptureVideoOrientation?
     private var orientationUpdateTimer: Timer?
-    fileprivate var lastLiDARProcessingState: Bool?
-    fileprivate enum AutoCaptureWorkflowState {
+    var lastLiDARProcessingState: Bool?
+    enum AutoCaptureWorkflowState {
         case idle
         case waitingForLiDAR
         case waitingForBackground
     }
-    fileprivate var autoCaptureState: AutoCaptureWorkflowState = .idle
-    fileprivate var shouldAutoStartTriggers = false
-    fileprivate var backgroundSamplingWorkItem: DispatchWorkItem?
+    var autoCaptureState: AutoCaptureWorkflowState = .idle
+    var shouldAutoStartTriggers = false
+    var backgroundSamplingWorkItem: DispatchWorkItem?
+    var backgroundSamplingTimeoutWorkItem: DispatchWorkItem?
     private var pendingTriggerType: TriggerType = .manual
+
+    private final class PixelBufferBox: @unchecked Sendable {
+        let buffer: CVPixelBuffer
+        init(_ buffer: CVPixelBuffer) {
+            self.buffer = buffer
+        }
+    }
 
     override init() {
         super.init()
@@ -454,8 +462,10 @@ extension CameraManager: AVCaptureVideoDataOutputSampleBufferDelegate {
                        from connection: AVCaptureConnection) {
         // Process frame for ROI detection
         guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { return }
+        let pixelBufferBox = PixelBufferBox(pixelBuffer)
 
-        DispatchQueue.main.async {
+        DispatchQueue.main.async { [weak self, pixelBufferBox] in
+            guard let self = self else { return }
             // Record frame for performance monitoring
             self.performanceMonitor.recordFrame()
 
@@ -481,9 +491,10 @@ extension CameraManager: AVCaptureVideoDataOutputSampleBufferDelegate {
                 }
                 self.lastLiDARProcessingState = false
                 // Traditional frame processing
-                self.roiDetector.processFrame(pixelBuffer)
-                self.motionDetector.processFrame(pixelBuffer)
-                self.vehicleDetector.processFrame(pixelBuffer)
+                let buffer = pixelBufferBox.buffer
+                self.roiDetector.processFrame(buffer)
+                self.motionDetector.processFrame(buffer)
+                self.vehicleDetector.processFrame(buffer)
             }
         }
     }
@@ -622,7 +633,8 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
                 self.processBackgroundRemoval(
                     imageData: params.imageData,
                     filename: params.filename,
-                    depthData: params.depthData
+                    depthData: params.depthData,
+                    sessionFileURL: fileURL
                 )
             } else {
                 // Also save to photo library if user has granted permission
