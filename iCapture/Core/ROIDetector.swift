@@ -31,9 +31,6 @@ class ROIDetector: ObservableObject {
     // ROI configuration
     private var roiRect: CGRect = CGRect(x: 50, y: 200, width: 300, height: 200)
 
-    // Processing queue
-    private let processingQueue = DispatchQueue(label: "roi.detection.queue", qos: .userInitiated)
-
     init() {
         loadROIConfiguration()
     }
@@ -63,14 +60,10 @@ class ROIDetector: ObservableObject {
     }
 
     func processFrame(_ pixelBuffer: CVPixelBuffer) {
-        processingQueue.async { [weak self] in
-            guard let self = self else { return }
-
-            if self.isBackgroundSampling {
-                self.processBackgroundFrame(pixelBuffer)
-            } else if self.isBackgroundLearned {
-                self.processOccupancyFrame(pixelBuffer)
-            }
+        if isBackgroundSampling {
+            processBackgroundFrame(pixelBuffer)
+        } else if isBackgroundLearned {
+            processOccupancyFrame(pixelBuffer)
         }
     }
 
@@ -147,7 +140,7 @@ class ROIDetector: ObservableObject {
         do {
             try handler.perform([request])
 
-            if let result = request.results?.first {
+            if request.results?.first != nil {
                 // Convert the result to a usable mask
                 // For now, we'll use a simplified approach
                 // In a full implementation, we'd convert the instance mask to a pixel buffer

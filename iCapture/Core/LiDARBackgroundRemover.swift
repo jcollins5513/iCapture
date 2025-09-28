@@ -9,6 +9,7 @@ import ARKit
 import AVFoundation
 import UIKit
 import CoreImage
+import Combine
 
 @MainActor
 class LiDARBackgroundRemover: ObservableObject {
@@ -70,7 +71,7 @@ class LiDARBackgroundRemover: ObservableObject {
             return
         }
 
-        removeBackground(image: image, depthMap: depthMap) { [weak self] processedImage in
+        removeBackground(image: image, depthMap: depthMap) { processedImage in
             guard let processedImage = processedImage else {
                 completion(nil)
                 return
