@@ -29,6 +29,7 @@ class TriggerEngine: ObservableObject {
     private weak var cameraManager: CameraManager?
     private weak var roiDetector: ROIDetector?
     private weak var motionDetector: MotionDetector?
+    private weak var vehicleDetector: VehicleDetector?
 
     // Cancellables for Combine subscriptions
     private var cancellables = Set<AnyCancellable>()
@@ -37,15 +38,23 @@ class TriggerEngine: ObservableObject {
         // Will be configured with dependencies after initialization
     }
 
-    func configure(cameraManager: CameraManager, roiDetector: ROIDetector, motionDetector: MotionDetector) {
+    func configure(cameraManager: CameraManager, roiDetector: ROIDetector, motionDetector: MotionDetector, vehicleDetector: VehicleDetector) {
         self.cameraManager = cameraManager
         self.roiDetector = roiDetector
         self.motionDetector = motionDetector
+        self.vehicleDetector = vehicleDetector
 
         // Subscribe to ROI occupancy changes
         roiDetector.$isROIOccupied
             .sink { [weak self] isOccupied in
                 self?.handleROIOccupancyChange(isOccupied)
+            }
+            .store(in: &cancellables)
+        
+        // Subscribe to vehicle detection changes
+        vehicleDetector.$isVehicleDetected
+            .sink { [weak self] isVehicleDetected in
+                self?.handleVehicleDetectionChange(isVehicleDetected)
             }
             .store(in: &cancellables)
 
@@ -126,6 +135,21 @@ class TriggerEngine: ObservableObject {
         if isStopped {
             // Vehicle has stopped, trigger capture
             triggerStopCapture()
+        }
+    }
+    
+    private func handleVehicleDetectionChange(_ isVehicleDetected: Bool) {
+        // Handle vehicle detection changes
+        if isVehicleDetected {
+            print("TriggerEngine: Vehicle detected - enabling capture triggers")
+            // Vehicle detected, ensure capture triggers are active
+            if roiDetector?.isROIOccupied == true {
+                startIntervalTimer()
+            }
+        } else {
+            print("TriggerEngine: Vehicle lost - disabling capture triggers")
+            // Vehicle lost, stop capture triggers
+            stopIntervalTimer()
         }
     }
 

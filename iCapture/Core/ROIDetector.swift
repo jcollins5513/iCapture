@@ -180,23 +180,33 @@ class ROIDetector: ObservableObject {
         let bufferWidth = CVPixelBufferGetWidth(pixelBuffer)
         let bufferHeight = CVPixelBufferGetHeight(pixelBuffer)
 
-        // For now, implement a simplified occupancy calculation
-        // This is a placeholder that will be enhanced with proper Vision framework processing
-
+        // Get the screen bounds to properly convert coordinates
+        let screenBounds = UIScreen.main.bounds
+        
         // Convert screen coordinates to buffer coordinates
-        // Note: This is a simplified conversion - in practice, you'd need proper coordinate transformation
+        // Note: This assumes the preview layer fills the screen
         let roiInBuffer = CGRect(
-            x: roiRect.origin.x * CGFloat(bufferWidth) / 400, // Assuming 400pt screen width
-            y: roiRect.origin.y * CGFloat(bufferHeight) / 800, // Assuming 800pt screen height
-            width: roiRect.width * CGFloat(bufferWidth) / 400,
-            height: roiRect.height * CGFloat(bufferHeight) / 800
+            x: roiRect.origin.x * CGFloat(bufferWidth) / screenBounds.width,
+            y: roiRect.origin.y * CGFloat(bufferHeight) / screenBounds.height,
+            width: roiRect.width * CGFloat(bufferWidth) / screenBounds.width,
+            height: roiRect.height * CGFloat(bufferHeight) / screenBounds.height
         )
 
-        // Simplified occupancy calculation using pixel intensity variance
-        // In a real implementation, this would use proper foreground detection
-        let occupancy = calculatePixelVarianceInROI(pixelBuffer, roi: roiInBuffer)
+        // Ensure ROI is within buffer bounds
+        let clampedROI = CGRect(
+            x: max(0, min(roiInBuffer.origin.x, CGFloat(bufferWidth))),
+            y: max(0, min(roiInBuffer.origin.y, CGFloat(bufferHeight))),
+            width: min(roiInBuffer.width, CGFloat(bufferWidth) - roiInBuffer.origin.x),
+            height: min(roiInBuffer.height, CGFloat(bufferHeight) - roiInBuffer.origin.y)
+        )
 
-        return occupancy
+        // Use Vision framework for more accurate foreground detection
+        if let backgroundBuffer = backgroundBuffer {
+            return calculateForegroundOccupancy(currentFrame: pixelBuffer, backgroundFrame: backgroundBuffer, roi: clampedROI)
+        } else {
+            // Fallback to pixel variance if no background is available
+            return calculatePixelVarianceInROI(pixelBuffer, roi: clampedROI)
+        }
     }
 
     private func calculatePixelVarianceInROI(_ pixelBuffer: CVPixelBuffer, roi: CGRect) -> Double {
@@ -251,6 +261,63 @@ class ROIDetector: ObservableObject {
         let normalizedVariance = min(variance / 1000.0, 1.0) // Scale factor may need adjustment
 
         return normalizedVariance
+    }
+    
+    private func calculateForegroundOccupancy(currentFrame: CVPixelBuffer, backgroundFrame: CVPixelBuffer, roi: CGRect) -> Double {
+        // Lock both pixel buffers
+        CVPixelBufferLockBaseAddress(currentFrame, .readOnly)
+        CVPixelBufferLockBaseAddress(backgroundFrame, .readOnly)
+        defer {
+            CVPixelBufferUnlockBaseAddress(currentFrame, .readOnly)
+            CVPixelBufferUnlockBaseAddress(backgroundFrame, .readOnly)
+        }
+        
+        guard let currentBaseAddress = CVPixelBufferGetBaseAddress(currentFrame),
+              let backgroundBaseAddress = CVPixelBufferGetBaseAddress(backgroundFrame) else {
+            return 0.0
+        }
+        
+        let width = CVPixelBufferGetWidth(currentFrame)
+        let height = CVPixelBufferGetHeight(currentFrame)
+        let bytesPerRow = CVPixelBufferGetBytesPerRow(currentFrame)
+        
+        // Convert to 8-bit grayscale for analysis
+        let currentPixels = currentBaseAddress.assumingMemoryBound(to: UInt8.self)
+        let backgroundPixels = backgroundBaseAddress.assumingMemoryBound(to: UInt8.self)
+        
+        // Calculate bounds within the ROI
+        let startX = max(0, Int(roi.origin.x))
+        let startY = max(0, Int(roi.origin.y))
+        let endX = min(width, Int(roi.origin.x + roi.width))
+        let endY = min(height, Int(roi.origin.y + roi.height))
+        
+        guard startX < endX && startY < endY else { return 0.0 }
+        
+        var foregroundPixels = 0
+        var totalPixels = 0
+        let threshold = 30 // Intensity difference threshold for foreground detection
+        
+        // Sample pixels in the ROI (every 2nd pixel for performance)
+        for rowY in stride(from: startY, to: endY, by: 2) {
+            for colX in stride(from: startX, to: endX, by: 2) {
+                let pixelIndex = rowY * bytesPerRow + colX
+                if pixelIndex < bytesPerRow * height {
+                    let currentIntensity = Int(currentPixels[pixelIndex])
+                    let backgroundIntensity = Int(backgroundPixels[pixelIndex])
+                    let difference = abs(currentIntensity - backgroundIntensity)
+                    
+                    if difference > threshold {
+                        foregroundPixels += 1
+                    }
+                    totalPixels += 1
+                }
+            }
+        }
+        
+        guard totalPixels > 0 else { return 0.0 }
+        
+        // Return the percentage of foreground pixels
+        return Double(foregroundPixels) / Double(totalPixels)
     }
 
     // MARK: - Persistence

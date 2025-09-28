@@ -133,12 +133,14 @@ class SessionManager: ObservableObject {
     // MARK: - Asset Management
 
     func addAsset(_ asset: CaptureAsset) throws {
-        guard isSessionActive, let session = currentSession else {
+        guard isSessionActive, let session = currentSession, let sessionURL = sessionDirectory else {
             throw SessionError.noActiveSession
         }
 
-        // Ensure asset file exists
-        guard asset.fileExists else {
+        // Check if asset file exists using the correct session directory
+        let assetFileURL = asset.getFileURL(with: sessionURL)
+        guard FileManager.default.fileExists(atPath: assetFileURL.path) else {
+            print("SessionManager: Asset file not found at: \(assetFileURL.path)")
             throw SessionError.assetFileNotFound
         }
 
