@@ -70,6 +70,23 @@ class CameraManager: NSObject, ObservableObject {
         
         // Initialize LiDAR detection if available
         initializeLiDARDetection()
+        
+        // Listen for LiDAR timeout notifications
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleLiDARTimeout),
+            name: NSNotification.Name("LiDARDetectionTimeout"),
+            object: nil
+        )
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    @objc private func handleLiDARTimeout() {
+        print("CameraManager: LiDAR detection timeout - disabling LiDAR and switching to traditional detection")
+        disableLiDARDetection()
     }
 
     @MainActor
@@ -198,10 +215,8 @@ class CameraManager: NSObject, ObservableObject {
                     print("CameraManager: WARNING - Preview layer is nil!")
                 }
                 
-                // Start LiDAR detection if available
-                if self.useLiDARDetection {
-                    self.lidarDetector.startLiDARDetection()
-                }
+                // LiDAR detection will be started manually when needed
+                // Don't start it automatically to avoid camera conflicts
                 
                 // Start debugging if enabled
                 if self.cameraDebugger.isDebugMode {
@@ -403,8 +418,12 @@ extension CameraManager: AVCaptureVideoDataOutputSampleBufferDelegate {
                 // LiDAR handles ROI detection and vehicle detection automatically
                 // No need to process frames with traditional methods
                 print("CameraManager: Using LiDAR detection for frame processing")
+                print("CameraManager: - useLiDARDetection: \(self.useLiDARDetection)")
+                print("CameraManager: - LiDAR available: \(self.lidarDetector.isLiDARAvailable)")
+                print("CameraManager: - Depth data available: \(self.lidarDetector.depthData != nil)")
             } else {
                 // Traditional frame processing
+                print("CameraManager: Using traditional frame processing")
                 self.roiDetector.processFrame(pixelBuffer)
                 self.motionDetector.processFrame(pixelBuffer)
                 self.vehicleDetector.processFrame(pixelBuffer)
@@ -787,10 +806,35 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
     }
     
     private func processLiDARBackgroundRemoval(imageData: Data, filename: String) {
-        guard let image = UIImage(data: imageData),
-              let depthData = lidarDetector.depthData else {
-            print("CameraManager: LiDAR background removal failed - no depth data")
+        guard let image = UIImage(data: imageData) else {
+            print("CameraManager: LiDAR background removal failed - invalid image data")
             saveToPhotoLibrary(imageData: imageData)
+            return
+        }
+        
+        guard let depthData = lidarDetector.depthData else {
+            print("CameraManager: LiDAR background removal failed - no depth data available")
+            print("CameraManager: Falling back to traditional background removal")
+            
+            // Fallback to traditional background removal
+            backgroundRemover.removeBackgroundFromPhotoData(imageData) { [weak self] processedData in
+                guard let self = self, let processedData = processedData else {
+                    print("CameraManager: Traditional background removal also failed for \(filename)")
+                    self?.saveToPhotoLibrary(imageData: imageData)
+                    return
+                }
+                
+                print("CameraManager: Traditional background removal completed for \(filename)")
+                
+                // Save processed version to photo library
+                if let processedImage = UIImage(data: processedData) {
+                    UIImageWriteToSavedPhotosAlbum(processedImage, nil, nil, nil)
+                    print("CameraManager: Traditional processed photo saved to photo library")
+                }
+                
+                // Also save original to photo library for comparison
+                self.saveToPhotoLibrary(imageData: imageData)
+            }
             return
         }
         
@@ -820,13 +864,50 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
     // MARK: - LiDAR Initialization
     
     private func initializeLiDARDetection() {
-        // Check if LiDAR is available and enable it
+        print("CameraManager: Initializing LiDAR detection...")
+        print("CameraManager: - LiDAR available: \(lidarDetector.isLiDARAvailable)")
+        
+        // Check if LiDAR is available but don't start it automatically
         if lidarDetector.isLiDARAvailable {
             useLiDARDetection = true
-            print("CameraManager: LiDAR detection enabled")
+            print("CameraManager: LiDAR detection available (will start on demand)")
+            print("CameraManager: - useLiDARDetection set to: \(useLiDARDetection)")
         } else {
             useLiDARDetection = false
             print("CameraManager: LiDAR not available, using traditional detection")
+            print("CameraManager: - useLiDARDetection set to: \(useLiDARDetection)")
         }
+    }
+    
+    // MARK: - Manual LiDAR Control
+    
+    func startLiDARDetection() {
+        guard lidarDetector.isLiDARAvailable else {
+            print("CameraManager: LiDAR not available")
+            return
+        }
+        
+        lidarDetector.startLiDARDetection()
+        print("CameraManager: LiDAR detection started manually")
+    }
+    
+    func stopLiDARDetection() {
+        lidarDetector.stopLiDARDetection()
+        print("CameraManager: LiDAR detection stopped")
+    }
+    
+    func disableLiDARDetection() {
+        useLiDARDetection = false
+        lidarDetector.stopLiDARDetection()
+        print("CameraManager: LiDAR detection disabled - switching to traditional detection")
+    }
+    
+    func enableLiDARDetection() {
+        guard lidarDetector.isLiDARAvailable else {
+            print("CameraManager: Cannot enable LiDAR - not available on this device")
+            return
+        }
+        useLiDARDetection = true
+        print("CameraManager: LiDAR detection enabled")
     }
 }

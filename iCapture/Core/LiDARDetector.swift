@@ -33,6 +33,10 @@ class LiDARDetector: NSObject, ObservableObject {
     // ROI configuration
     private var roiRect: CGRect = CGRect(x: 50, y: 200, width: 300, height: 200)
     
+    // Timeout mechanism
+    private var depthDataTimeoutTimer: Timer?
+    private let depthDataTimeout: TimeInterval = 10.0 // 10 seconds timeout
+    
     override init() {
         super.init()
         checkLiDARAvailability()
@@ -47,18 +51,100 @@ class LiDARDetector: NSObject, ObservableObject {
             return
         }
         
-        arSession?.run(ARWorldTrackingConfiguration())
-        print("LiDARDetector: Started LiDAR detection")
+        guard let session = arSession else {
+            print("LiDARDetector: ERROR - ARSession is nil!")
+            return
+        }
+        
+        // Check if device supports scene depth specifically
+        guard ARWorldTrackingConfiguration.supportsFrameSemantics(.sceneDepth) else {
+            print("LiDARDetector: ERROR - Device does not support scene depth!")
+            return
+        }
+        
+        // Ensure ARSession is running with depth sensing
+        let configuration = ARWorldTrackingConfiguration()
+        configuration.frameSemantics.insert(.sceneDepth) // Use insert instead of array
+        
+        // Add additional configuration for better depth data
+        if ARWorldTrackingConfiguration.supportsFrameSemantics(.smoothedSceneDepth) {
+            configuration.frameSemantics.insert(.smoothedSceneDepth)
+            print("LiDARDetector: Using smoothed scene depth for better quality")
+        }
+        
+        print("LiDARDetector: Starting ARSession with depth sensing...")
+        print("LiDARDetector: Configuration frame semantics: \(configuration.frameSemantics)")
+        print("LiDARDetector: Device supports scene depth: \(ARWorldTrackingConfiguration.supportsFrameSemantics(.sceneDepth))")
+        
+        session.run(configuration)
+        print("LiDARDetector: ARSession started successfully")
+        
+        // Start timeout timer
+        startDepthDataTimeout()
+        
+        // Add a timer to check if we're getting frames
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+            self.checkARSessionStatus()
+        }
+    }
+    
+    private func checkARSessionStatus() {
+        guard arSession != nil else {
+            print("LiDARDetector: ARSession status check failed - session is nil")
+            return
+        }
+        
+        print("LiDARDetector: ARSession status check:")
+        print("LiDARDetector: - Session exists: true")
+        print("LiDARDetector: - Depth data available: \(depthData != nil)")
+        print("LiDARDetector: - Background learned: \(isBackgroundLearned)")
+        print("LiDARDetector: - Vehicle detected: \(isVehicleDetected)")
+        
+        if let depth = depthData {
+            let width = CVPixelBufferGetWidth(depth.depthMap)
+            let height = CVPixelBufferGetHeight(depth.depthMap)
+            print("LiDARDetector: - Depth map size: \(width)x\(height)")
+        } else {
+            print("LiDARDetector: - No depth data received yet")
+        }
     }
     
     func stopLiDARDetection() {
         arSession?.pause()
+        stopDepthDataTimeout()
         print("LiDARDetector: Stopped LiDAR detection")
+    }
+    
+    private func startDepthDataTimeout() {
+        stopDepthDataTimeout() // Clear any existing timer
+        
+        depthDataTimeoutTimer = Timer.scheduledTimer(withTimeInterval: depthDataTimeout, repeats: false) { [weak self] _ in
+            Task { @MainActor in
+                await self?.handleDepthDataTimeout()
+            }
+        }
+        print("LiDARDetector: Started depth data timeout timer (\(depthDataTimeout)s)")
+    }
+    
+    private func stopDepthDataTimeout() {
+        depthDataTimeoutTimer?.invalidate()
+        depthDataTimeoutTimer = nil
+    }
+    
+    private func handleDepthDataTimeout() async {
+        print("LiDARDetector: WARNING - No depth data received within timeout period")
+        print("LiDARDetector: This may indicate a device compatibility issue")
+        print("LiDARDetector: Consider disabling LiDAR detection and using traditional methods")
+        
+        // Notify CameraManager to disable LiDAR detection
+        NotificationCenter.default.post(name: NSNotification.Name("LiDARDetectionTimeout"), object: nil)
     }
     
     func learnBackground() {
         guard let depthData = depthData else {
             print("LiDARDetector: No depth data available for background learning")
+            print("LiDARDetector: ARSession exists: \(arSession != nil)")
+            print("LiDARDetector: LiDAR available: \(isLiDARAvailable)")
             return
         }
         
@@ -67,6 +153,7 @@ class LiDARDetector: NSObject, ObservableObject {
         isBackgroundLearned = true
         
         print("LiDARDetector: Background learned using LiDAR depth data")
+        print("LiDARDetector: Depth map size: \(CVPixelBufferGetWidth(depthData.depthMap))x\(CVPixelBufferGetHeight(depthData.depthMap))")
     }
     
     func updateROIRect(_ rect: CGRect) {
@@ -77,33 +164,67 @@ class LiDARDetector: NSObject, ObservableObject {
         return roiRect
     }
     
+    func debugARSessionStatus() {
+        print("LiDARDetector: === ARSession Debug Status ===")
+        print("LiDARDetector: - isLiDARAvailable: \(isLiDARAvailable)")
+        print("LiDARDetector: - ARSession exists: \(arSession != nil)")
+        print("LiDARDetector: - ARSession delegate: \(arSession?.delegate != nil)")
+        print("LiDARDetector: - Depth data available: \(depthData != nil)")
+        print("LiDARDetector: - Background learned: \(isBackgroundLearned)")
+        print("LiDARDetector: - Vehicle detected: \(isVehicleDetected)")
+        
+        // Check device capabilities
+        print("LiDARDetector: - Device supports scene depth: \(ARWorldTrackingConfiguration.supportsFrameSemantics(.sceneDepth))")
+        print("LiDARDetector: - Device supports smoothed scene depth: \(ARWorldTrackingConfiguration.supportsFrameSemantics(.smoothedSceneDepth))")
+        
+        if let depth = depthData {
+            let width = CVPixelBufferGetWidth(depth.depthMap)
+            let height = CVPixelBufferGetHeight(depth.depthMap)
+            print("LiDARDetector: - Current depth map size: \(width)x\(height)")
+        } else {
+            print("LiDARDetector: - No depth data currently available")
+        }
+        print("LiDARDetector: === End Debug Status ===")
+    }
+    
     // MARK: - Private Methods
     
     private func checkLiDARAvailability() {
-        // Check if device supports LiDAR
+        // Check if device supports scene depth specifically (not just LiDAR)
         if ARWorldTrackingConfiguration.supportsFrameSemantics(.sceneDepth) {
             isLiDARAvailable = true
-            print("LiDARDetector: LiDAR is available on this device")
+            print("LiDARDetector: Scene depth is available on this device")
+            print("LiDARDetector: Smoothed scene depth available: \(ARWorldTrackingConfiguration.supportsFrameSemantics(.smoothedSceneDepth))")
         } else {
             isLiDARAvailable = false
-            print("LiDARDetector: LiDAR not available on this device")
+            print("LiDARDetector: Scene depth not available on this device")
+            print("LiDARDetector: This device may have LiDAR but not support scene depth")
         }
     }
     
     private func setupARSession() {
-        guard isLiDARAvailable else { return }
+        guard isLiDARAvailable else { 
+            print("LiDARDetector: Skipping ARSession setup - LiDAR not available")
+            return 
+        }
         
+        print("LiDARDetector: Setting up ARSession...")
         arSession = ARSession()
         arSession?.delegate = self
         
-        // Configure for depth sensing
-        let configuration = ARWorldTrackingConfiguration()
-        configuration.frameSemantics = [.sceneDepth]
-        arSession?.run(configuration)
+        print("LiDARDetector: ARSession created with delegate")
+        print("LiDARDetector: ARSession delegate set: \(arSession?.delegate != nil)")
+        
+        // Don't start the ARSession immediately - wait for explicit start
+        print("LiDARDetector: ARSession created but not started yet")
     }
     
     private func processDepthData(_ depthData: ARDepthData) {
         self.depthData = depthData
+        
+        // Reset timeout since we received depth data
+        stopDepthDataTimeout()
+        print("LiDARDetector: Depth data received - timeout reset")
         
         // Convert depth data to vehicle detection
         let vehicleDetected = detectVehicleInDepthData(depthData)
@@ -237,7 +358,16 @@ class LiDARDetector: NSObject, ObservableObject {
             return windowScene.screen.bounds
         } else {
             // Fallback to deprecated API if needed
+            #if swift(>=5.9)
+            if #available(iOS 26.0, *) {
+                // Use the modern approach
+                return CGRect(x: 0, y: 0, width: 400, height: 800) // Default fallback
+            } else {
+                return UIScreen.main.bounds
+            }
+            #else
             return UIScreen.main.bounds
+            #endif
         }
     }
 }
@@ -246,7 +376,31 @@ class LiDARDetector: NSObject, ObservableObject {
 
 extension LiDARDetector: ARSessionDelegate {
     nonisolated func session(_ session: ARSession, didUpdate frame: ARFrame) {
-        guard let depthData = frame.sceneDepth else { return }
+        print("LiDARDetector: ARSession didUpdate frame - Timestamp: \(frame.timestamp)")
+        print("LiDARDetector: Frame has scene depth: \(frame.sceneDepth != nil)")
+        print("LiDARDetector: Frame has scene depth confidence: \(frame.sceneDepth?.confidenceMap != nil)")
+        
+        // Check if we're getting any frames at all
+        print("LiDARDetector: Frame camera tracking state: \(frame.camera.trackingState)")
+        
+        // Check if we're getting frames with proper tracking
+        if frame.camera.trackingState != .normal {
+            print("LiDARDetector: Camera tracking state is not normal: \(frame.camera.trackingState)")
+        }
+        
+        guard let depthData = frame.sceneDepth else { 
+            print("LiDARDetector: No scene depth data in frame")
+            print("LiDARDetector: This could be due to:")
+            print("LiDARDetector: - Device doesn't support scene depth")
+            print("LiDARDetector: - Poor lighting conditions")
+            print("LiDARDetector: - ARSession not properly configured")
+            print("LiDARDetector: - Tracking issues")
+            return 
+        }
+        
+        let width = CVPixelBufferGetWidth(depthData.depthMap)
+        let height = CVPixelBufferGetHeight(depthData.depthMap)
+        print("LiDARDetector: Received depth data - Size: \(width)x\(height)")
         
         Task { @MainActor in
             self.processDepthData(depthData)
@@ -255,6 +409,21 @@ extension LiDARDetector: ARSessionDelegate {
     
     nonisolated func session(_ session: ARSession, didFailWithError error: Error) {
         print("LiDARDetector: ARSession failed with error: \(error)")
+        print("LiDARDetector: Error domain: \(error._domain)")
+        print("LiDARDetector: Error code: \(error._code)")
+    }
+    
+    nonisolated func session(_ session: ARSession, cameraDidChangeTrackingState camera: ARCamera) {
+        print("LiDARDetector: Camera tracking state changed: \(camera.trackingState)")
+        print("LiDARDetector: Camera tracking state: \(camera.trackingState)")
+    }
+    
+    nonisolated func sessionWasInterrupted(_ session: ARSession) {
+        print("LiDARDetector: ARSession was interrupted")
+    }
+    
+    nonisolated func sessionInterruptionEnded(_ session: ARSession) {
+        print("LiDARDetector: ARSession interruption ended")
     }
 }
 
