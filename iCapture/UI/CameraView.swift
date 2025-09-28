@@ -351,8 +351,18 @@ struct CameraView: View {
             cameraManager.stopSession()
         }
         .onReceive(NotificationCenter.default.publisher(for: UIDevice.orientationDidChangeNotification)) { _ in
-            // Update preview layer frame when device rotates - let AVFoundation handle orientation naturally
-            cameraManager.updatePreviewLayerFrame()
+            // Update video orientation when device rotates
+            // Preview layer frame is handled by CameraPreviewView
+            cameraManager.updateVideoOrientation()
+        }
+        
+        // Debug overlay (only show in debug builds or when enabled)
+        .overlay(alignment: .topLeading) {
+            if cameraManager.cameraDebugger.isDebugMode {
+                CameraDebugView(cameraDebugger: cameraManager.cameraDebugger)
+                    .padding(.top, 50)
+                    .padding(.leading, 16)
+            }
         }
         .sheet(isPresented: $showSetupWizard) {
             FrameBoxSetupWizard(isPresented: $showSetupWizard)
@@ -360,7 +370,7 @@ struct CameraView: View {
         .sheet(isPresented: $showStockNumberInput) {
             StockNumberInputView(sessionManager: sessionManager, isPresented: $showStockNumberInput)
         }
-        .onChange(of: sessionManager.isSessionActive) { isActive in
+        .onChange(of: sessionManager.isSessionActive) { _, isActive in
             if isActive {
                 // Start trigger engine when session becomes active
                 cameraManager.triggerEngine.startSession()
