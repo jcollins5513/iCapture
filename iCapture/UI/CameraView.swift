@@ -168,26 +168,34 @@ struct CameraView: View {
 
                         Spacer()
 
-                        // Background sampling button (LiDAR or traditional)
-                        Button(action: {
-                            if cameraManager.useLiDARDetection && cameraManager.lidarDetector.isLiDARAvailable {
-                                cameraManager.lidarDetector.learnBackground()
-                            } else {
+                        // LiDAR toggle button
+                        if cameraManager.useLiDARDetection {
+                            Button(action: {
+                                if cameraManager.lidarDetector.isLiDARAvailable {
+                                    cameraManager.lidarDetector.learnBackground()
+                                }
+                            }, label: {
+                                Image(systemName: "sensor.tag.radiowaves.forward.fill")
+                                    .font(.title2)
+                                    .foregroundColor(.white)
+                                    .padding()
+                                    .background(cameraManager.lidarDetector.isBackgroundLearned ? Color.green : Color.purple)
+                                    .clipShape(Circle())
+                            })
+                        } else {
+                            // Traditional background sampling button
+                            Button(action: {
                                 cameraManager.roiDetector.startBackgroundSampling()
-                            }
-                        }, label: {
-                            Image(systemName: cameraManager.useLiDARDetection ? 
-                                  "sensor.tag.radiowaves.forward.fill" : 
-                                  (cameraManager.roiDetector.isBackgroundSampling ? "waveform" : "brain.head.profile"))
-                                .font(.title2)
-                                .foregroundColor(.white)
-                                .padding()
-                                .background(cameraManager.useLiDARDetection ? 
-                                           (cameraManager.lidarDetector.isBackgroundLearned ? Color.green : Color.purple) :
-                                           (cameraManager.roiDetector.isBackgroundSampling ? Color.orange : Color.blue))
-                                .clipShape(Circle())
-                        })
-                        .disabled(cameraManager.roiDetector.isBackgroundSampling)
+                            }, label: {
+                                Image(systemName: cameraManager.roiDetector.isBackgroundSampling ? "waveform" : "brain.head.profile")
+                                    .font(.title2)
+                                    .foregroundColor(.white)
+                                    .padding()
+                                    .background(cameraManager.roiDetector.isBackgroundSampling ? Color.orange : Color.blue)
+                                    .clipShape(Circle())
+                            })
+                            .disabled(cameraManager.roiDetector.isBackgroundSampling)
+                        }
 
                         // Setup button
                         Button(action: {
@@ -219,6 +227,55 @@ struct CameraView: View {
                                                Color.red : Color.purple)
                                     .clipShape(Circle())
                             })
+                        }
+
+                        // LiDAR control buttons (only show if LiDAR is available)
+                        if cameraManager.lidarDetector.isLiDARAvailable {
+                            HStack(spacing: 8) {
+                                // LiDAR start/stop button
+                                Button(action: {
+                                    if cameraManager.lidarDetector.isLiDARAvailable {
+                                        cameraManager.stopLiDARDetection()
+                                    } else {
+                                        cameraManager.startLiDARDetection()
+                                    }
+                                }, label: {
+                                    Image(systemName: "sensor.tag.radiowaves.forward")
+                                        .font(.title2)
+                                        .foregroundColor(.white)
+                                        .padding()
+                                        .background(cameraManager.lidarDetector.isLiDARAvailable ? Color.green : Color.gray)
+                                        .clipShape(Circle())
+                                })
+                                
+                                // LiDAR enable/disable button
+                                Button(action: {
+                                    if cameraManager.useLiDARDetection {
+                                        cameraManager.disableLiDARDetection()
+                                    } else {
+                                        cameraManager.enableLiDARDetection()
+                                    }
+                                }, label: {
+                                    Image(systemName: "sensor.tag.radiowaves.forward.fill")
+                                        .font(.title2)
+                                        .foregroundColor(.white)
+                                        .padding()
+                                        .background(cameraManager.useLiDARDetection ? Color.purple : Color.gray)
+                                        .clipShape(Circle())
+                                })
+                                
+                                // Debug button
+                                Button(action: {
+                                    cameraManager.lidarDetector.debugARSessionStatus()
+                                }, label: {
+                                    Image(systemName: "ladybug")
+                                        .font(.title2)
+                                        .foregroundColor(.white)
+                                        .padding()
+                                        .background(Color.orange)
+                                        .clipShape(Circle())
+                                })
+                            }
                         }
 
                         // Performance overlay toggle
