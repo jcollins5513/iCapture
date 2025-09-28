@@ -110,28 +110,4 @@ extension CaptureAsset {
 }
 
 // MARK: - ROI Rectangle Codable Support
-extension CGRect: Codable {
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let xCoordinate = try container.decode(CGFloat.self, forKey: .xCoordinate)
-        let yCoordinate = try container.decode(CGFloat.self, forKey: .yCoordinate)
-        let width = try container.decode(CGFloat.self, forKey: .width)
-        let height = try container.decode(CGFloat.self, forKey: .height)
-        self.init(x: xCoordinate, y: yCoordinate, width: width, height: height)
-    }
-
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(origin.x, forKey: .xCoordinate)
-        try container.encode(origin.y, forKey: .yCoordinate)
-        try container.encode(size.width, forKey: .width)
-        try container.encode(size.height, forKey: .height)
-    }
-
-    private enum CodingKeys: String, CodingKey {
-        case xCoordinate
-        case yCoordinate
-        case width
-        case height
-    }
-}
+// Note: CGRect already conforms to Codable in iOS 26, so no custom extension needed

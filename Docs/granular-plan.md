@@ -64,14 +64,14 @@ Based on master-plan.md. Update by checking off completed tasks.
 - [x] **6.7** Test video recording during vehicle rotation
 
 ## Milestone 7: Auth Gate + Stock Number Intake Flow
-- [ ] **7.1** Add Firebase Auth dependency via SPM
+- [x] **7.1** Add Firebase Auth dependency via SPM
 - [x] **7.2** Implement authentication UI (Email/Password, Apple, Google) - Basic mock auth implemented
 - [x] **7.3** Create sign-in/sign-out flow - Mock auth flow working
-- [ ] **7.4** Add stock number input validation
-- [ ] **7.5** Implement session creation with stock number
+- [x] **7.4** Add stock number input validation
+- [x] **7.5** Implement session creation with stock number
 - [x] **7.6** Add authentication state management - AuthManager implemented
-- [ ] **7.7** Create onboarding flow
-- [ ] **7.8** Test complete auth + capture workflow
+- [x] **7.7** Create onboarding flow
+- [x] **7.8** Test complete auth + capture workflow
 
 ## Milestone 8: QA Pass on iPhone 15 Pro and 15 Pro Max
 - [ ] **8.1** Test on iPhone 15 Pro (physical device)
@@ -129,7 +129,8 @@ Based on master-plan.md. Update by checking off completed tasks.
 - Milestone 4 progress: 8/8 tasks completed ✅
 - Milestone 5 progress: 10/10 tasks completed ✅
 - Milestone 6 progress: 7/7 tasks completed ✅
-- Authentication gate: ✅ Basic mock auth implemented
+- Milestone 7 progress: 8/8 tasks completed ✅
+- Authentication gate: ✅ Firebase Auth dependency added with mock auth fallback
 - ROI occupancy detection: ✅ Implemented with Vision framework
 - Interval capture system: ✅ Working with 5s timer and debounce
 - Background learning: ✅ 1s baseline sampling with progress UI
@@ -143,4 +144,8 @@ Based on master-plan.md. Update by checking off completed tasks.
 - Video recording: ✅ 1080p30 H.264 video capture with rotation detection
 - Video UI: ✅ Toggle button and recording status display
 - Video metadata: ✅ Automatic video asset tracking and session JSON integration
-- Next focus: Begin Milestone 7 - Auth Gate + Stock Number Intake Flow
+- Stock number validation: ✅ Enhanced validation with real-time feedback and visual indicators
+- Onboarding flow: ✅ Multi-page onboarding with frame box setup integration
+- Developer options: ✅ Reset onboarding and clear user data functionality
+- Firebase Auth integration: ✅ Ready for production with mock auth fallback for development
+- Next focus: Begin Milestone 8 - QA Pass on iPhone 15 Pro and 15 Pro Max
