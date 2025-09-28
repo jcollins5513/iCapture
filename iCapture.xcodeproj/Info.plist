@@ -2,10 +2,9 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <key>NSPhotoLibraryUsageDescription</key>
-    <string>iCapture accesses your photo library to save vehicle photos for easy viewing and sharing.</string>
-
-    <key>NSPhotoLibraryAddUsageDescription</key>
-    <string>iCapture saves vehicle photos to your photo library for easy access and sharing. This allows you to view and manage captured vehicle images alongside your other photos.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>iCapture saves vehicle photos to your photo library for easy access and sharing. This allows you to view and manage captured vehicle images alongside your other photos.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Need photo library access to save processed vehicle photos.</string>
 </dict>
 </plist>

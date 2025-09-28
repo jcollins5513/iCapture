@@ -36,20 +36,7 @@ extension CameraManager {
     @MainActor
     func onBackgroundSamplingCompleted() {
         guard shouldAutoStartTriggers else { return }
-
-        if autoCaptureState == .waitingForBackground {
-            autoCaptureState = .idle
-            shouldAutoStartTriggers = false
-            backgroundSamplingWorkItem?.cancel()
-
-            if sessionManager?.isSessionActive == true {
-                triggerEngine.resetSession()
-                triggerEngine.startSession()
-                print("CameraManager: Automatic capture workflow completed - triggers started")
-            } else {
-                print("CameraManager: Background sampling completed but session inactive")
-            }
-        }
+        finalizeAutomaticCaptureWorkflow(reason: "background sampling completed")
     }
 
     @MainActor
@@ -85,6 +72,8 @@ extension CameraManager {
         shouldAutoStartTriggers = false
         autoCaptureState = .idle
         backgroundSamplingWorkItem?.cancel()
+        backgroundSamplingTimeoutWorkItem?.cancel()
+        backgroundSamplingTimeoutWorkItem = nil
         roiDetector.resetBackgroundLearning()
         print("CameraManager: Automatic capture workflow cancelled")
     }
@@ -92,6 +81,8 @@ extension CameraManager {
     @MainActor
     func scheduleAutomaticBackgroundSampling(delay: TimeInterval = 0.5) {
         backgroundSamplingWorkItem?.cancel()
+        backgroundSamplingTimeoutWorkItem?.cancel()
+        backgroundSamplingTimeoutWorkItem = nil
         let workItem = DispatchWorkItem { [weak self] in
             guard let self = self else { return }
             Task { @MainActor in
@@ -102,6 +93,16 @@ extension CameraManager {
         }
         backgroundSamplingWorkItem = workItem
         DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: workItem)
+
+        let timeoutItem = DispatchWorkItem { [weak self] in
+            Task { @MainActor in
+                guard let self = self, self.shouldAutoStartTriggers else { return }
+                print("CameraManager: Automatic background sampling timed out - proceeding with capture workflow")
+                self.finalizeAutomaticCaptureWorkflow(reason: "background sampling timeout")
+            }
+        }
+        backgroundSamplingTimeoutWorkItem = timeoutItem
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay + 2.0, execute: timeoutItem)
     }
 
     @objc func handleSessionDidStart(_ notification: Notification) {
@@ -109,6 +110,25 @@ extension CameraManager {
             if self.sessionManager?.isSessionActive == true {
                 self.beginAutomaticCaptureWorkflow()
             }
+        }
+    }
+
+    @MainActor
+    private func finalizeAutomaticCaptureWorkflow(reason: String) {
+        guard autoCaptureState == .waitingForBackground else { return }
+
+        autoCaptureState = .idle
+        shouldAutoStartTriggers = false
+        backgroundSamplingWorkItem?.cancel()
+        backgroundSamplingTimeoutWorkItem?.cancel()
+        backgroundSamplingTimeoutWorkItem = nil
+
+        if sessionManager?.isSessionActive == true {
+            triggerEngine.resetSession()
+            triggerEngine.startSession()
+            print("CameraManager: Automatic capture workflow completed (\(reason)) - triggers started")
+        } else {
+            print("CameraManager: Background sampling finished but session inactive")
         }
     }
 }
