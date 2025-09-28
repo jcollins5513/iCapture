@@ -38,6 +38,9 @@ class CameraManager: NSObject, ObservableObject {
     // Session Manager reference (will be set by CameraView)
     weak var sessionManager: SessionManager?
 
+    // Performance monitoring
+    @Published var performanceMonitor = PerformanceMonitor()
+
     override init() {
         super.init()
         checkAuthorization()
@@ -157,6 +160,9 @@ class CameraManager: NSObject, ObservableObject {
     }
 
     func capturePhoto(triggerType: TriggerType) {
+        // Record capture start for performance monitoring
+        performanceMonitor.recordCaptureStart()
+
         sessionQueue.async { [weak self] in
             guard let self = self, self.captureSession.isRunning else { return }
 
@@ -226,6 +232,9 @@ extension CameraManager: AVCaptureVideoDataOutputSampleBufferDelegate {
         guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { return }
 
         Task { @MainActor in
+            // Record frame for performance monitoring
+            performanceMonitor.recordFrame()
+
             roiDetector.processFrame(pixelBuffer)
             motionDetector.processFrame(pixelBuffer)
         }
@@ -240,6 +249,11 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
         if let error = error {
             print("Error capturing photo: \(error)")
             return
+        }
+
+        // Record capture end for performance monitoring
+        Task { @MainActor in
+            self.performanceMonitor.recordCaptureEnd()
         }
 
         // Save photo to appropriate directory

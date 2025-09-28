@@ -13,6 +13,7 @@ struct CameraView: View {
     @ObservedObject var authManager: AuthManager
     @State private var showSetupWizard = false
     @State private var showStockNumberInput = false
+    @State private var showPerformanceOverlay = false
 
     var body: some View {
         ZStack {
@@ -167,6 +168,18 @@ struct CameraView: View {
                             })
                         }
 
+                        // Performance overlay toggle
+                        Button(action: {
+                            showPerformanceOverlay.toggle()
+                        }, label: {
+                            Image(systemName: "chart.line.uptrend.xyaxis")
+                                .font(.title2)
+                                .foregroundColor(.white)
+                                .padding()
+                                .background(showPerformanceOverlay ? Color.orange : Color.blue)
+                                .clipShape(Circle())
+                        })
+
                         // Session control button
                         Button(action: {
                             if sessionManager.isSessionActive {
@@ -224,6 +237,12 @@ struct CameraView: View {
                         .ignoresSafeArea()
                         .opacity(0.8)
                         .animation(.easeOut(duration: 0.1), value: cameraManager.showCaptureFlash)
+                }
+
+                // Performance overlay
+                if showPerformanceOverlay {
+                    PerformanceOverlayView(performanceMonitor: cameraManager.performanceMonitor)
+                        .ignoresSafeArea()
                 }
             } else {
                 // Camera not authorized

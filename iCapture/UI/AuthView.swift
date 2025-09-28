@@ -223,6 +223,7 @@ struct CredentialRow: View {
 struct DeveloperOptionsView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var showingResetAlert = false
+    @State private var showingQATesting = false
 
     var body: some View {
         NavigationView {
@@ -243,6 +244,24 @@ struct DeveloperOptionsView: View {
                     .foregroundColor(.orange)
 
                     Text("This will show the onboarding flow again on next app launch.")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                .padding()
+                .background(Color.gray.opacity(0.1))
+                .cornerRadius(8)
+
+                VStack(alignment: .leading, spacing: 16) {
+                    Text("QA Testing")
+                        .font(.headline)
+
+                    Button("Open QA Testing Tools") {
+                        showingQATesting = true
+                    }
+                    .buttonStyle(.bordered)
+                    .foregroundColor(.blue)
+
+                    Text("Access performance monitoring and QA testing tools for device testing.")
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
@@ -285,6 +304,9 @@ struct DeveloperOptionsView: View {
                     }
                 }
             }
+        }
+        .sheet(isPresented: $showingQATesting) {
+            QATestingView()
         }
         .alert("Reset Onboarding", isPresented: $showingResetAlert) {
             Button("Reset", role: .destructive) {

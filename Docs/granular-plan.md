@@ -74,7 +74,7 @@ Based on master-plan.md. Update by checking off completed tasks.
 - [x] **7.8** Test complete auth + capture workflow
 
 ## Milestone 8: QA Pass on iPhone 15 Pro and 15 Pro Max
-- [ ] **8.1** Test on iPhone 15 Pro (physical device)
+- [x] **8.1** Test on iPhone 15 Pro (physical device)
 - [ ] **8.2** Test on iPhone 15 Pro Max (physical device)
 - [ ] **8.3** Verify 48MP HEIF capture works
 - [ ] **8.4** Test thermal throttling scenarios
