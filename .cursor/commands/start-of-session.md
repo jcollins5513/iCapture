@@ -6,23 +6,32 @@ Continue development on iCapture project.
 - Milestone 1: Project Bootstrap + Toolchain Pass - 8/8 tasks completed ✅
 - Milestone 2: Camera Preview + Frame Box Overlay - 8/8 tasks completed ✅
 - Milestone 3: Interval Capture with ROI Occupancy - 8/8 tasks completed ✅
+- Milestone 4: Stop-Based Capture Working - 8/8 tasks completed ✅
+- Milestone 5: Session Storage + Per-Stock Folders + JSON Export - 10/10 tasks completed ✅
 - Authentication gate: ✅ Basic mock auth implemented
 - Git version control: ✅ Fully configured with quality gates
 - ROI occupancy detection: ✅ Implemented with Vision framework
 - Interval capture system: ✅ Working with 5s timer and debounce
 - Background learning: ✅ 1s baseline sampling with progress UI
 - Capture feedback: ✅ Flash, haptic, and sound feedback
-- Next focus: Begin Milestone 4 - Stop-Based Capture Working
+- Motion detection: ✅ Optical flow calculation with stop detection
+- Stop-based capture: ✅ Integrated with ROI occupancy and debounce
+- Session management: ✅ Complete session storage with per-stock folders and JSON export
+- Stock number input: ✅ UI for starting new sessions with stock number validation
+- Asset tracking: ✅ CaptureAsset model with metadata and file management
+- Export functionality: ✅ Automatic export bundle creation with organized assets
+- Code quality: ✅ All SwiftLint violations resolved (0 violations)
+- Build status: ✅ All code compiles successfully with only warnings
+- Next focus: Begin Milestone 6 - Video Recording Toggle During Rotation
 
 **Immediate Next Steps:**
-1. Complete task 4.1: Implement optical flow calculation
-2. Complete task 4.2: Add motion magnitude computation over ROI
-3. Complete task 4.3: Create sliding window for motion history (15 frames)
-4. Complete task 4.4: Implement median filter for motion stability
-5. Complete task 4.5: Add stop detection logic (motion < ε for 0.7s)
-6. Complete task 4.6: Integrate stop detection with ROI occupancy
-7. Complete task 4.7: Add debounce mechanism (1.2s between shots)
-8. Complete task 4.8: Test stop-based capture with real motion
+1. Complete task 6.1: Add video recording toggle UI
+2. Complete task 6.2: Implement AVFoundation video capture
+3. Complete task 6.3: Configure 1080p30 H.264 encoding
+4. Complete task 6.4: Add video file naming (turn.MOV)
+5. Complete task 6.5: Implement video start/stop with rotation
+6. Complete task 6.6: Add video metadata to session JSON
+7. Complete task 6.7: Test video recording during vehicle rotation
 
 **Project Context:**
 - Hands-free vehicle photo capture app for iPhone 15 Pro+
@@ -36,18 +45,25 @@ Continue development on iCapture project.
 - ROI occupancy detection with background learning
 - Interval capture system with 5s timer and debounce
 - Visual, haptic, and audio capture feedback
+- Motion detection with optical flow and stop detection
+- Complete stop-based capture system with debounce
 
 **Key Files:**
-- `Docs/granular-plan.md` - Detailed implementation roadmap (Milestone 4 ready)
+- `Docs/granular-plan.md` - Detailed implementation roadmap (Milestone 6 ready)
 - `Docs/master-plan.md` - Project specifications
 - `Docs/git-workflow.md` - Git development guidelines
 - `iCapture/ContentView.swift` - Main UI router (auth gate)
 - `iCapture/UI/AuthView.swift` - Authentication interface
-- `iCapture/UI/CameraView.swift` - Camera functionality with ROI status
+- `iCapture/UI/CameraView.swift` - Camera functionality with session management
+- `iCapture/UI/StockNumberInputView.swift` - Stock number input for new sessions
 - `iCapture/Core/AuthManager.swift` - Authentication state management
-- `iCapture/Core/CameraManager.swift` - AVFoundation camera control with ROI integration
+- `iCapture/Core/CameraManager.swift` - AVFoundation camera control with session integration
+- `iCapture/Core/SessionManager.swift` - Session and asset management with export functionality
+- `iCapture/Core/VehicleSession.swift` - Session data model with metadata
+- `iCapture/Core/CaptureAsset.swift` - Asset data model with file management
 - `iCapture/Core/ROIDetector.swift` - ROI occupancy detection with Vision framework
-- `iCapture/Core/TriggerEngine.swift` - Interval capture system with debounce
+- `iCapture/Core/MotionDetector.swift` - Optical flow calculation and stop detection
+- `iCapture/Core/TriggerEngine.swift` - Interval + stop-based capture system
 - `iCapture/UI/FrameBoxOverlay.swift` - ROI selection component (fully interactive)
 - `iCapture/UI/FrameBoxSetupWizard.swift` - Setup wizard with test shots
 
@@ -67,11 +83,12 @@ Continue development on iCapture project.
 **Git Status:**
 - Repository: Clean working tree, all linting issues resolved
 - Pre-commit hooks: Active (linting + build validation)
-- Branch: main (ready for feature/milestone4)
+- Branch: main (ready for feature/milestone5)
+- SwiftLint: 0 violations across all 12 Swift files
 
-**Ready to begin Milestone 4: Stop-Based Capture Working!**
+**Ready to begin Milestone 6: Video Recording Toggle During Rotation!**
 
 ---
 
 **TLDR/Previous Session:**
-Completed Milestone 3 with full ROI occupancy detection, background learning, interval capture system, and capture feedback. Implemented Vision framework integration for ROI detection, 5-second interval timer with debounce, visual/haptic/audio feedback, and comprehensive UI integration. All code passes linting and builds successfully. Ready for Milestone 4: Stop-Based Capture Working.
+Completed Milestone 5 with full session storage and asset management system. Implemented VehicleSession and CaptureAsset data models with comprehensive metadata tracking. Created SessionManager with automatic folder structure creation (/Documents/Captures/<STOCK_ID>/ with photos/ and video/ subdirectories). Added StockNumberInputView UI for session creation with validation. Integrated session management with CameraManager for automatic asset tracking and export bundle creation. Enhanced CameraView with session status display and controls. All code compiles successfully with 0 SwiftLint violations. Ready for Milestone 6: Video Recording Toggle During Rotation.
