@@ -48,7 +48,7 @@ class TriggerEngine: ObservableObject {
                 self?.handleROIOccupancyChange(isOccupied)
             }
             .store(in: &cancellables)
-        
+
         // Subscribe to motion detector changes
         motionDetector.$isVehicleStopped
             .sink { [weak self] isStopped in
@@ -115,10 +115,10 @@ class TriggerEngine: ObservableObject {
             stopIntervalTimer()
         }
     }
-    
+
     private func handleVehicleStopChange(_ isStopped: Bool) {
         guard isStopCaptureActive else { return }
-        
+
         if isStopped {
             // Vehicle has stopped, trigger capture
             triggerStopCapture()
@@ -161,7 +161,7 @@ class TriggerEngine: ObservableObject {
         // Perform capture
         performCapture()
     }
-    
+
     private func triggerStopCapture() {
         guard canCapture() else {
             print("TriggerEngine: Stop capture blocked (debounce or limit)")
