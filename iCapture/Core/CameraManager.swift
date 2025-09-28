@@ -36,12 +36,12 @@ class CameraManager: NSObject, ObservableObject {
     @Published var vehicleDetector = VehicleDetector()
     @Published var triggerEngine = TriggerEngine()
     @Published var backgroundRemover = BackgroundRemover()
-    
+
     // LiDAR-based detection (preferred when available)
     @Published var lidarDetector = LiDARDetector()
     @Published var lidarBackgroundRemover = LiDARBackgroundRemover()
     @Published var useLiDARDetection = false
-    
+
     // Background removal settings
     @Published var backgroundRemovalEnabled = false
 
@@ -50,13 +50,14 @@ class CameraManager: NSObject, ObservableObject {
 
     // Performance monitoring
     @Published var performanceMonitor = PerformanceMonitor()
-    
+
     // Debug tools
     @Published var cameraDebugger = CameraDebugger()
-    
+
     // Orientation handling
     private var lastVideoOrientation: AVCaptureVideoOrientation?
     private var orientationUpdateTimer: Timer?
+    private var lastLiDARProcessingState: Bool?
 
     override init() {
         super.init()
@@ -67,10 +68,10 @@ class CameraManager: NSObject, ObservableObject {
 
         // Configure video recording manager
         videoRecordingManager.configure(sessionManager: sessionManager, roiDetector: roiDetector)
-        
+
         // Initialize LiDAR detection if available
         initializeLiDARDetection()
-        
+
         // Listen for LiDAR timeout notifications
         NotificationCenter.default.addObserver(
             self,
@@ -78,15 +79,36 @@ class CameraManager: NSObject, ObservableObject {
             name: NSNotification.Name("LiDARDetectionTimeout"),
             object: nil
         )
+
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleLiDARScanCompleted(_:)),
+            name: .LiDARScanCompleted,
+            object: nil
+        )
     }
-    
+
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
-    
+
     @objc private func handleLiDARTimeout() {
         print("CameraManager: LiDAR detection timeout - disabling LiDAR and switching to traditional detection")
         disableLiDARDetection()
+    }
+
+    @objc private func handleLiDARScanCompleted(_ notification: Notification) {
+        print("CameraManager: LiDAR environment scan completed - resuming camera capture workflow")
+
+        if lidarDetector.isSessionRunning {
+            stopLiDARDetection()
+        } else {
+            restartCaptureSessionIfNeeded()
+        }
+
+        useLiDARDetection = true
+        lastLiDARProcessingState = nil
+        print("CameraManager: LiDAR depth data cached for background removal")
     }
 
     @MainActor
@@ -175,15 +197,13 @@ class CameraManager: NSObject, ObservableObject {
                 self.configurePhotoOutputForHighResolution()
             }
 
-                // Create preview layer immediately (not async) to avoid timing issues
-            self.previewLayer = AVCaptureVideoPreviewLayer(session: self.captureSession)
-            self.previewLayer?.videoGravity = .resizeAspectFill
-            
-            print("CameraManager: Preview layer created and configured")
-            print("CameraManager: Preview layer session: \(self.previewLayer?.session != nil)")
-            
-            // Ensure the preview layer is properly connected
-            if let previewLayer = self.previewLayer {
+            let previewLayer = AVCaptureVideoPreviewLayer(session: self.captureSession)
+            previewLayer.videoGravity = .resizeAspectFill
+
+            DispatchQueue.main.async {
+                self.previewLayer = previewLayer
+                print("CameraManager: Preview layer created and configured")
+                print("CameraManager: Preview layer session: \(previewLayer.session != nil)")
                 print("CameraManager: Preview layer videoGravity: \(previewLayer.videoGravity)")
                 print("CameraManager: Preview layer connection: \(previewLayer.connection != nil)")
             }
@@ -194,7 +214,7 @@ class CameraManager: NSObject, ObservableObject {
         sessionQueue.async { [weak self] in
             guard let self = self, !self.captureSession.isRunning else { return }
             print("CameraManager: Starting capture session")
-            
+
             // Check camera hardware status before starting
             if let device = self.captureDevice {
                 print("CameraManager: Camera device: \(device.localizedName)")
@@ -203,7 +223,7 @@ class CameraManager: NSObject, ObservableObject {
             } else {
                 print("CameraManager: ERROR - No camera device available!")
             }
-            
+
             self.captureSession.startRunning()
             DispatchQueue.main.async {
                 self.isSessionRunning = self.captureSession.isRunning
@@ -214,15 +234,15 @@ class CameraManager: NSObject, ObservableObject {
                 } else {
                     print("CameraManager: WARNING - Preview layer is nil!")
                 }
-                
+
                 // LiDAR detection will be started manually when needed
                 // Don't start it automatically to avoid camera conflicts
-                
+
                 // Start debugging if enabled
                 if self.cameraDebugger.isDebugMode {
                     self.cameraDebugger.startDebugging(cameraManager: self)
                 }
-                
+
                 // Set initial video orientation
                 self.updateVideoOrientation()
             }
@@ -235,15 +255,15 @@ class CameraManager: NSObject, ObservableObject {
             self.captureSession.stopRunning()
             DispatchQueue.main.async {
                 self.isSessionRunning = self.captureSession.isRunning
-                
+
                 // Stop LiDAR detection
                 if self.useLiDARDetection {
                     self.lidarDetector.stopLiDARDetection()
                 }
-                
+
                 // Stop debugging
                 self.cameraDebugger.stopDebugging()
-                
+
                 // Clean up orientation timer
                 self.orientationUpdateTimer?.invalidate()
                 self.orientationUpdateTimer = nil
@@ -270,10 +290,10 @@ class CameraManager: NSObject, ObservableObject {
             } else {
                 photoSettings = AVCapturePhotoSettings()
             }
-            
+
             // Enable high resolution capture if supported
         if #available(iOS 16.0, *) {
-            if let device = self.captureDevice, 
+            if let device = self.captureDevice,
                let maxDimensions = device.activeFormat.supportedMaxPhotoDimensions.max(by: { $0.width * $0.height < $1.width * $1.height }),
                maxDimensions.width >= 8000 {
                 // Check if the photo output supports this resolution
@@ -340,10 +360,10 @@ class CameraManager: NSObject, ObservableObject {
         // Check if device supports 48MP capture (iPhone 15 Pro and Pro Max)
         _ = UIDevice.current.model
         _ = UIDevice.current.systemVersion
-        
+
         // Configure photo settings for maximum resolution
         var photoSettings: AVCapturePhotoSettings
-        
+
         if photoOutput.availablePhotoCodecTypes.contains(.hevc) {
             // Use HEVC/HEIF format for better compression
             photoSettings = AVCapturePhotoSettings(format: [AVVideoCodecKey: AVVideoCodecType.hevc])
@@ -351,7 +371,7 @@ class CameraManager: NSObject, ObservableObject {
             // Fallback to standard format
             photoSettings = AVCapturePhotoSettings()
         }
-        
+
         // Check if 48MP is available but don't set maxPhotoDimensions here
         // We'll set it per capture to avoid conflicts
         if #available(iOS 16.0, *) {
@@ -363,21 +383,21 @@ class CameraManager: NSObject, ObservableObject {
                 print("CameraManager: 48MP capture not available, using standard resolution")
             }
         }
-        
+
         // Set up prepared photo settings for optimal performance
         photoOutput.setPreparedPhotoSettingsArray([photoSettings])
-        
+
         print("CameraManager: Photo output configured for high-resolution capture")
     }
-    
+
     @MainActor
     func getMaxPhotoResolution() -> CGSize {
         guard let device = captureDevice else {
             return CGSize(width: 4032, height: 3024) // Default 12MP
         }
-        
+
         // Return the maximum supported resolution
-        if #available(iOS 16.0, *), 
+        if #available(iOS 16.0, *),
            let maxDimensions = device.activeFormat.supportedMaxPhotoDimensions.max(by: { $0.width * $0.height < $1.width * $1.height }),
            maxDimensions.width >= 8000 {
             return CGSize(width: 8064, height: 6048) // 48MP
@@ -385,18 +405,18 @@ class CameraManager: NSObject, ObservableObject {
             return CGSize(width: 4032, height: 3024) // 12MP
         }
     }
-    
+
     @MainActor
     func getCurrentPhotoResolution() -> CGSize {
         return getMaxPhotoResolution()
     }
-    
+
     @MainActor
     func getPhotoCaptureInfo() -> (resolution: CGSize, format: String, is48MPSupported: Bool) {
         let resolution = getCurrentPhotoResolution()
         let format = photoOutput.availablePhotoCodecTypes.contains(.hevc) ? "HEIF" : "JPEG"
         let is48MPSupported = (resolution.width >= 8000 || resolution.height >= 6000)
-        
+
         return (resolution: resolution, format: format, is48MPSupported: is48MPSupported)
     }
 }
@@ -413,17 +433,28 @@ extension CameraManager: AVCaptureVideoDataOutputSampleBufferDelegate {
             // Record frame for performance monitoring
             self.performanceMonitor.recordFrame()
 
-            // Use LiDAR detection if available, otherwise fallback to traditional methods
-            if self.useLiDARDetection && self.lidarDetector.isLiDARAvailable {
-                // LiDAR handles ROI detection and vehicle detection automatically
-                // No need to process frames with traditional methods
-                print("CameraManager: Using LiDAR detection for frame processing")
-                print("CameraManager: - useLiDARDetection: \(self.useLiDARDetection)")
-                print("CameraManager: - LiDAR available: \(self.lidarDetector.isLiDARAvailable)")
-                print("CameraManager: - Depth data available: \(self.lidarDetector.depthData != nil)")
+            let lidarReady = self.useLiDARDetection
+                && self.lidarDetector.isLiDARAvailable
+                && self.lidarDetector.isSessionRunning
+                && self.lidarDetector.depthData != nil
+
+            // Use LiDAR detection if it's ready, otherwise fallback to traditional methods
+            if lidarReady {
+                if self.lastLiDARProcessingState != true {
+                    print("CameraManager: Switching to LiDAR-based frame processing")
+                    print("CameraManager: - LiDAR session running: \(self.lidarDetector.isSessionRunning)")
+                }
+                self.lastLiDARProcessingState = true
             } else {
+                if self.lastLiDARProcessingState != false {
+                    print("CameraManager: Using traditional frame processing")
+                    if self.useLiDARDetection && self.lidarDetector.isLiDARAvailable {
+                        print("CameraManager: - LiDAR session running: \(self.lidarDetector.isSessionRunning)")
+                        print("CameraManager: - Depth data available: \(self.lidarDetector.depthData != nil)")
+                    }
+                }
+                self.lastLiDARProcessingState = false
                 // Traditional frame processing
-                print("CameraManager: Using traditional frame processing")
                 self.roiDetector.processFrame(pixelBuffer)
                 self.motionDetector.processFrame(pixelBuffer)
                 self.vehicleDetector.processFrame(pixelBuffer)
@@ -472,14 +503,14 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
             let timestamp = Date().timeIntervalSince1970
             let resolutionSuffix = (width >= 8000 || height >= 6000) ? "_48MP" : "_12MP"
             let filename = "photo_\(Int(timestamp))\(resolutionSuffix).heic"
-            
+
             // Log photo capture details and validate file size
             let fileSizeMB = Double(imageData.count) / (1024 * 1024)
             let isHighResolution = (width >= 8000 || height >= 6000)
             let maxSizeMB = isHighResolution ? 15.0 : 5.0
-            
+
             print("CameraManager: Captured photo - Resolution: \(width)x\(height), Size: \(String(format: "%.2f", fileSizeMB))MB")
-            
+
             if fileSizeMB > maxSizeMB {
                 print("CameraManager: WARNING - Photo size (\(String(format: "%.2f", fileSizeMB))MB) exceeds target (\(maxSizeMB)MB)")
             } else {
@@ -490,7 +521,7 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
             let isSessionActive = DispatchQueue.main.sync {
                 return self.sessionManager?.isSessionActive ?? false
             }
-            
+
             if isSessionActive {
                 let params = PhotoSessionParams(
                     imageData: imageData,
@@ -535,7 +566,7 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
             let photosURL = sessionURL.appendingPathComponent("photos")
             let fileURL = photosURL.appendingPathComponent(params.filename)
             try params.imageData.write(to: fileURL)
-            
+
             // Ensure the file was written successfully
             guard FileManager.default.fileExists(atPath: fileURL.path) else {
                 print("CameraManager: Failed to write photo file: \(fileURL.path)")
@@ -557,7 +588,7 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
             try sessionManager.addAsset(asset)
 
             print("Photo saved to session: \(params.filename)")
-            
+
             // Process background removal if enabled
             if self.backgroundRemovalEnabled {
                 self.processBackgroundRemoval(imageData: params.imageData, filename: params.filename)
@@ -596,7 +627,7 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
             print("Failed to save test shot: \(error)")
         }
     }
-    
+
     // MARK: - Camera Health Check
     @MainActor
     func checkCameraHealth() -> Bool {
@@ -604,40 +635,40 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
             print("CameraManager: Health check failed - No camera device")
             return false
         }
-        
+
         let isAvailable = device.isConnected && !device.isSuspended
         print("CameraManager: Camera health check - Available: \(isAvailable)")
-        
+
         if !isAvailable {
             print("CameraManager: Camera not available - Connected: \(device.isConnected), Suspended: \(device.isSuspended)")
         }
-        
+
         return isAvailable
     }
-    
+
     @MainActor
     func restartCameraSession() {
         print("CameraManager: Restarting camera session...")
         stopSession()
-        
+
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
             self?.setupCaptureSession()
             self?.startSession()
         }
     }
-    
+
     @MainActor
     func updatePreviewLayerFrame() {
         guard previewLayer != nil else {
             print("CameraManager: Cannot update frame - preview layer is nil")
             return
         }
-        
+
         // Don't update the preview layer frame here - let CameraPreviewView handle it
         // The preview layer frame should be managed by the UIView that contains it
         print("CameraManager: Preview layer frame update requested - delegating to CameraPreviewView")
     }
-    
+
     func updateVideoOrientation() {
         // Debounce rapid orientation changes
         orientationUpdateTimer?.invalidate()
@@ -645,23 +676,23 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
             self?.performVideoOrientationUpdate()
         }
     }
-    
+
     private func performVideoOrientationUpdate() {
         guard let previewLayer = previewLayer,
               let connection = previewLayer.connection else {
             print("CameraManager: Cannot update video orientation - no preview layer or connection")
             return
         }
-        
+
         // Use device orientation instead of interface orientation for more reliable detection
         let deviceOrientation = UIDevice.current.orientation
-        
+
         // Only update if device orientation is valid
         guard deviceOrientation != .unknown && deviceOrientation != .faceUp && deviceOrientation != .faceDown else {
             print("CameraManager: Skipping orientation update - invalid device orientation: \(orientationString(deviceOrientation))")
             return
         }
-        
+
         // Convert device orientation to video orientation
         // Note: Landscape orientations are mapped in reverse due to device sensor alignment
         let videoOrientation: AVCaptureVideoOrientation
@@ -677,18 +708,18 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
         default:
             videoOrientation = .portrait
         }
-        
+
         // Only update if orientation actually changed
         if lastVideoOrientation == videoOrientation {
             print("CameraManager: Video orientation unchanged: \(videoOrientationString(videoOrientation))")
             return
         }
-        
+
         // Debug logging
         print("CameraManager: Device orientation: \(deviceOrientation.rawValue) (\(orientationString(deviceOrientation)))")
         print("CameraManager: Mapped to video orientation: \(videoOrientation.rawValue) (\(videoOrientationString(videoOrientation)))")
         print("CameraManager: Applying video orientation to connection...")
-        
+
         // Set the video orientation to keep camera image upright
         if connection.isVideoOrientationSupported {
             connection.videoOrientation = videoOrientation
@@ -698,7 +729,7 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
             print("CameraManager: Video orientation not supported on this connection")
         }
     }
-    
+
     private func orientationString(_ orientation: UIDeviceOrientation) -> String {
         switch orientation {
         case .portrait: return "Portrait"
@@ -710,7 +741,7 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
         default: return "Unknown"
         }
     }
-    
+
     private func interfaceOrientationString(_ orientation: UIInterfaceOrientation) -> String {
         switch orientation {
         case .portrait: return "Portrait"
@@ -720,7 +751,7 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
         default: return "Unknown"
         }
     }
-    
+
     private func videoOrientationString(_ orientation: AVCaptureVideoOrientation) -> String {
         switch orientation {
         case .portrait: return "Portrait"
@@ -729,7 +760,7 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
         case .landscapeRight: return "Landscape Right"
         }
     }
-    
+
     // Helper function to get screen bounds using modern API
     private func getScreenBounds() -> CGRect {
         if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
@@ -739,11 +770,11 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
             return UIScreen.main.bounds
         }
     }
-    
+
     private func saveToPhotoLibrary(imageData: Data) {
         // Check photo library authorization status
         let status = PHPhotoLibrary.authorizationStatus()
-        
+
         switch status {
         case .authorized, .limited:
             // Save to photo library using PhotoKit
@@ -774,10 +805,10 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
             print("CameraManager: Unknown photo library authorization status")
         }
     }
-    
+
     private func processBackgroundRemoval(imageData: Data, filename: String) {
         print("CameraManager: Starting background removal for \(filename)")
-        
+
         // Use LiDAR-based background removal if available
         if useLiDARDetection && lidarDetector.isLiDARAvailable {
             processLiDARBackgroundRemoval(imageData: imageData, filename: filename)
@@ -790,32 +821,32 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
                     self?.saveToPhotoLibrary(imageData: imageData)
                     return
                 }
-                
+
                 print("CameraManager: Background removal completed for \(filename)")
-                
+
                 // Save processed version to photo library
                 if let processedImage = UIImage(data: processedData) {
                     UIImageWriteToSavedPhotosAlbum(processedImage, nil, nil, nil)
                     print("CameraManager: Processed photo saved to photo library")
                 }
-                
+
                 // Also save original to photo library for comparison
                 self.saveToPhotoLibrary(imageData: imageData)
             }
         }
     }
-    
+
     private func processLiDARBackgroundRemoval(imageData: Data, filename: String) {
         guard let image = UIImage(data: imageData) else {
             print("CameraManager: LiDAR background removal failed - invalid image data")
             saveToPhotoLibrary(imageData: imageData)
             return
         }
-        
-        guard let depthData = lidarDetector.depthData else {
+
+        guard let depthData = lidarDetector.latestDepthData else {
             print("CameraManager: LiDAR background removal failed - no depth data available")
             print("CameraManager: Falling back to traditional background removal")
-            
+
             // Fallback to traditional background removal
             backgroundRemover.removeBackgroundFromPhotoData(imageData) { [weak self] processedData in
                 guard let self = self, let processedData = processedData else {
@@ -823,21 +854,23 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
                     self?.saveToPhotoLibrary(imageData: imageData)
                     return
                 }
-                
+
                 print("CameraManager: Traditional background removal completed for \(filename)")
-                
+
                 // Save processed version to photo library
                 if let processedImage = UIImage(data: processedData) {
                     UIImageWriteToSavedPhotosAlbum(processedImage, nil, nil, nil)
                     print("CameraManager: Traditional processed photo saved to photo library")
                 }
-                
+
                 // Also save original to photo library for comparison
                 self.saveToPhotoLibrary(imageData: imageData)
             }
             return
         }
-        
+
+        print("CameraManager: Using cached LiDAR depth data for background removal")
+
         lidarBackgroundRemover.removeBackgroundFromPhotoDataWithLiDAR(
             imageData: imageData,
             depthData: depthData
@@ -847,26 +880,26 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
                 self?.saveToPhotoLibrary(imageData: imageData)
                 return
             }
-            
+
             print("CameraManager: LiDAR background removal completed for \(filename)")
-            
+
             // Save processed version to photo library
             if let processedImage = UIImage(data: processedData) {
                 UIImageWriteToSavedPhotosAlbum(processedImage, nil, nil, nil)
                 print("CameraManager: LiDAR processed photo saved to photo library")
             }
-            
+
             // Also save original to photo library for comparison
             self.saveToPhotoLibrary(imageData: imageData)
         }
     }
-    
+
     // MARK: - LiDAR Initialization
-    
+
     private func initializeLiDARDetection() {
         print("CameraManager: Initializing LiDAR detection...")
         print("CameraManager: - LiDAR available: \(lidarDetector.isLiDARAvailable)")
-        
+
         // Check if LiDAR is available but don't start it automatically
         if lidarDetector.isLiDARAvailable {
             useLiDARDetection = true
@@ -878,36 +911,90 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
             print("CameraManager: - useLiDARDetection set to: \(useLiDARDetection)")
         }
     }
-    
+
     // MARK: - Manual LiDAR Control
-    
+
     func startLiDARDetection() {
         guard lidarDetector.isLiDARAvailable else {
             print("CameraManager: LiDAR not available")
             return
         }
-        
-        lidarDetector.startLiDARDetection()
-        print("CameraManager: LiDAR detection started manually")
+
+        guard !lidarDetector.isSessionRunning else {
+            print("CameraManager: LiDAR session already running")
+            return
+        }
+
+        // Stop the camera session temporarily to avoid conflicts
+        print("CameraManager: Temporarily stopping camera session for LiDAR...")
+        sessionQueue.async { [weak self] in
+            guard let self = self else { return }
+
+            if self.captureSession.isRunning {
+                self.captureSession.stopRunning()
+                print("CameraManager: Camera session stopped for LiDAR")
+            }
+
+            // Start LiDAR detection
+            DispatchQueue.main.async {
+                self.lidarDetector.startLiDARDetection()
+                self.useLiDARDetection = true
+                self.lastLiDARProcessingState = nil
+                print("CameraManager: LiDAR detection started manually")
+            }
+        }
     }
-    
+
     func stopLiDARDetection() {
+        guard lidarDetector.isSessionRunning else {
+            print("CameraManager: LiDAR session already stopped")
+            return
+        }
+
         lidarDetector.stopLiDARDetection()
+        lastLiDARProcessingState = nil
         print("CameraManager: LiDAR detection stopped")
+
+        restartCaptureSessionIfNeeded()
     }
-    
+
     func disableLiDARDetection() {
-        useLiDARDetection = false
-        lidarDetector.stopLiDARDetection()
-        print("CameraManager: LiDAR detection disabled - switching to traditional detection")
+        if lidarDetector.isSessionRunning {
+            stopLiDARDetection()
+        }
+        if useLiDARDetection {
+            useLiDARDetection = false
+            lastLiDARProcessingState = nil
+            print("CameraManager: LiDAR detection disabled - switching to traditional detection")
+        }
     }
-    
+
     func enableLiDARDetection() {
         guard lidarDetector.isLiDARAvailable else {
             print("CameraManager: Cannot enable LiDAR - not available on this device")
             return
         }
-        useLiDARDetection = true
-        print("CameraManager: LiDAR detection enabled")
+        if lidarDetector.isSessionRunning {
+            useLiDARDetection = true
+            lastLiDARProcessingState = nil
+            print("CameraManager: LiDAR detection enabled")
+        } else {
+            startLiDARDetection()
+        }
+    }
+
+    private func restartCaptureSessionIfNeeded() {
+        sessionQueue.async { [weak self] in
+            guard let self = self else { return }
+
+            if !self.captureSession.isRunning {
+                self.captureSession.startRunning()
+                print("CameraManager: Camera session restarted")
+
+                DispatchQueue.main.async {
+                    self.isSessionRunning = self.captureSession.isRunning
+                }
+            }
+        }
     }
 }

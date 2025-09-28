@@ -120,14 +120,14 @@ struct CameraView: View {
                                         .font(.caption)
                                         .foregroundColor(.yellow)
                                 }
-                                
+
                                 // Photo capture info
                                 let photoInfo = cameraManager.getPhotoCaptureInfo()
                                 let resolutionText = photoInfo.is48MPSupported ? "48MP" : "12MP"
                                 Text("Photo: \(resolutionText) \(photoInfo.format)")
                                     .font(.caption)
                                     .foregroundColor(.cyan)
-                                
+
                                 // LiDAR status
                                 if cameraManager.useLiDARDetection {
                                     if cameraManager.lidarDetector.isLiDARAvailable {
@@ -234,7 +234,7 @@ struct CameraView: View {
                             HStack(spacing: 8) {
                                 // LiDAR start/stop button
                                 Button(action: {
-                                    if cameraManager.lidarDetector.isLiDARAvailable {
+                                    if cameraManager.lidarDetector.isSessionRunning {
                                         cameraManager.stopLiDARDetection()
                                     } else {
                                         cameraManager.startLiDARDetection()
@@ -244,10 +244,10 @@ struct CameraView: View {
                                         .font(.title2)
                                         .foregroundColor(.white)
                                         .padding()
-                                        .background(cameraManager.lidarDetector.isLiDARAvailable ? Color.green : Color.gray)
+                                        .background(cameraManager.lidarDetector.isSessionRunning ? Color.green : Color.gray)
                                         .clipShape(Circle())
                                 })
-                                
+
                                 // LiDAR enable/disable button
                                 Button(action: {
                                     if cameraManager.useLiDARDetection {
@@ -263,7 +263,7 @@ struct CameraView: View {
                                         .background(cameraManager.useLiDARDetection ? Color.purple : Color.gray)
                                         .clipShape(Circle())
                                 })
-                                
+
                                 // Debug button
                                 Button(action: {
                                     cameraManager.lidarDetector.debugARSessionStatus()
@@ -339,11 +339,11 @@ struct CameraView: View {
                     }
 
                     Spacer()
-                    
+
                     // Manual capture button
                     HStack {
                         Spacer()
-                        
+
                         Button(action: {
                             print("CameraView: Manual capture triggered")
                             cameraManager.capturePhoto(triggerType: .manual)
@@ -352,18 +352,18 @@ struct CameraView: View {
                                 Circle()
                                     .fill(Color.white)
                                     .frame(width: 80, height: 80)
-                                
+
                                 Circle()
                                     .fill(Color.black)
                                     .frame(width: 70, height: 70)
-                                
+
                                 Circle()
                                     .fill(Color.white)
                                     .frame(width: 60, height: 60)
                             }
                         })
                         .disabled(!cameraManager.isSessionRunning)
-                        
+
                         Spacer()
                     }
                     .padding(.bottom, 50)
@@ -416,7 +416,7 @@ struct CameraView: View {
                 sessionManager: sessionManager,
                 roiDetector: cameraManager.roiDetector
             )
-            
+
             // Ensure camera session is properly set up
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 print("CameraView: Checking camera session status...")
@@ -427,10 +427,10 @@ struct CameraView: View {
                     print("CameraView: Preview layer session exists: \(previewLayer.session != nil)")
                     print("CameraView: Preview layer frame: \(previewLayer.frame)")
                 }
-                
+
                 // Force preview layer frame update
                 cameraManager.updatePreviewLayerFrame()
-                
+
                 // Check camera health and restart if needed
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
                     if !cameraManager.checkCameraHealth() {
@@ -451,7 +451,7 @@ struct CameraView: View {
             // Preview layer frame is handled by CameraPreviewView
             cameraManager.updateVideoOrientation()
         }
-        
+
         // Debug overlay (only show in debug builds or when enabled)
         .overlay(alignment: .topLeading) {
             if cameraManager.cameraDebugger.isDebugMode {
