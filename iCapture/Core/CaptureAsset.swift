@@ -35,11 +35,19 @@ struct CaptureAsset: Codable, Identifiable {
 
     // File system properties
     var fileURL: URL {
+        // Use the session directory from SessionManager
         let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
         let sessionPath = documentsPath.appendingPathComponent("Captures")
             .appendingPathComponent(sessionId)
         let subdirectory = type == .photo ? "photos" : "video"
         return sessionPath.appendingPathComponent(subdirectory)
+            .appendingPathComponent(filename)
+    }
+    
+    // Helper method to get file URL with actual session directory
+    func getFileURL(with sessionDirectory: URL) -> URL {
+        let subdirectory = type == .photo ? "photos" : "video"
+        return sessionDirectory.appendingPathComponent(subdirectory)
             .appendingPathComponent(filename)
     }
 
@@ -54,6 +62,12 @@ struct CaptureAsset: Codable, Identifiable {
 
     var fileExists: Bool {
         return FileManager.default.fileExists(atPath: fileURL.path)
+    }
+    
+    // Helper method to check if file exists with specific session directory
+    func fileExists(with sessionDirectory: URL) -> Bool {
+        let assetFileURL = getFileURL(with: sessionDirectory)
+        return FileManager.default.fileExists(atPath: assetFileURL.path)
     }
 
     init(sessionId: String, type: AssetType, filename: String, width: Int, height: Int,

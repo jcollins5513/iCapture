@@ -9,6 +9,7 @@
 import Combine
 import SwiftUI
 import AudioToolbox
+import Photos
 
 class CameraManager: NSObject, ObservableObject {
     @Published var isAuthorized = false
@@ -29,10 +30,15 @@ class CameraManager: NSObject, ObservableObject {
     // Video recording manager
     @Published var videoRecordingManager = VideoRecordingManager()
 
-    // ROI Detection, Motion Detection and Trigger Engine
+    // ROI Detection, Motion Detection, Vehicle Detection and Trigger Engine
     @Published var roiDetector = ROIDetector()
     @Published var motionDetector = MotionDetector()
+    @Published var vehicleDetector = VehicleDetector()
     @Published var triggerEngine = TriggerEngine()
+    @Published var backgroundRemover = BackgroundRemover()
+    
+    // Background removal settings
+    @Published var backgroundRemovalEnabled = false
 
     // Session Manager reference (will be set by CameraView)
     weak var sessionManager: SessionManager?
@@ -52,7 +58,7 @@ class CameraManager: NSObject, ObservableObject {
         checkAuthorization()
 
         // Configure trigger engine with dependencies
-        triggerEngine.configure(cameraManager: self, roiDetector: roiDetector, motionDetector: motionDetector)
+        triggerEngine.configure(cameraManager: self, roiDetector: roiDetector, motionDetector: motionDetector, vehicleDetector: vehicleDetector)
 
         // Configure video recording manager
         videoRecordingManager.configure(sessionManager: sessionManager, roiDetector: roiDetector)
@@ -376,6 +382,7 @@ extension CameraManager: AVCaptureVideoDataOutputSampleBufferDelegate {
 
             self.roiDetector.processFrame(pixelBuffer)
             self.motionDetector.processFrame(pixelBuffer)
+            self.vehicleDetector.processFrame(pixelBuffer)
         }
     }
 }
@@ -483,6 +490,12 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
             let photosURL = sessionURL.appendingPathComponent("photos")
             let fileURL = photosURL.appendingPathComponent(params.filename)
             try params.imageData.write(to: fileURL)
+            
+            // Ensure the file was written successfully
+            guard FileManager.default.fileExists(atPath: fileURL.path) else {
+                print("CameraManager: Failed to write photo file: \(fileURL.path)")
+                return
+            }
 
             // Create capture asset
             let asset = CaptureAsset(
@@ -499,6 +512,14 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
             try sessionManager.addAsset(asset)
 
             print("Photo saved to session: \(params.filename)")
+            
+            // Process background removal if enabled
+            if self.backgroundRemovalEnabled {
+                self.processBackgroundRemoval(imageData: params.imageData, filename: params.filename)
+            } else {
+                // Also save to photo library if user has granted permission
+                self.saveToPhotoLibrary(imageData: params.imageData)
+            }
 
             DispatchQueue.main.async {
                 self.testShotCaptured = true
@@ -671,6 +692,65 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
         } else {
             // Fallback to deprecated API if needed
             return UIScreen.main.bounds
+        }
+    }
+    
+    private func saveToPhotoLibrary(imageData: Data) {
+        // Check photo library authorization status
+        let status = PHPhotoLibrary.authorizationStatus()
+        
+        switch status {
+        case .authorized, .limited:
+            // Save to photo library using PhotoKit
+            PHPhotoLibrary.shared().performChanges({
+                let creationRequest = PHAssetCreationRequest.forAsset()
+                creationRequest.addResource(with: .photo, data: imageData, options: nil)
+            }, completionHandler: { success, error in
+                if success {
+                    print("CameraManager: Photo saved to photo library using PhotoKit")
+                } else {
+                    print("CameraManager: Failed to save photo to photo library: \(error?.localizedDescription ?? "Unknown error")")
+                }
+            })
+        case .notDetermined:
+            // Request permission
+            PHPhotoLibrary.requestAuthorization { [weak self] newStatus in
+                if newStatus == .authorized || newStatus == .limited {
+                    DispatchQueue.main.async {
+                        self?.saveToPhotoLibrary(imageData: imageData)
+                    }
+                } else {
+                    print("CameraManager: Photo library permission denied")
+                }
+            }
+        case .denied, .restricted:
+            print("CameraManager: Photo library access denied or restricted")
+        @unknown default:
+            print("CameraManager: Unknown photo library authorization status")
+        }
+    }
+    
+    private func processBackgroundRemoval(imageData: Data, filename: String) {
+        print("CameraManager: Starting background removal for \(filename)")
+        
+        backgroundRemover.removeBackgroundFromPhotoData(imageData) { [weak self] processedData in
+            guard let self = self, let processedData = processedData else {
+                print("CameraManager: Background removal failed for \(filename)")
+                // Fallback to saving original to photo library
+                self?.saveToPhotoLibrary(imageData: imageData)
+                return
+            }
+            
+            print("CameraManager: Background removal completed for \(filename)")
+            
+            // Save processed version to photo library
+            if let processedImage = UIImage(data: processedData) {
+                UIImageWriteToSavedPhotosAlbum(processedImage, nil, nil, nil)
+                print("CameraManager: Processed photo saved to photo library")
+            }
+            
+            // Also save original to photo library for comparison
+            self.saveToPhotoLibrary(imageData: imageData)
         }
     }
 }

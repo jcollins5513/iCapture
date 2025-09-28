@@ -135,6 +135,22 @@ struct CameraView: View {
 
                         Spacer()
 
+                        // Background removal toggle
+                        Button(action: {
+                            cameraManager.backgroundRemovalEnabled.toggle()
+                        }, label: {
+                            Image(systemName: cameraManager.backgroundRemovalEnabled ?
+                                  "photo.badge.plus" : "photo")
+                                .font(.title2)
+                                .foregroundColor(.white)
+                                .padding()
+                                .background(cameraManager.backgroundRemovalEnabled ?
+                                           Color.green : Color.gray)
+                                .clipShape(Circle())
+                        })
+
+                        Spacer()
+
                         // Background sampling button
                         Button(action: {
                             cameraManager.roiDetector.startBackgroundSampling()
