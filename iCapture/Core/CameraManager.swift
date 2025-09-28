@@ -27,6 +27,9 @@ class CameraManager: NSObject, ObservableObject {
     private let videoDataQueue = DispatchQueue(label: "camera.video.data.queue")
     private let photoQueue = DispatchQueue(label: "camera.photo.queue")
 
+    // Video recording manager
+    @Published var videoRecordingManager = VideoRecordingManager()
+
     // ROI Detection, Motion Detection and Trigger Engine
     @Published var roiDetector = ROIDetector()
     @Published var motionDetector = MotionDetector()
@@ -41,6 +44,9 @@ class CameraManager: NSObject, ObservableObject {
 
         // Configure trigger engine with dependencies
         triggerEngine.configure(cameraManager: self, roiDetector: roiDetector, motionDetector: motionDetector)
+
+        // Configure video recording manager
+        videoRecordingManager.configure(sessionManager: sessionManager, roiDetector: roiDetector)
     }
 
     func checkAuthorization() {
@@ -109,6 +115,11 @@ class CameraManager: NSObject, ObservableObject {
                         AVCapturePhotoSettings(format: [AVVideoCodecKey: AVVideoCodecType.hevc])
                     ])
                 }
+            }
+
+            // Add movie file output for video recording
+            if self.captureSession.canAddOutput(self.videoRecordingManager.getMovieFileOutput()) {
+                self.captureSession.addOutput(self.videoRecordingManager.getMovieFileOutput())
             }
 
             self.captureSession.commitConfiguration()
@@ -181,6 +192,28 @@ class CameraManager: NSObject, ObservableObject {
 
         // Sound feedback
         AudioServicesPlaySystemSound(1108) // Camera shutter sound
+    }
+
+    // MARK: - Video Recording Methods
+
+    func startVideoRecording() {
+        videoRecordingManager.startVideoRecording()
+    }
+
+    func stopVideoRecording() {
+        videoRecordingManager.stopVideoRecording()
+    }
+
+    var isVideoRecording: Bool {
+        return videoRecordingManager.isVideoRecording
+    }
+
+    var videoRecordingDuration: TimeInterval {
+        return videoRecordingManager.videoRecordingDuration
+    }
+
+    func getFormattedVideoDuration() -> String {
+        return videoRecordingManager.getFormattedVideoDuration()
     }
 }
 
