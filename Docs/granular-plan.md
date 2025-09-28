@@ -75,13 +75,63 @@ Based on master-plan.md. Update by checking off completed tasks.
 
 ## Milestone 8: QA Pass on iPhone 15 Pro and 15 Pro Max
 - [x] **8.1** Test on iPhone 15 Pro (physical device)
+  - [x] **8.1.1** Camera functionality verification
+  - [x] **8.1.2** Frame box overlay testing
+  - [x] **8.1.3** ROI occupancy detection testing
+  - [x] **8.1.4** Motion detection testing
+  - [x] **8.1.5** Capture quality verification
+  - [x] **8.1.6** Performance monitoring setup
 - [ ] **8.2** Test on iPhone 15 Pro Max (physical device)
+  - [ ] **8.2.1** Screen adaptation testing (6.7" vs 6.1")
+  - [ ] **8.2.2** UI scaling verification
+  - [ ] **8.2.3** Performance comparison with iPhone 15 Pro
+  - [ ] **8.2.4** Battery consumption analysis
+  - [ ] **8.2.5** Thermal behavior comparison
 - [ ] **8.3** Verify 48MP HEIF capture works
+  - [ ] **8.3.1** Test 48MP photo capture on iPhone 15 Pro
+  - [ ] **8.3.2** Verify file size optimization (< 15MB)
+  - [ ] **8.3.3** Test fallback to 12MP on older devices
+  - [ ] **8.3.4** Verify HEIF format compatibility
+  - [ ] **8.3.5** Test capture latency with high resolution
 - [ ] **8.4** Test thermal throttling scenarios
+  - [ ] **8.4.1** Extended capture session testing (30+ minutes)
+  - [ ] **8.4.2** Monitor thermal state changes
+  - [ ] **8.4.3** Test performance degradation under thermal stress
+  - [ ] **8.4.4** Verify recovery after cooling
+  - [ ] **8.4.5** Test thermal management strategies
 - [ ] **8.5** Verify storage limits and cleanup
+  - [ ] **8.5.1** Test session storage limits (60 photos max)
+  - [ ] **8.5.2** Verify automatic cleanup after session end
+  - [ ] **8.5.3** Test storage usage monitoring
+  - [ ] **8.5.4** Verify export bundle creation
+  - [ ] **8.5.5** Test storage optimization features
 - [ ] **8.6** Test crash scenarios and recovery
+  - [ ] **8.6.1** Test app stability during extended use
+  - [ ] **8.6.2** Test memory pressure scenarios
+  - [ ] **8.6.3** Test crash recovery mechanisms
+  - [ ] **8.6.4** Verify session data persistence
+  - [ ] **8.6.5** Test error handling and user feedback
 - [ ] **8.7** Performance testing (memory, CPU)
+  - [ ] **8.7.1** Monitor memory usage during capture sessions
+  - [ ] **8.7.2** Test CPU usage patterns
+  - [ ] **8.7.3** Verify frame rate stability (30fps target)
+  - [ ] **8.7.4** Test capture latency (< 1s requirement)
+  - [ ] **8.7.5** Monitor performance metrics with QA tools
 - [ ] **8.8** Battery usage optimization
+  - [ ] **8.8.1** Test battery consumption during active sessions
+  - [ ] **8.8.2** Monitor power usage patterns
+  - [ ] **8.8.3** Test low power mode compatibility
+  - [ ] **8.8.4** Verify battery level monitoring
+  - [ ] **8.8.5** Test power optimization features
+- [ ] **8.9** QA Testing Framework Implementation
+  - [x] **8.9.1** Create PerformanceMonitor class
+  - [x] **8.9.2** Implement QA testing mode
+  - [x] **8.9.3** Add performance overlay UI
+  - [x] **8.9.4** Create QA testing documentation
+  - [x] **8.9.5** Add developer options for QA access
+  - [ ] **8.9.6** Test QA tools on physical devices
+  - [ ] **8.9.7** Verify performance metrics accuracy
+  - [ ] **8.9.8** Test QA metrics export functionality
 
 ## Milestone 9: Pre-Release Field Test in Booth
 - [ ] **9.1** Create field test checklist
@@ -148,4 +198,5 @@ Based on master-plan.md. Update by checking off completed tasks.
 - Onboarding flow: ✅ Multi-page onboarding with frame box setup integration
 - Developer options: ✅ Reset onboarding and clear user data functionality
 - Firebase Auth integration: ✅ Ready for production with mock auth fallback for development
-- Next focus: Begin Milestone 8 - QA Pass on iPhone 15 Pro and 15 Pro Max
+- QA Testing Framework: ✅ PerformanceMonitor, QA testing tools, and documentation complete
+- Next focus: Continue Milestone 8 - Physical device testing with comprehensive QA tools
