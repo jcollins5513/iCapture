@@ -83,11 +83,13 @@ class CameraManager: NSObject, ObservableObject {
         sessionQueue.async { [weak self] in
             guard let self = self else { return }
 
+            print("CameraManager: Setting up capture session...")
             self.captureSession.beginConfiguration()
 
             // Configure session preset for high quality
             if self.captureSession.canSetSessionPreset(.photo) {
                 self.captureSession.sessionPreset = .photo
+                print("CameraManager: Session preset set to photo")
             }
 
             // Add video input
@@ -96,17 +98,22 @@ class CameraManager: NSObject, ObservableObject {
                                                             position: .back),
                   let videoInput = try? AVCaptureDeviceInput(device: videoDevice),
                   self.captureSession.canAddInput(videoInput) else {
+                print("CameraManager: ERROR - Failed to create video input")
                 self.captureSession.commitConfiguration()
                 return
             }
 
             self.captureSession.addInput(videoInput)
             self.captureDevice = videoDevice
+            print("CameraManager: Video input added successfully")
 
             // Add video output for preview
             if self.captureSession.canAddOutput(self.videoOutput) {
                 self.captureSession.addOutput(self.videoOutput)
                 self.videoOutput.setSampleBufferDelegate(self, queue: self.videoDataQueue)
+                print("CameraManager: Video output added successfully")
+            } else {
+                print("CameraManager: WARNING - Cannot add video output")
             }
 
             // Add photo output
@@ -114,29 +121,71 @@ class CameraManager: NSObject, ObservableObject {
                 self.captureSession.addOutput(self.photoOutput)
                 // Configure for high quality photos with 48MP support
                 self.configurePhotoOutputForHighResolution()
+                print("CameraManager: Photo output added successfully")
+            } else {
+                print("CameraManager: WARNING - Cannot add photo output")
             }
 
             // Add movie file output for video recording
             if self.captureSession.canAddOutput(self.videoRecordingManager.getMovieFileOutput()) {
                 self.captureSession.addOutput(self.videoRecordingManager.getMovieFileOutput())
+                print("CameraManager: Movie file output added successfully")
+            } else {
+                print("CameraManager: WARNING - Cannot add movie file output")
             }
 
             self.captureSession.commitConfiguration()
+            print("CameraManager: Session configuration committed")
 
-            // Create preview layer
-            DispatchQueue.main.async {
-                self.previewLayer = AVCaptureVideoPreviewLayer(session: self.captureSession)
-                self.previewLayer?.videoGravity = .resizeAspectFill
-            }
+                // Create preview layer on main thread
+                DispatchQueue.main.async {
+                    self.previewLayer = AVCaptureVideoPreviewLayer(session: self.captureSession)
+                    self.previewLayer?.videoGravity = .resizeAspectFill
+                    
+                    // Set initial frame size
+                    let screenBounds = UIScreen.main.bounds
+                    self.previewLayer?.frame = screenBounds
+                    
+                    // Don't configure orientation - let AVFoundation handle it naturally like native camera
+                    
+                    print("CameraManager: Preview layer created and configured")
+                    print("CameraManager: Preview layer session: \(self.previewLayer?.session != nil)")
+                    print("CameraManager: Preview layer frame: \(self.previewLayer?.frame ?? .zero)")
+                    print("CameraManager: Screen bounds: \(screenBounds)")
+                    
+                    // Ensure the preview layer is properly connected
+                    if let previewLayer = self.previewLayer {
+                        print("CameraManager: Preview layer videoGravity: \(previewLayer.videoGravity)")
+                        print("CameraManager: Preview layer connection: \(previewLayer.connection != nil)")
+                    }
+                }
         }
     }
 
     func startSession() {
         sessionQueue.async { [weak self] in
             guard let self = self, !self.captureSession.isRunning else { return }
+            print("CameraManager: Starting capture session")
+            
+            // Check camera hardware status before starting
+            if let device = self.captureDevice {
+                print("CameraManager: Camera device: \(device.localizedName)")
+                print("CameraManager: Camera position: \(device.position.rawValue)")
+                print("CameraManager: Camera format: \(device.activeFormat)")
+            } else {
+                print("CameraManager: ERROR - No camera device available!")
+            }
+            
             self.captureSession.startRunning()
             DispatchQueue.main.async {
                 self.isSessionRunning = self.captureSession.isRunning
+                print("CameraManager: Session running: \(self.captureSession.isRunning)")
+                if let previewLayer = self.previewLayer {
+                    print("CameraManager: Preview layer exists, session: \(previewLayer.session != nil)")
+                    print("CameraManager: Preview layer frame: \(previewLayer.frame)")
+                } else {
+                    print("CameraManager: WARNING - Preview layer is nil!")
+                }
             }
         }
     }
@@ -176,18 +225,20 @@ class CameraManager: NSObject, ObservableObject {
             if let device = self.captureDevice, 
                let maxDimensions = device.activeFormat.supportedMaxPhotoDimensions.max(by: { $0.width * $0.height < $1.width * $1.height }),
                maxDimensions.width >= 8000 {
-                photoSettings.maxPhotoDimensions = maxDimensions
-                print("CameraManager: Capturing 48MP high-resolution photo")
+                // Check if the photo output supports this resolution
+                if self.photoOutput.maxPhotoDimensions.width >= maxDimensions.width {
+                    photoSettings.maxPhotoDimensions = maxDimensions
+                    print("CameraManager: Capturing 48MP high-resolution photo")
+                } else {
+                    print("CameraManager: Photo output doesn't support 48MP, using standard resolution")
+                }
             } else {
                 print("CameraManager: Capturing standard resolution photo")
             }
         }
 
-            // Add metadata
-            photoSettings.metadata = [
-                "com.icapture.trigger": triggerType.rawValue,
-                "com.icapture.timestamp": Date().timeIntervalSince1970
-            ]
+            // Note: Custom metadata keys are not allowed by AVFoundation
+            // We'll store trigger info in session data instead
 
             self.photoOutput.capturePhoto(with: photoSettings, delegate: self)
         }
@@ -248,14 +299,13 @@ class CameraManager: NSObject, ObservableObject {
             photoSettings = AVCapturePhotoSettings()
         }
         
-        // Enable high resolution capture if supported
+        // Check if 48MP is available but don't set maxPhotoDimensions here
+        // We'll set it per capture to avoid conflicts
         if #available(iOS 16.0, *) {
-            // Check if 48MP is available
             if let device = captureDevice,
                let maxDimensions = device.activeFormat.supportedMaxPhotoDimensions.max(by: { $0.width * $0.height < $1.width * $1.height }),
                maxDimensions.width >= 8000 {
-                photoSettings.maxPhotoDimensions = maxDimensions
-                print("CameraManager: 48MP high-resolution capture enabled")
+                print("CameraManager: 48MP high-resolution capture supported")
             } else {
                 print("CameraManager: 48MP capture not available, using standard resolution")
             }
@@ -337,15 +387,8 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
                 return
             }
 
-            // Determine trigger type from metadata
-            let triggerType: TriggerType
-            let metadata = photo.metadata
-            if let triggerString = metadata["com.icapture.trigger"] as? String,
-               let trigger = TriggerType(rawValue: triggerString) {
-                triggerType = trigger
-            } else {
-                triggerType = .manual
-            }
+            // Use manual trigger type since custom metadata is not supported
+            let triggerType: TriggerType = .manual
 
             // Get image dimensions
             let width = photo.resolvedSettings.photoDimensions.width
@@ -457,5 +500,49 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
         } catch {
             print("Failed to save test shot: \(error)")
         }
+    }
+    
+    // MARK: - Camera Health Check
+    func checkCameraHealth() -> Bool {
+        guard let device = captureDevice else {
+            print("CameraManager: Health check failed - No camera device")
+            return false
+        }
+        
+        let isAvailable = device.isConnected && !device.isSuspended
+        print("CameraManager: Camera health check - Available: \(isAvailable)")
+        
+        if !isAvailable {
+            print("CameraManager: Camera not available - Connected: \(device.isConnected), Suspended: \(device.isSuspended)")
+        }
+        
+        return isAvailable
+    }
+    
+    func restartCameraSession() {
+        print("CameraManager: Restarting camera session...")
+        stopSession()
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            self.setupCaptureSession()
+            self.startSession()
+        }
+    }
+    
+    func updatePreviewLayerFrame() {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self, let previewLayer = self.previewLayer else { return }
+            
+            let screenBounds = UIScreen.main.bounds
+            if previewLayer.frame != screenBounds {
+                print("CameraManager: Updating preview layer frame from \(previewLayer.frame) to \(screenBounds)")
+                previewLayer.frame = screenBounds
+            }
+        }
+    }
+    
+    func updateVideoOrientation() {
+        // Don't update orientation - let AVFoundation handle it naturally like native camera
+        print("CameraManager: Letting AVFoundation handle orientation naturally")
     }
 }

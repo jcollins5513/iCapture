@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import AVFoundation
 
 struct CameraView: View {
     @StateObject private var cameraManager = CameraManager()
@@ -21,6 +22,12 @@ struct CameraView: View {
                 // Camera preview
                 CameraPreviewView(previewLayer: cameraManager.previewLayer)
                     .ignoresSafeArea()
+                    .onAppear {
+                        print("CameraView: Camera preview appeared, previewLayer exists: \(cameraManager.previewLayer != nil)")
+                        if let previewLayer = cameraManager.previewLayer {
+                            print("CameraView: Preview layer session exists: \(previewLayer.session != nil)")
+                        }
+                    }
 
                 // Frame box overlay
                 FrameBoxOverlay(roiDetector: cameraManager.roiDetector)
@@ -236,6 +243,34 @@ struct CameraView: View {
                     }
 
                     Spacer()
+                    
+                    // Manual capture button
+                    HStack {
+                        Spacer()
+                        
+                        Button(action: {
+                            print("CameraView: Manual capture triggered")
+                            cameraManager.capturePhoto(triggerType: .manual)
+                        }, label: {
+                            ZStack {
+                                Circle()
+                                    .fill(Color.white)
+                                    .frame(width: 80, height: 80)
+                                
+                                Circle()
+                                    .fill(Color.black)
+                                    .frame(width: 70, height: 70)
+                                
+                                Circle()
+                                    .fill(Color.white)
+                                    .frame(width: 60, height: 60)
+                            }
+                        })
+                        .disabled(!cameraManager.isSessionRunning)
+                        
+                        Spacer()
+                    }
+                    .padding(.bottom, 50)
                 }
 
                 // Capture flash overlay
@@ -276,6 +311,7 @@ struct CameraView: View {
             }
         }
         .onAppear {
+            print("CameraView: View appeared, starting camera session...")
             cameraManager.startSession()
             // Connect session manager to camera manager
             cameraManager.sessionManager = sessionManager
@@ -284,9 +320,39 @@ struct CameraView: View {
                 sessionManager: sessionManager,
                 roiDetector: cameraManager.roiDetector
             )
+            
+            // Ensure camera session is properly set up
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                print("CameraView: Checking camera session status...")
+                print("CameraView: Is authorized: \(cameraManager.isAuthorized)")
+                print("CameraView: Is session running: \(cameraManager.isSessionRunning)")
+                print("CameraView: Preview layer exists: \(cameraManager.previewLayer != nil)")
+                if let previewLayer = cameraManager.previewLayer {
+                    print("CameraView: Preview layer session exists: \(previewLayer.session != nil)")
+                    print("CameraView: Preview layer frame: \(previewLayer.frame)")
+                }
+                
+                // Force preview layer frame update
+                cameraManager.updatePreviewLayerFrame()
+                
+                // Check camera health and restart if needed
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                    if !cameraManager.checkCameraHealth() {
+                        print("CameraView: Camera health check failed, restarting session...")
+                        cameraManager.restartCameraSession()
+                    } else {
+                        // Force another frame update after health check
+                        cameraManager.updatePreviewLayerFrame()
+                    }
+                }
+            }
         }
         .onDisappear {
             cameraManager.stopSession()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIDevice.orientationDidChangeNotification)) { _ in
+            // Update preview layer frame when device rotates - let AVFoundation handle orientation naturally
+            cameraManager.updatePreviewLayerFrame()
         }
         .sheet(isPresented: $showSetupWizard) {
             FrameBoxSetupWizard(isPresented: $showSetupWizard)
