@@ -105,18 +105,18 @@ Based on master-plan.md. Update by checking off completed tasks.
   - [x] **8.5.3** Test storage usage monitoring
   - [x] **8.5.4** Verify export bundle creation
   - [x] **8.5.5** Test storage optimization features
-- [ ] **8.6** Test crash scenarios and recovery
-  - [ ] **8.6.1** Test app stability during extended use
-  - [ ] **8.6.2** Test memory pressure scenarios
-  - [ ] **8.6.3** Test crash recovery mechanisms
-  - [ ] **8.6.4** Verify session data persistence
-  - [ ] **8.6.5** Test error handling and user feedback
-- [ ] **8.7** Performance testing (memory, CPU)
-  - [ ] **8.7.1** Monitor memory usage during capture sessions
-  - [ ] **8.7.2** Test CPU usage patterns
-  - [ ] **8.7.3** Verify frame rate stability (30fps target)
-  - [ ] **8.7.4** Test capture latency (< 1s requirement)
-  - [ ] **8.7.5** Monitor performance metrics with QA tools
+- [x] **8.6** Test crash scenarios and recovery
+  - [x] **8.6.1** Test app stability during extended use
+  - [x] **8.6.2** Test memory pressure scenarios
+  - [x] **8.6.3** Test crash recovery mechanisms
+  - [x] **8.6.4** Verify session data persistence
+  - [x] **8.6.5** Test error handling and user feedback
+- [x] **8.7** Performance testing (memory, CPU)
+  - [x] **8.7.1** Monitor memory usage during capture sessions
+  - [x] **8.7.2** Test CPU usage patterns
+  - [x] **8.7.3** Verify frame rate stability (30fps target)
+  - [x] **8.7.4** Test capture latency (< 1s requirement)
+  - [x] **8.7.5** Monitor performance metrics with QA tools
 - [ ] **8.8** Battery usage optimization
   - [ ] **8.8.1** Test battery consumption during active sessions
   - [ ] **8.8.2** Monitor power usage patterns

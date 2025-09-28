@@ -135,9 +135,9 @@ class TriggerEngine: ObservableObject {
 
         print("TriggerEngine: ROI occupied - starting interval timer")
 
-        intervalTimer = Timer.scheduledTimer(withTimeInterval: intervalDuration, repeats: true) { [weak self] _ in
+        intervalTimer = Timer.scheduledTimer(withTimeInterval: intervalDuration, repeats: true) { _ in
             Task { @MainActor in
-                self?.triggerCapture()
+                self.triggerCapture()
             }
         }
     }

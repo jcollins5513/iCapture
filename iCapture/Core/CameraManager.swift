@@ -10,7 +10,6 @@ import Combine
 import SwiftUI
 import AudioToolbox
 
-@MainActor
 class CameraManager: NSObject, ObservableObject {
     @Published var isAuthorized = false
     @Published var previewLayer: AVCaptureVideoPreviewLayer?
@@ -40,6 +39,13 @@ class CameraManager: NSObject, ObservableObject {
 
     // Performance monitoring
     @Published var performanceMonitor = PerformanceMonitor()
+    
+    // Debug tools
+    @Published var cameraDebugger = CameraDebugger()
+    
+    // Orientation handling
+    private var lastVideoOrientation: AVCaptureVideoOrientation?
+    private var orientationUpdateTimer: Timer?
 
     override init() {
         super.init()
@@ -52,30 +58,25 @@ class CameraManager: NSObject, ObservableObject {
         videoRecordingManager.configure(sessionManager: sessionManager, roiDetector: roiDetector)
     }
 
+    @MainActor
     func checkAuthorization() {
         switch AVCaptureDevice.authorizationStatus(for: .video) {
         case .authorized:
-            DispatchQueue.main.async {
-                self.isAuthorized = true
-            }
+            isAuthorized = true
             setupCaptureSession()
         case .notDetermined:
-            AVCaptureDevice.requestAccess(for: .video) { [weak self] granted in
-                DispatchQueue.main.async {
-                    self?.isAuthorized = granted
+            AVCaptureDevice.requestAccess(for: .video) { granted in
+                Task { @MainActor in
+                    self.isAuthorized = granted
                     if granted {
-                        self?.setupCaptureSession()
+                        self.setupCaptureSession()
                     }
                 }
             }
         case .denied, .restricted:
-            DispatchQueue.main.async {
-                self.isAuthorized = false
-            }
+            isAuthorized = false
         @unknown default:
-            DispatchQueue.main.async {
-                self.isAuthorized = false
-            }
+            isAuthorized = false
         }
     }
 
@@ -119,16 +120,17 @@ class CameraManager: NSObject, ObservableObject {
             // Add photo output
             if self.captureSession.canAddOutput(self.photoOutput) {
                 self.captureSession.addOutput(self.photoOutput)
-                // Configure for high quality photos with 48MP support
-                self.configurePhotoOutputForHighResolution()
                 print("CameraManager: Photo output added successfully")
             } else {
                 print("CameraManager: WARNING - Cannot add photo output")
             }
 
             // Add movie file output for video recording
-            if self.captureSession.canAddOutput(self.videoRecordingManager.getMovieFileOutput()) {
-                self.captureSession.addOutput(self.videoRecordingManager.getMovieFileOutput())
+            let movieFileOutput = DispatchQueue.main.sync {
+                return self.videoRecordingManager.getMovieFileOutput()
+            }
+            if self.captureSession.canAddOutput(movieFileOutput) {
+                self.captureSession.addOutput(movieFileOutput)
                 print("CameraManager: Movie file output added successfully")
             } else {
                 print("CameraManager: WARNING - Cannot add movie file output")
@@ -137,28 +139,23 @@ class CameraManager: NSObject, ObservableObject {
             self.captureSession.commitConfiguration()
             print("CameraManager: Session configuration committed")
 
-                // Create preview layer on main thread
-                DispatchQueue.main.async {
-                    self.previewLayer = AVCaptureVideoPreviewLayer(session: self.captureSession)
-                    self.previewLayer?.videoGravity = .resizeAspectFill
-                    
-                    // Set initial frame size
-                    let screenBounds = UIScreen.main.bounds
-                    self.previewLayer?.frame = screenBounds
-                    
-                    // Don't configure orientation - let AVFoundation handle it naturally like native camera
-                    
-                    print("CameraManager: Preview layer created and configured")
-                    print("CameraManager: Preview layer session: \(self.previewLayer?.session != nil)")
-                    print("CameraManager: Preview layer frame: \(self.previewLayer?.frame ?? .zero)")
-                    print("CameraManager: Screen bounds: \(screenBounds)")
-                    
-                    // Ensure the preview layer is properly connected
-                    if let previewLayer = self.previewLayer {
-                        print("CameraManager: Preview layer videoGravity: \(previewLayer.videoGravity)")
-                        print("CameraManager: Preview layer connection: \(previewLayer.connection != nil)")
-                    }
-                }
+            // Configure photo output for high resolution after session is committed
+            DispatchQueue.main.async {
+                self.configurePhotoOutputForHighResolution()
+            }
+
+                // Create preview layer immediately (not async) to avoid timing issues
+            self.previewLayer = AVCaptureVideoPreviewLayer(session: self.captureSession)
+            self.previewLayer?.videoGravity = .resizeAspectFill
+            
+            print("CameraManager: Preview layer created and configured")
+            print("CameraManager: Preview layer session: \(self.previewLayer?.session != nil)")
+            
+            // Ensure the preview layer is properly connected
+            if let previewLayer = self.previewLayer {
+                print("CameraManager: Preview layer videoGravity: \(previewLayer.videoGravity)")
+                print("CameraManager: Preview layer connection: \(previewLayer.connection != nil)")
+            }
         }
     }
 
@@ -186,6 +183,14 @@ class CameraManager: NSObject, ObservableObject {
                 } else {
                     print("CameraManager: WARNING - Preview layer is nil!")
                 }
+                
+                // Start debugging if enabled
+                if self.cameraDebugger.isDebugMode {
+                    self.cameraDebugger.startDebugging(cameraManager: self)
+                }
+                
+                // Set initial video orientation
+                self.updateVideoOrientation()
             }
         }
     }
@@ -196,6 +201,13 @@ class CameraManager: NSObject, ObservableObject {
             self.captureSession.stopRunning()
             DispatchQueue.main.async {
                 self.isSessionRunning = self.captureSession.isRunning
+                
+                // Stop debugging
+                self.cameraDebugger.stopDebugging()
+                
+                // Clean up orientation timer
+                self.orientationUpdateTimer?.invalidate()
+                self.orientationUpdateTimer = nil
             }
         }
     }
@@ -244,11 +256,12 @@ class CameraManager: NSObject, ObservableObject {
         }
     }
 
+    @MainActor
     func triggerCaptureFeedback() {
         // Visual flash feedback
         showCaptureFlash = true
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            self.showCaptureFlash = false
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+            self?.showCaptureFlash = false
         }
 
         // Haptic feedback
@@ -283,10 +296,11 @@ class CameraManager: NSObject, ObservableObject {
 
     // MARK: - High-Resolution Photo Configuration
 
+    @MainActor
     private func configurePhotoOutputForHighResolution() {
         // Check if device supports 48MP capture (iPhone 15 Pro and Pro Max)
-        let deviceModel = UIDevice.current.model
-        let systemVersion = UIDevice.current.systemVersion
+        _ = UIDevice.current.model
+        _ = UIDevice.current.systemVersion
         
         // Configure photo settings for maximum resolution
         var photoSettings: AVCapturePhotoSettings
@@ -317,6 +331,7 @@ class CameraManager: NSObject, ObservableObject {
         print("CameraManager: Photo output configured for high-resolution capture")
     }
     
+    @MainActor
     func getMaxPhotoResolution() -> CGSize {
         guard let device = captureDevice else {
             return CGSize(width: 4032, height: 3024) // Default 12MP
@@ -332,10 +347,12 @@ class CameraManager: NSObject, ObservableObject {
         }
     }
     
+    @MainActor
     func getCurrentPhotoResolution() -> CGSize {
         return getMaxPhotoResolution()
     }
     
+    @MainActor
     func getPhotoCaptureInfo() -> (resolution: CGSize, format: String, is48MPSupported: Bool) {
         let resolution = getCurrentPhotoResolution()
         let format = photoOutput.availablePhotoCodecTypes.contains(.hevc) ? "HEIF" : "JPEG"
@@ -347,18 +364,18 @@ class CameraManager: NSObject, ObservableObject {
 
 // MARK: - AVCaptureVideoDataOutputSampleBufferDelegate
 extension CameraManager: AVCaptureVideoDataOutputSampleBufferDelegate {
-    func captureOutput(_ output: AVCaptureOutput,
+    nonisolated func captureOutput(_ output: AVCaptureOutput,
                        didOutput sampleBuffer: CMSampleBuffer,
                        from connection: AVCaptureConnection) {
         // Process frame for ROI detection
         guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { return }
 
-        Task { @MainActor in
+        DispatchQueue.main.async {
             // Record frame for performance monitoring
-            performanceMonitor.recordFrame()
+            self.performanceMonitor.recordFrame()
 
-            roiDetector.processFrame(pixelBuffer)
-            motionDetector.processFrame(pixelBuffer)
+            self.roiDetector.processFrame(pixelBuffer)
+            self.motionDetector.processFrame(pixelBuffer)
         }
     }
 }
@@ -374,7 +391,7 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
         }
 
         // Record capture end for performance monitoring
-        Task { @MainActor in
+        DispatchQueue.main.async {
             self.performanceMonitor.recordCaptureEnd()
         }
 
@@ -394,8 +411,10 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
             let width = photo.resolvedSettings.photoDimensions.width
             let height = photo.resolvedSettings.photoDimensions.height
 
-            // Get ROI rectangle
-            let roiRect = self.roiDetector.getROIRect()
+            // Get ROI rectangle - we'll get this on the main thread
+            let roiRect = DispatchQueue.main.sync {
+                return self.roiDetector.getROIRect()
+            }
 
             // Create filename with timestamp and resolution info
             let timestamp = Date().timeIntervalSince1970
@@ -416,7 +435,11 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
             }
 
             // Save to session directory if session is active, otherwise to test shots
-            if let sessionManager = self.sessionManager, sessionManager.isSessionActive {
+            let isSessionActive = DispatchQueue.main.sync {
+                return self.sessionManager?.isSessionActive ?? false
+            }
+            
+            if isSessionActive {
                 let params = PhotoSessionParams(
                     imageData: imageData,
                     filename: filename,
@@ -425,9 +448,13 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
                     roiRect: roiRect,
                     triggerType: triggerType
                 )
-                self.savePhotoToSession(params)
+                DispatchQueue.main.async {
+                    self.savePhotoToSession(params)
+                }
             } else {
-                self.saveTestShot(imageData: imageData, filename: filename)
+                DispatchQueue.main.async {
+                    self.saveTestShot(imageData: imageData, filename: filename)
+                }
             }
         }
     }
@@ -441,6 +468,7 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
         let triggerType: TriggerType
     }
 
+    @MainActor
     private func savePhotoToSession(_ params: PhotoSessionParams) {
         guard let sessionManager = sessionManager,
               let session = sessionManager.currentSession,
@@ -480,6 +508,7 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
         }
     }
 
+    @MainActor
     private func saveTestShot(imageData: Data, filename: String) {
         // Create test shots directory
         let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
@@ -503,6 +532,7 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
     }
     
     // MARK: - Camera Health Check
+    @MainActor
     func checkCameraHealth() -> Bool {
         guard let device = captureDevice else {
             print("CameraManager: Health check failed - No camera device")
@@ -519,30 +549,128 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
         return isAvailable
     }
     
+    @MainActor
     func restartCameraSession() {
         print("CameraManager: Restarting camera session...")
         stopSession()
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-            self.setupCaptureSession()
-            self.startSession()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+            self?.setupCaptureSession()
+            self?.startSession()
         }
     }
     
+    @MainActor
     func updatePreviewLayerFrame() {
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self, let previewLayer = self.previewLayer else { return }
-            
-            let screenBounds = UIScreen.main.bounds
-            if previewLayer.frame != screenBounds {
-                print("CameraManager: Updating preview layer frame from \(previewLayer.frame) to \(screenBounds)")
-                previewLayer.frame = screenBounds
-            }
+        guard previewLayer != nil else {
+            print("CameraManager: Cannot update frame - preview layer is nil")
+            return
         }
+        
+        // Don't update the preview layer frame here - let CameraPreviewView handle it
+        // The preview layer frame should be managed by the UIView that contains it
+        print("CameraManager: Preview layer frame update requested - delegating to CameraPreviewView")
     }
     
     func updateVideoOrientation() {
-        // Don't update orientation - let AVFoundation handle it naturally like native camera
-        print("CameraManager: Letting AVFoundation handle orientation naturally")
+        // Debounce rapid orientation changes
+        orientationUpdateTimer?.invalidate()
+        orientationUpdateTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: false) { [weak self] _ in
+            self?.performVideoOrientationUpdate()
+        }
+    }
+    
+    private func performVideoOrientationUpdate() {
+        guard let previewLayer = previewLayer,
+              let connection = previewLayer.connection else {
+            print("CameraManager: Cannot update video orientation - no preview layer or connection")
+            return
+        }
+        
+        // Use device orientation instead of interface orientation for more reliable detection
+        let deviceOrientation = UIDevice.current.orientation
+        
+        // Only update if device orientation is valid
+        guard deviceOrientation != .unknown && deviceOrientation != .faceUp && deviceOrientation != .faceDown else {
+            print("CameraManager: Skipping orientation update - invalid device orientation: \(orientationString(deviceOrientation))")
+            return
+        }
+        
+        // Convert device orientation to video orientation
+        // Note: Landscape orientations are mapped in reverse due to device sensor alignment
+        let videoOrientation: AVCaptureVideoOrientation
+        switch deviceOrientation {
+        case .portrait:
+            videoOrientation = .portrait
+        case .portraitUpsideDown:
+            videoOrientation = .portraitUpsideDown
+        case .landscapeLeft:
+            videoOrientation = .landscapeRight  // Reversed!
+        case .landscapeRight:
+            videoOrientation = .landscapeLeft   // Reversed!
+        default:
+            videoOrientation = .portrait
+        }
+        
+        // Only update if orientation actually changed
+        if lastVideoOrientation == videoOrientation {
+            print("CameraManager: Video orientation unchanged: \(videoOrientationString(videoOrientation))")
+            return
+        }
+        
+        // Debug logging
+        print("CameraManager: Device orientation: \(deviceOrientation.rawValue) (\(orientationString(deviceOrientation)))")
+        print("CameraManager: Mapped to video orientation: \(videoOrientation.rawValue) (\(videoOrientationString(videoOrientation)))")
+        print("CameraManager: Applying video orientation to connection...")
+        
+        // Set the video orientation to keep camera image upright
+        if connection.isVideoOrientationSupported {
+            connection.videoOrientation = videoOrientation
+            lastVideoOrientation = videoOrientation
+            print("CameraManager: Video orientation set successfully")
+        } else {
+            print("CameraManager: Video orientation not supported on this connection")
+        }
+    }
+    
+    private func orientationString(_ orientation: UIDeviceOrientation) -> String {
+        switch orientation {
+        case .portrait: return "Portrait"
+        case .portraitUpsideDown: return "Portrait Upside Down"
+        case .landscapeLeft: return "Landscape Left"
+        case .landscapeRight: return "Landscape Right"
+        case .faceUp: return "Face Up"
+        case .faceDown: return "Face Down"
+        default: return "Unknown"
+        }
+    }
+    
+    private func interfaceOrientationString(_ orientation: UIInterfaceOrientation) -> String {
+        switch orientation {
+        case .portrait: return "Portrait"
+        case .portraitUpsideDown: return "Portrait Upside Down"
+        case .landscapeLeft: return "Landscape Left"
+        case .landscapeRight: return "Landscape Right"
+        default: return "Unknown"
+        }
+    }
+    
+    private func videoOrientationString(_ orientation: AVCaptureVideoOrientation) -> String {
+        switch orientation {
+        case .portrait: return "Portrait"
+        case .portraitUpsideDown: return "Portrait Upside Down"
+        case .landscapeLeft: return "Landscape Left"
+        case .landscapeRight: return "Landscape Right"
+        }
+    }
+    
+    // Helper function to get screen bounds using modern API
+    private func getScreenBounds() -> CGRect {
+        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+            return windowScene.screen.bounds
+        } else {
+            // Fallback to deprecated API if needed
+            return UIScreen.main.bounds
+        }
     }
 }

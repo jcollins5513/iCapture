@@ -45,7 +45,7 @@ struct QATestingView: View {
                         Spacer()
 
                         Toggle("", isOn: $isQAModeActive)
-                            .onChange(of: isQAModeActive) { isActive in
+                            .onChange(of: isQAModeActive) { _, isActive in
                                 if isActive {
                                     performanceMonitor.startQAMode()
                                 } else {
@@ -53,7 +53,24 @@ struct QATestingView: View {
                                 }
                             }
                     }
-
+                    
+                    // Camera Debug Toggle
+                    HStack {
+                        Text("Camera Debug Mode")
+                            .font(.headline)
+                        
+                        Spacer()
+                        
+                        Toggle("", isOn: $cameraManager.cameraDebugger.isDebugMode)
+                            .onChange(of: cameraManager.cameraDebugger.isDebugMode) { _, isActive in
+                                if isActive {
+                                    cameraManager.cameraDebugger.startDebugging(cameraManager: cameraManager)
+                                } else {
+                                    cameraManager.cameraDebugger.stopDebugging()
+                                }
+                            }
+                    }
+                    
                     Text(isQAModeActive ?
                          "QA mode is active. Performance metrics are being recorded." :
                          "Enable QA mode to start recording performance metrics for testing.")
