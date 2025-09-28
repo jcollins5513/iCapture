@@ -174,7 +174,7 @@ class TriggerEngine: ObservableObject {
         }
 
         // Perform stop-based capture
-        performCapture()
+        performStopCapture()
     }
 
     private func performCapture() {
@@ -183,7 +183,7 @@ class TriggerEngine: ObservableObject {
             return
         }
 
-        print("TriggerEngine: Triggering capture #\(captureCount + 1)")
+        print("TriggerEngine: Triggering interval capture #\(captureCount + 1)")
 
         // Update capture tracking
         lastCaptureTime = Date()
@@ -191,7 +191,33 @@ class TriggerEngine: ObservableObject {
         captureCount += 1
 
         // Trigger the actual capture
-        cameraManager.captureTestShot()
+        cameraManager.capturePhoto(triggerType: .interval)
+
+        // Trigger capture feedback
+        cameraManager.triggerCaptureFeedback()
+
+        // Check if we've reached the capture limit
+        if captureCount >= maxCapturesPerSession {
+            print("TriggerEngine: Reached capture limit (\(maxCapturesPerSession))")
+            stopSession()
+        }
+    }
+
+    private func performStopCapture() {
+        guard let cameraManager = cameraManager else {
+            print("TriggerEngine: No camera manager available")
+            return
+        }
+
+        print("TriggerEngine: Triggering stop capture #\(captureCount + 1)")
+
+        // Update capture tracking
+        lastCaptureTime = Date()
+        lastDebounceTime = Date()
+        captureCount += 1
+
+        // Trigger the actual capture
+        cameraManager.capturePhoto(triggerType: .stop)
 
         // Trigger capture feedback
         cameraManager.triggerCaptureFeedback()

@@ -32,6 +32,9 @@ class CameraManager: NSObject, ObservableObject {
     @Published var motionDetector = MotionDetector()
     @Published var triggerEngine = TriggerEngine()
 
+    // Session Manager reference (will be set by CameraView)
+    weak var sessionManager: SessionManager?
+
     override init() {
         super.init()
         checkAuthorization()
@@ -139,6 +142,10 @@ class CameraManager: NSObject, ObservableObject {
     }
 
     func captureTestShot() {
+        capturePhoto(triggerType: .manual)
+    }
+
+    func capturePhoto(triggerType: TriggerType) {
         sessionQueue.async { [weak self] in
             guard let self = self, self.captureSession.isRunning else { return }
 
@@ -153,7 +160,7 @@ class CameraManager: NSObject, ObservableObject {
 
             // Add metadata
             photoSettings.metadata = [
-                "com.icapture.test": "true",
+                "com.icapture.trigger": triggerType.rawValue,
                 "com.icapture.timestamp": Date().timeIntervalSince1970
             ]
 
@@ -202,7 +209,7 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
             return
         }
 
-        // Save test shot to documents directory
+        // Save photo to appropriate directory
         photoQueue.async { [weak self] in
             guard let self = self else { return }
 
@@ -211,27 +218,111 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
                 return
             }
 
-            // Create test shots directory
-            let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-            let testShotsDirectory = documentsPath.appendingPathComponent("TestShots")
-
-            try? FileManager.default.createDirectory(at: testShotsDirectory, withIntermediateDirectories: true)
-
-            // Save with timestamp
-            let timestamp = Date().timeIntervalSince1970
-            let filename = "test_shot_\(Int(timestamp)).heic"
-            let fileURL = testShotsDirectory.appendingPathComponent(filename)
-
-            do {
-                try imageData.write(to: fileURL)
-                print("Test shot saved: \(fileURL)")
-
-                DispatchQueue.main.async {
-                    self.testShotCaptured = true
-                }
-            } catch {
-                print("Failed to save test shot: \(error)")
+            // Determine trigger type from metadata
+            let triggerType: TriggerType
+            let metadata = photo.metadata
+            if let triggerString = metadata["com.icapture.trigger"] as? String,
+               let trigger = TriggerType(rawValue: triggerString) {
+                triggerType = trigger
+            } else {
+                triggerType = .manual
             }
+
+            // Get image dimensions
+            let width = photo.resolvedSettings.photoDimensions.width
+            let height = photo.resolvedSettings.photoDimensions.height
+
+            // Get ROI rectangle
+            let roiRect = self.roiDetector.getROIRect()
+
+            // Create filename with timestamp
+            let timestamp = Date().timeIntervalSince1970
+            let filename = "photo_\(Int(timestamp)).heic"
+
+            // Save to session directory if session is active, otherwise to test shots
+            if let sessionManager = self.sessionManager, sessionManager.isSessionActive {
+                let params = PhotoSessionParams(
+                    imageData: imageData,
+                    filename: filename,
+                    width: Int(width),
+                    height: Int(height),
+                    roiRect: roiRect,
+                    triggerType: triggerType
+                )
+                self.savePhotoToSession(params)
+            } else {
+                self.saveTestShot(imageData: imageData, filename: filename)
+            }
+        }
+    }
+
+    private struct PhotoSessionParams {
+        let imageData: Data
+        let filename: String
+        let width: Int
+        let height: Int
+        let roiRect: CGRect
+        let triggerType: TriggerType
+    }
+
+    private func savePhotoToSession(_ params: PhotoSessionParams) {
+        guard let sessionManager = sessionManager,
+              let session = sessionManager.currentSession,
+              let sessionURL = sessionManager.sessionDirectory else {
+            print("No active session - saving as test shot")
+            saveTestShot(imageData: params.imageData, filename: params.filename)
+            return
+        }
+
+        do {
+            // Save to photos subdirectory
+            let photosURL = sessionURL.appendingPathComponent("photos")
+            let fileURL = photosURL.appendingPathComponent(params.filename)
+            try params.imageData.write(to: fileURL)
+
+            // Create capture asset
+            let asset = CaptureAsset(
+                sessionId: session.id,
+                type: .photo,
+                filename: params.filename,
+                width: params.width,
+                height: params.height,
+                roiRect: params.roiRect,
+                triggerType: params.triggerType
+            )
+
+            // Add asset to session
+            try sessionManager.addAsset(asset)
+
+            print("Photo saved to session: \(params.filename)")
+
+            DispatchQueue.main.async {
+                self.testShotCaptured = true
+            }
+        } catch {
+            print("Failed to save photo to session: \(error)")
+        }
+    }
+
+    private func saveTestShot(imageData: Data, filename: String) {
+        // Create test shots directory
+        let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        let testShotsDirectory = documentsPath.appendingPathComponent("TestShots")
+
+        try? FileManager.default.createDirectory(at: testShotsDirectory, withIntermediateDirectories: true)
+
+        // Save with timestamp
+        let fileURL = testShotsDirectory.appendingPathComponent(filename)
+
+        do {
+            try imageData.write(to: fileURL)
+            print("Test shot saved: \(fileURL)")
+
+            DispatchQueue.main.async {
+                self.testShotCaptured = true
+            }
+        } catch {
+            print("Failed to save test shot: \(error)")
         }
     }
 }

@@ -43,16 +43,16 @@ Based on master-plan.md. Update by checking off completed tasks.
 - [x] **4.8** Test stop-based capture with real motion
 
 ## Milestone 5: Session Storage + Per-Stock Folders + JSON Export
-- [ ] **5.1** Create VehicleSession data model
-- [ ] **5.2** Create CaptureAsset data model
-- [ ] **5.3** Implement session manager
-- [ ] **5.4** Create /Documents/Captures/<STOCK_ID>/ folder structure
-- [ ] **5.5** Add photos/ and video/ subdirectories
-- [ ] **5.6** Implement session.json creation
-- [ ] **5.7** Add asset metadata to JSON
-- [ ] **5.8** Create export bundle functionality
-- [ ] **5.9** Add stock number input UI
-- [ ] **5.10** Implement session start/end workflow
+- [x] **5.1** Create VehicleSession data model
+- [x] **5.2** Create CaptureAsset data model
+- [x] **5.3** Implement session manager
+- [x] **5.4** Create /Documents/Captures/<STOCK_ID>/ folder structure
+- [x] **5.5** Add photos/ and video/ subdirectories
+- [x] **5.6** Implement session.json creation
+- [x] **5.7** Add asset metadata to JSON
+- [x] **5.8** Create export bundle functionality
+- [x] **5.9** Add stock number input UI
+- [x] **5.10** Implement session start/end workflow
 
 ## Milestone 6: Video Recording Toggle During Rotation
 - [ ] **6.1** Add video recording toggle UI
@@ -127,6 +127,7 @@ Based on master-plan.md. Update by checking off completed tasks.
 - Milestone 2 progress: 8/8 tasks completed ✅
 - Milestone 3 progress: 8/8 tasks completed ✅
 - Milestone 4 progress: 8/8 tasks completed ✅
+- Milestone 5 progress: 10/10 tasks completed ✅
 - Authentication gate: ✅ Basic mock auth implemented
 - ROI occupancy detection: ✅ Implemented with Vision framework
 - Interval capture system: ✅ Working with 5s timer and debounce
@@ -134,4 +135,8 @@ Based on master-plan.md. Update by checking off completed tasks.
 - Capture feedback: ✅ Flash, haptic, and sound feedback
 - Motion detection: ✅ Optical flow calculation with stop detection
 - Stop-based capture: ✅ Integrated with ROI occupancy and debounce
-- Next focus: Begin Milestone 5 - Session Storage + Per-Stock Folders + JSON Export
+- Session management: ✅ Complete session storage with per-stock folders and JSON export
+- Stock number input: ✅ UI for starting new sessions with stock number validation
+- Asset tracking: ✅ CaptureAsset model with metadata and file management
+- Export functionality: ✅ Automatic export bundle creation with organized assets
+- Next focus: Begin Milestone 6 - Video Recording Toggle During Rotation

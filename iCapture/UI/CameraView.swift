@@ -9,8 +9,10 @@ import SwiftUI
 
 struct CameraView: View {
     @StateObject private var cameraManager = CameraManager()
+    @StateObject private var sessionManager = SessionManager()
     @ObservedObject var authManager: AuthManager
     @State private var showSetupWizard = false
+    @State private var showStockNumberInput = false
 
     var body: some View {
         ZStack {
@@ -48,15 +50,31 @@ struct CameraView: View {
 
                         // Session status
                         VStack(alignment: .leading, spacing: 4) {
-                            Text(cameraManager.triggerEngine.isIntervalCaptureActive ? "Recording" : "Ready")
-                                .foregroundColor(cameraManager.triggerEngine.isIntervalCaptureActive ? .green : .white)
-                                .fontWeight(.semibold)
+                            if sessionManager.isSessionActive {
+                                Text("Session Active")
+                                    .foregroundColor(.green)
+                                    .fontWeight(.semibold)
+
+                                if let session = sessionManager.currentSession {
+                                    Text("Stock: \(session.stockNumber)")
+                                        .font(.caption)
+                                        .foregroundColor(.white)
+
+                                    Text("Duration: \(sessionManager.getFormattedDuration())")
+                                        .font(.caption)
+                                        .foregroundColor(.white)
+
+                                    Text("Captures: \(sessionManager.getAssetCount())")
+                                        .font(.caption)
+                                        .foregroundColor(.white)
+                                }
+                            } else {
+                                Text("No Session")
+                                    .foregroundColor(.orange)
+                                    .fontWeight(.semibold)
+                            }
 
                             if cameraManager.triggerEngine.isIntervalCaptureActive {
-                                Text("Captures: \(cameraManager.triggerEngine.captureCount)")
-                                    .font(.caption)
-                                    .foregroundColor(.white)
-
                                 if cameraManager.roiDetector.isROIOccupied {
                                     let occupancy = cameraManager.roiDetector.occupancyPercentage
                                     let occupancyText = String(format: "%.1f", occupancy)
@@ -119,18 +137,25 @@ struct CameraView: View {
 
                         // Session control button
                         Button(action: {
-                            if cameraManager.triggerEngine.isIntervalCaptureActive {
-                                cameraManager.triggerEngine.stopSession()
+                            if sessionManager.isSessionActive {
+                                // End session
+                                do {
+                                    try sessionManager.endSession()
+                                    cameraManager.triggerEngine.stopSession()
+                                } catch {
+                                    print("Failed to end session: \(error)")
+                                }
                             } else {
-                                cameraManager.triggerEngine.startSession()
+                                // Start new session
+                                showStockNumberInput = true
                             }
                         }, label: {
-                            Image(systemName: cameraManager.triggerEngine.isIntervalCaptureActive ?
+                            Image(systemName: sessionManager.isSessionActive ?
                                   "stop.circle.fill" : "play.circle.fill")
                                 .font(.title)
                                 .foregroundColor(.white)
                                 .padding()
-                                .background(cameraManager.triggerEngine.isIntervalCaptureActive ?
+                                .background(sessionManager.isSessionActive ?
                                            Color.red : Color.green)
                                 .clipShape(Circle())
                         })
@@ -194,12 +219,26 @@ struct CameraView: View {
         }
         .onAppear {
             cameraManager.startSession()
+            // Connect session manager to camera manager
+            cameraManager.sessionManager = sessionManager
         }
         .onDisappear {
             cameraManager.stopSession()
         }
         .sheet(isPresented: $showSetupWizard) {
             FrameBoxSetupWizard(isPresented: $showSetupWizard)
+        }
+        .sheet(isPresented: $showStockNumberInput) {
+            StockNumberInputView(sessionManager: sessionManager, isPresented: $showStockNumberInput)
+        }
+        .onChange(of: sessionManager.isSessionActive) { isActive in
+            if isActive {
+                // Start trigger engine when session becomes active
+                cameraManager.triggerEngine.startSession()
+            } else {
+                // Stop trigger engine when session ends
+                cameraManager.triggerEngine.stopSession()
+            }
         }
     }
 }
