@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		CD11C55F2E88E6850068B3F2 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = CD03F0402E884DA000831FD4 /* FirebaseAuth */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		CD03F02E2E884D9F00831FD4 /* iCapture.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iCapture.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -23,6 +27,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CD11C55F2E88E6850068B3F2 /* FirebaseAuth in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -65,6 +70,7 @@
 			);
 			name = iCapture;
 			packageProductDependencies = (
+				CD03F0402E884DA000831FD4 /* FirebaseAuth */,
 			);
 			productName = iCapture;
 			productReference = CD03F02E2E884D9F00831FD4 /* iCapture.app */;
@@ -94,6 +100,9 @@
 			);
 			mainGroup = CD03F0252E884D9E00831FD4;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				CD03F03F2E884DA000831FD4 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = CD03F02F2E884D9F00831FD4 /* Products */;
 			projectDirPath = "";
@@ -336,6 +345,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		CD03F03F2E884DA000831FD4 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 10.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		CD03F0402E884DA000831FD4 /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CD03F03F2E884DA000831FD4 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = CD03F0262E884D9E00831FD4 /* Project object */;
 }

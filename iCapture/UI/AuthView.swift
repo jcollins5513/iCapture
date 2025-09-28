@@ -12,6 +12,7 @@ struct AuthView: View {
     @State private var email = ""
     @State private var password = ""
     @State private var showingDemoInfo = false
+    @State private var showingDeveloperOptions = false
 
     var body: some View {
         ZStack {
@@ -103,16 +104,30 @@ struct AuthView: View {
                 .padding(.horizontal, 40)
 
                 // Demo credentials info
-                Button(action: {
-                    showingDemoInfo.toggle()
-                }, label: {
-                    Text("Demo Credentials")
-                        .font(.caption)
-                        .foregroundColor(.white.opacity(0.7))
-                        .underline()
-                })
-                .sheet(isPresented: $showingDemoInfo) {
-                    DemoCredentialsView()
+                HStack(spacing: 20) {
+                    Button(action: {
+                        showingDemoInfo.toggle()
+                    }, label: {
+                        Text("Demo Credentials")
+                            .font(.caption)
+                            .foregroundColor(.white.opacity(0.7))
+                            .underline()
+                    })
+                    .sheet(isPresented: $showingDemoInfo) {
+                        DemoCredentialsView()
+                    }
+
+                    Button(action: {
+                        showingDeveloperOptions.toggle()
+                    }, label: {
+                        Text("Developer Options")
+                            .font(.caption)
+                            .foregroundColor(.white.opacity(0.7))
+                            .underline()
+                    })
+                    .sheet(isPresented: $showingDeveloperOptions) {
+                        DeveloperOptionsView()
+                    }
                 }
 
                 Spacer()
@@ -202,6 +217,84 @@ struct CredentialRow: View {
         .padding()
         .background(Color.gray.opacity(0.1))
         .cornerRadius(8)
+    }
+}
+
+struct DeveloperOptionsView: View {
+    @Environment(\.dismiss) private var dismiss
+    @State private var showingResetAlert = false
+
+    var body: some View {
+        NavigationView {
+            VStack(spacing: 20) {
+                Text("Developer Options")
+                    .font(.title2)
+                    .fontWeight(.bold)
+                    .padding(.top)
+
+                VStack(alignment: .leading, spacing: 16) {
+                    Text("Reset Options")
+                        .font(.headline)
+
+                    Button("Reset Onboarding") {
+                        showingResetAlert = true
+                    }
+                    .buttonStyle(.bordered)
+                    .foregroundColor(.orange)
+
+                    Text("This will show the onboarding flow again on next app launch.")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                .padding()
+                .background(Color.gray.opacity(0.1))
+                .cornerRadius(8)
+
+                VStack(alignment: .leading, spacing: 16) {
+                    Text("Storage Options")
+                        .font(.headline)
+
+                    Button("Clear All User Data") {
+                        // This would clear all stored data
+                        UserDefaults.standard.removeObject(forKey: "authenticated_user")
+                        UserDefaults.standard.removeObject(forKey: "frameBoxRect")
+                        UserDefaults.standard.removeObject(forKey: "roiConfiguration")
+                        UserDefaults.standard.removeObject(forKey: "motionConfiguration")
+                        UserDefaults.standard.removeObject(forKey: "currentSession")
+                    }
+                    .buttonStyle(.bordered)
+                    .foregroundColor(.red)
+
+                    Text("This will clear all stored settings and return the app to its initial state.")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                .padding()
+                .background(Color.gray.opacity(0.1))
+                .cornerRadius(8)
+
+                Spacer()
+            }
+            .padding(.horizontal)
+            .navigationTitle("Developer Options")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Done") {
+                        dismiss()
+                    }
+                }
+            }
+        }
+        .alert("Reset Onboarding", isPresented: $showingResetAlert) {
+            Button("Reset", role: .destructive) {
+                UserDefaults.standard.removeObject(forKey: "onboardingCompleted")
+                dismiss()
+            }
+            Button("Cancel", role: .cancel) { }
+        } message: {
+            Text("This will reset the onboarding flow and show it again on next app launch.")
+        }
     }
 }
 
