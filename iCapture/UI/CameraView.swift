@@ -113,6 +113,13 @@ struct CameraView: View {
                                         .font(.caption)
                                         .foregroundColor(.yellow)
                                 }
+                                
+                                // Photo capture info
+                                let photoInfo = cameraManager.getPhotoCaptureInfo()
+                                let resolutionText = photoInfo.is48MPSupported ? "48MP" : "12MP"
+                                Text("Photo: \(resolutionText) \(photoInfo.format)")
+                                    .font(.caption)
+                                    .foregroundColor(.cyan)
                             }
                         }
                         .padding()

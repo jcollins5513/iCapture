@@ -21,6 +21,11 @@ class SessionManager: ObservableObject {
     @Published var photoCount = 0
     @Published var videoCount = 0
     @Published var sessionDuration: TimeInterval = 0
+    
+    // Storage management
+    @Published var currentStorageUsage: Int64 = 0
+    @Published var maxStorageLimit: Int64 = 60 * 15 * 1024 * 1024 // 60 photos * 15MB = 900MB
+    @Published var storageWarningThreshold: Int64 = 80 * 15 * 1024 * 1024 // 80% of limit
 
     private let fileManager = FileManager.default
     private let documentsPath: URL
@@ -66,6 +71,9 @@ class SessionManager: ObservableObject {
 
         // Save session metadata
         try saveSessionMetadata()
+        
+        // Cleanup old sessions to manage storage
+        try cleanupOldSessions()
 
         print("SessionManager: Started session for stock \(stockNumber)")
     }
@@ -314,6 +322,76 @@ class SessionManager: ObservableObject {
         let minutes = Int(sessionDuration) / 60
         let seconds = Int(sessionDuration) % 60
         return String(format: "%d:%02d", minutes, seconds)
+    }
+    
+    // MARK: - Storage Management
+    
+    func getStorageUsage() -> Int64 {
+        guard let sessionURL = sessionDirectory else { return 0 }
+        
+        var totalSize: Int64 = 0
+        
+        do {
+            let contents = try fileManager.contentsOfDirectory(at: sessionURL, includingPropertiesForKeys: [.fileSizeKey])
+            for url in contents {
+                let attributes = try fileManager.attributesOfItem(atPath: url.path)
+                if let fileSize = attributes[.size] as? Int64 {
+                    totalSize += fileSize
+                }
+            }
+        } catch {
+            print("Failed to calculate storage usage: \(error)")
+        }
+        
+        currentStorageUsage = totalSize
+        return totalSize
+    }
+    
+    func getFormattedStorageUsage() -> String {
+        let usage = getStorageUsage()
+        return ByteCountFormatter.string(fromByteCount: usage, countStyle: .file)
+    }
+    
+    func isStorageLimitReached() -> Bool {
+        return getStorageUsage() >= maxStorageLimit
+    }
+    
+    func isStorageWarningThresholdReached() -> Bool {
+        return getStorageUsage() >= storageWarningThreshold
+    }
+    
+    func cleanupOldSessions() throws {
+        let capturesPath = documentsPath.appendingPathComponent("Captures")
+        
+        guard fileManager.fileExists(atPath: capturesPath.path) else { return }
+        
+        let contents = try fileManager.contentsOfDirectory(at: capturesPath, includingPropertiesForKeys: [.creationDateKey])
+        
+        // Sort by creation date (oldest first)
+        let sortedContents = contents.sorted { url1, url2 in
+            let date1 = (try? url1.resourceValues(forKeys: [.creationDateKey]).creationDate) ?? Date.distantPast
+            let date2 = (try? url2.resourceValues(forKeys: [.creationDateKey]).creationDate) ?? Date.distantPast
+            return date1 < date2
+        }
+        
+        // Keep only the 10 most recent sessions
+        let sessionsToDelete = sortedContents.dropLast(10)
+        
+        for sessionURL in sessionsToDelete {
+            try fileManager.removeItem(at: sessionURL)
+            print("SessionManager: Cleaned up old session: \(sessionURL.lastPathComponent)")
+        }
+    }
+    
+    func getStorageStatus() -> String {
+        let usage = getStorageUsage()
+        let limit = maxStorageLimit
+        let percentage = Double(usage) / Double(limit) * 100
+        
+        let usageString = ByteCountFormatter.string(fromByteCount: usage, countStyle: .file)
+        let limitString = ByteCountFormatter.string(fromByteCount: limit, countStyle: .file)
+        
+        return "Storage: \(usageString) / \(limitString) (\(String(format: "%.1f", percentage))%)"
     }
 }
 

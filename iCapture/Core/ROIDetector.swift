@@ -167,6 +167,11 @@ class ROIDetector: ObservableObject {
         Task { @MainActor in
             self.occupancyPercentage = occupancy * 100
             self.isROIOccupied = isOccupied
+            
+            // Debug logging every 30 frames (about once per second at 30fps)
+            if self.occupancyPercentage > 0 {
+                print("ROIDetector: Occupancy: \(String(format: "%.1f", self.occupancyPercentage))%, Threshold: \(String(format: "%.1f", self.occupancyThreshold * 100))%, Occupied: \(isOccupied)")
+            }
         }
     }
 

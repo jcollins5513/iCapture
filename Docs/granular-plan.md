@@ -81,30 +81,30 @@ Based on master-plan.md. Update by checking off completed tasks.
   - [x] **8.1.4** Motion detection testing
   - [x] **8.1.5** Capture quality verification
   - [x] **8.1.6** Performance monitoring setup
-- [ ] **8.2** Test on iPhone 15 Pro Max (physical device)
-  - [ ] **8.2.1** Screen adaptation testing (6.7" vs 6.1")
-  - [ ] **8.2.2** UI scaling verification
-  - [ ] **8.2.3** Performance comparison with iPhone 15 Pro
-  - [ ] **8.2.4** Battery consumption analysis
-  - [ ] **8.2.5** Thermal behavior comparison
-- [ ] **8.3** Verify 48MP HEIF capture works
-  - [ ] **8.3.1** Test 48MP photo capture on iPhone 15 Pro
-  - [ ] **8.3.2** Verify file size optimization (< 15MB)
-  - [ ] **8.3.3** Test fallback to 12MP on older devices
-  - [ ] **8.3.4** Verify HEIF format compatibility
-  - [ ] **8.3.5** Test capture latency with high resolution
-- [ ] **8.4** Test thermal throttling scenarios
-  - [ ] **8.4.1** Extended capture session testing (30+ minutes)
-  - [ ] **8.4.2** Monitor thermal state changes
-  - [ ] **8.4.3** Test performance degradation under thermal stress
-  - [ ] **8.4.4** Verify recovery after cooling
-  - [ ] **8.4.5** Test thermal management strategies
-- [ ] **8.5** Verify storage limits and cleanup
-  - [ ] **8.5.1** Test session storage limits (60 photos max)
-  - [ ] **8.5.2** Verify automatic cleanup after session end
-  - [ ] **8.5.3** Test storage usage monitoring
-  - [ ] **8.5.4** Verify export bundle creation
-  - [ ] **8.5.5** Test storage optimization features
+- [x] **8.2** Test on iPhone 15 Pro Max (physical device)
+  - [x] **8.2.1** Screen adaptation testing (6.7" vs 6.1")
+  - [x] **8.2.2** UI scaling verification
+  - [x] **8.2.3** Performance comparison with iPhone 15 Pro
+  - [x] **8.2.4** Battery consumption analysis
+  - [x] **8.2.5** Thermal behavior comparison
+- [x] **8.3** Verify 48MP HEIF capture works
+  - [x] **8.3.1** Test 48MP photo capture on iPhone 15 Pro
+  - [x] **8.3.2** Verify file size optimization (< 15MB)
+  - [x] **8.3.3** Test fallback to 12MP on older devices
+  - [x] **8.3.4** Verify HEIF format compatibility
+  - [x] **8.3.5** Test capture latency with high resolution
+- [x] **8.4** Test thermal throttling scenarios
+  - [x] **8.4.1** Extended capture session testing (30+ minutes)
+  - [x] **8.4.2** Monitor thermal state changes
+  - [x] **8.4.3** Test performance degradation under thermal stress
+  - [x] **8.4.4** Verify recovery after cooling
+  - [x] **8.4.5** Test thermal management strategies
+- [x] **8.5** Verify storage limits and cleanup
+  - [x] **8.5.1** Test session storage limits (60 photos max)
+  - [x] **8.5.2** Verify automatic cleanup after session end
+  - [x] **8.5.3** Test storage usage monitoring
+  - [x] **8.5.4** Verify export bundle creation
+  - [x] **8.5.5** Test storage optimization features
 - [ ] **8.6** Test crash scenarios and recovery
   - [ ] **8.6.1** Test app stability during extended use
   - [ ] **8.6.2** Test memory pressure scenarios
