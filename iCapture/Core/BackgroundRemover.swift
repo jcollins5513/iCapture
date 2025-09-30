@@ -21,6 +21,7 @@ class BackgroundRemover: ObservableObject {
 
     private let processingQueue = DispatchQueue(label: "background.removal.queue", qos: .userInitiated)
     private let ciContext = CIContext()
+    private let depthForegroundThreshold: Float = 15.0 // retained for legacy paths
 
     // MARK: - Public Interface
 
@@ -81,7 +82,6 @@ class BackgroundRemover: ObservableObject {
                 return
             }
 
-            // Convert back to Data (try HEIF first, fallback to JPEG)
             if let processedData = processedImage.heifData() {
                 completion(processedData)
             } else {
@@ -125,7 +125,6 @@ class BackgroundRemover: ObservableObject {
             completion(nil)
             return
         }
-        // Use Vision framework's foreground instance mask generation
         performForegroundSegmentation(cgImage: cgImage, depthMap: depthMap, originalImage: image, completion: completion)
     }
 
@@ -137,11 +136,7 @@ class BackgroundRemover: ObservableObject {
     ) {
         if #available(iOS 17.0, *) {
             let orientation = CGImagePropertyOrientation(originalImage.imageOrientation)
-            let handler = VNImageRequestHandler(
-                cgImage: cgImage,
-                orientation: orientation,
-                options: [:]
-            )
+            let handler = VNImageRequestHandler(cgImage: cgImage, orientation: orientation, options: [:])
 
             let request = VNGenerateForegroundInstanceMaskRequest { [weak self] request, error in
                 guard let self = self else { return }
@@ -150,7 +145,6 @@ class BackgroundRemover: ObservableObject {
                     self.performSimpleBackgroundRemoval(image: originalImage, completion: completion)
                     return
                 }
-
                 guard let results = request.results, let result = results.first else {
                     print("BackgroundRemover: No segmentation results")
                     self.performSimpleBackgroundRemoval(image: originalImage, completion: completion)
@@ -162,11 +156,13 @@ class BackgroundRemover: ObservableObject {
                     handler: handler,
                     to: originalImage,
                     cgImage: cgImage,
-                    depthMap: depthMap,
-                    orientation: orientation
+                    depthMap: depthMap
                 )
                 completion(processedImage)
             }
+
+            request.qualityLevel = .accurate
+            request.revision = VNGenerateForegroundInstanceMaskRequest.currentRevision
 
             do {
                 try handler.perform([request])
@@ -175,7 +171,6 @@ class BackgroundRemover: ObservableObject {
                 performSimpleBackgroundRemoval(image: originalImage, completion: completion)
             }
         } else {
-            // Older OS: fallback to simple removal
             performSimpleBackgroundRemoval(image: originalImage, completion: completion)
         }
     }
@@ -185,8 +180,7 @@ class BackgroundRemover: ObservableObject {
         handler: VNImageRequestHandler,
         to image: UIImage,
         cgImage: CGImage,
-        depthMap: CVPixelBuffer?,
-        orientation: CGImagePropertyOrientation
+        depthMap: CVPixelBuffer?
     ) -> UIImage? {
         print("BackgroundRemover: Applying foreground + (optional) depth mask")
 
@@ -196,27 +190,25 @@ class BackgroundRemover: ObservableObject {
 
         if #available(iOS 17.0, *) {
             do {
-                guard let maskPixelBuffer = dominantMaskPixelBuffer(
-                    from: observation,
-                    using: handler
-                ) else {
+                // choose the best instance mask
+                guard let maskPixelBuffer = dominantMaskPixelBuffer(from: observation, using: handler) else {
                     return performSimpleBackgroundRemovalSync(image: image)
                 }
 
                 let inputCIImage = CIImage(cgImage: cgImage)
                 let inputExtent = inputCIImage.extent
 
+                // refine the vision mask
                 var visionMask = CIImage(cvPixelBuffer: maskPixelBuffer)
                 visionMask = refinedMask(visionMask, targetExtent: inputExtent)
 
-                // If a depth map is provided (15 Pro/Max with LiDAR), convert it to a mask and intersect with the Vision mask
-                if let depthMap = depthMap {
-                    let depthMask = makeDepthMask(
+                // intersect with depth if present
+                if let depthMap = depthMap,
+                   let depthMask = makeDepthMask(
                         from: depthMap,
-                        targetExtent: inputExtent,
-                        orientation: orientation
-                    )
-                    // Intersect masks via multiply compositing (logical AND for [0,1] masks)
+                        guidedBy: maskPixelBuffer,
+                        targetExtent: inputExtent
+                   ) {
                     let multiply = CIFilter.multiplyCompositing()
                     multiply.inputImage = depthMask
                     multiply.backgroundImage = visionMask
@@ -225,7 +217,7 @@ class BackgroundRemover: ObservableObject {
                     }
                 }
 
-                // Blend original image over transparent background using the (combined) mask
+                // blend over transparent background
                 let blend = CIFilter.blendWithMask()
                 blend.inputImage = inputCIImage
                 blend.maskImage = visionMask
@@ -246,39 +238,33 @@ class BackgroundRemover: ObservableObject {
         }
     }
 
+    // MARK: - Mask refinement helpers (iOS 17+)
+
     @available(iOS 17.0, *)
     private func refinedMask(_ mask: CIImage, targetExtent: CGRect) -> CIImage {
         var refined = mask.clampedToExtent()
 
         let contrast = CIFilter.colorControls()
         contrast.inputImage = refined
-        contrast.saturation = Float(0)
-        contrast.brightness = Float(-0.02)
-        contrast.contrast = Float(1.1)
-        if let adjusted = contrast.outputImage {
-            refined = adjusted
-        }
+        contrast.saturation = 0
+        contrast.brightness = -0.02
+        contrast.contrast = 1.1
+        if let adjusted = contrast.outputImage { refined = adjusted }
 
         let dilate = CIFilter.morphologyMaximum()
         dilate.inputImage = refined
-        dilate.radius = Float(2.0)
-        if let dilated = dilate.outputImage {
-            refined = dilated
-        }
+        dilate.radius = 2.0
+        if let dilated = dilate.outputImage { refined = dilated }
 
         let erode = CIFilter.morphologyMinimum()
         erode.inputImage = refined
-        erode.radius = Float(1.5)
-        if let eroded = erode.outputImage {
-            refined = eroded
-        }
+        erode.radius = 1.5
+        if let eroded = erode.outputImage { refined = eroded }
 
         let blur = CIFilter.gaussianBlur()
         blur.inputImage = refined
-        blur.radius = Float(0.8)
-        if let blurred = blur.outputImage {
-            refined = blurred
-        }
+        blur.radius = 0.8
+        if let blurred = blur.outputImage { refined = blurred }
 
         return refined.cropped(to: targetExtent)
     }
@@ -289,12 +275,8 @@ class BackgroundRemover: ObservableObject {
         using handler: VNImageRequestHandler
     ) -> CVPixelBuffer? {
         let instances = observation.allInstances
-
         if instances.isEmpty {
-            return try? observation.generateScaledMaskForImage(
-                forInstances: instances,
-                from: handler
-            )
+            return try? observation.generateScaledMaskForImage(forInstances: instances, from: handler)
         }
 
         var bestScore: Float = -Float.greatestFiniteMagnitude
@@ -302,13 +284,9 @@ class BackgroundRemover: ObservableObject {
 
         for instance in instances {
             let selection = IndexSet(integer: instance)
-            guard let mask = try? observation.generateScaledMaskForImage(
-                forInstances: selection,
-                from: handler
-            ) else {
+            guard let mask = try? observation.generateScaledMaskForImage(forInstances: selection, from: handler) else {
                 continue
             }
-
             let score = maskScore(mask)
             if score > bestScore {
                 bestScore = score
@@ -316,14 +294,8 @@ class BackgroundRemover: ObservableObject {
             }
         }
 
-        if let bestBuffer {
-            return bestBuffer
-        }
-
-        return try? observation.generateScaledMaskForImage(
-            forInstances: instances,
-            from: handler
-        )
+        if let bestBuffer { return bestBuffer }
+        return try? observation.generateScaledMaskForImage(forInstances: instances, from: handler)
     }
 
     @available(iOS 17.0, *)
@@ -338,35 +310,31 @@ class BackgroundRemover: ObservableObject {
         let width = CVPixelBufferGetWidth(pixelBuffer)
         let height = CVPixelBufferGetHeight(pixelBuffer)
         let bytesPerRow = CVPixelBufferGetBytesPerRow(pixelBuffer)
-
         let pointer = baseAddress.assumingMemoryBound(to: UInt8.self)
 
         var total: Float = 0
         var center: Float = 0
 
-        let centerXStart = Int(Float(width) * 0.25)
-        let centerXEnd = Int(Float(width) * 0.75)
-        let centerYStart = Int(Float(height) * 0.25)
-        let centerYEnd = Int(Float(height) * 0.75)
+        let cx0 = Int(Float(width) * 0.25)
+        let cx1 = Int(Float(width) * 0.75)
+        let cy0 = Int(Float(height) * 0.25)
+        let cy1 = Int(Float(height) * 0.75)
 
         for row in 0..<height {
-            let rowPointer = pointer.advanced(by: row * bytesPerRow)
-            for column in 0..<width {
-                let value = Float(rowPointer[column])
-                total += value
-
-                if row >= centerYStart && row < centerYEnd && column >= centerXStart && column < centerXEnd {
-                    center += value
-                }
+            let rowPtr = pointer.advanced(by: row * bytesPerRow)
+            for col in 0..<width {
+                let v = Float(rowPtr[col])
+                total += v
+                if row >= cy0 && row < cy1 && col >= cx0 && col < cx1 { center += v }
             }
         }
 
         let pixelCount = Float(width * height)
         let coverage = total / (pixelCount * 255.0)
 
-        let centerWidth = max(1, centerXEnd - centerXStart)
-        let centerHeight = max(1, centerYEnd - centerYStart)
-        let centerCoverage = center / (Float(centerWidth * centerHeight) * 255.0)
+        let centerW = max(1, cx1 - cx0)
+        let centerH = max(1, cy1 - cy0)
+        let centerCoverage = center / (Float(centerW * centerH) * 255.0)
 
         return (coverage * 0.65) + (centerCoverage * 0.35)
     }
@@ -374,27 +342,68 @@ class BackgroundRemover: ObservableObject {
     @available(iOS 17.0, *)
     private func makeDepthMask(
         from depthPixelBuffer: CVPixelBuffer,
-        targetExtent: CGRect,
-        orientation: CGImagePropertyOrientation
-    ) -> CIImage {
-        // Convert depth to CIImage (typically 32-bit float, 1 channel)
-        var depth = CIImage(cvPixelBuffer: depthPixelBuffer)
-        depth = depth.oriented(forExifOrientation: Int32(orientation.rawValue))
+        guidedBy subjectMask: CVPixelBuffer?,
+        targetExtent: CGRect
+    ) -> CIImage? {
+        guard let depthStatistics = DepthStatistics(depthPixelBuffer: depthPixelBuffer, subjectMask: subjectMask) else {
+            return nil
+        }
 
-        // Scale depth map to match the target extent (Vision mask/original image size)
-        let sx = targetExtent.width / depth.extent.width
-        let sy = targetExtent.height / depth.extent.height
-        depth = depth.transformed(by: CGAffineTransform(scaleX: sx, y: sy))
+        let foregroundUpperBound = depthStatistics.foregroundUpperBound
 
-        // Convert luminance to alpha; then invert so nearer points (car) become white in the mask.
-        let alpha = depth.applyingFilter("CIMaskToAlpha")
-        let inverted = alpha.applyingFilter("CIColorInvert")
+        CVPixelBufferLockBaseAddress(depthPixelBuffer, .readOnly)
+        defer { CVPixelBufferUnlockBaseAddress(depthPixelBuffer, .readOnly) }
 
-        // Optional smoothing to avoid jagged edges
-        let blurred = inverted.applyingFilter("CIGaussianBlur", parameters: [kCIInputRadiusKey: 1.5])
+        guard let depthBase = CVPixelBufferGetBaseAddress(depthPixelBuffer) else { return nil }
 
-        return refinedMask(blurred, targetExtent: targetExtent)
+        let depthWidth = CVPixelBufferGetWidth(depthPixelBuffer)
+        let depthHeight = CVPixelBufferGetHeight(depthPixelBuffer)
+        let depthRowStride = CVPixelBufferGetBytesPerRow(depthPixelBuffer) / MemoryLayout<Float32>.stride
+        let depthValues = depthBase.assumingMemoryBound(to: Float32.self)
+
+        let attrs: [String: Any] = [kCVPixelBufferIOSurfacePropertiesKey as String: [:]]
+        var maskBuffer: CVPixelBuffer?
+        guard CVPixelBufferCreate(
+            kCFAllocatorDefault,
+            depthWidth,
+            depthHeight,
+            kCVPixelFormatType_OneComponent8,
+            attrs as CFDictionary,
+            &maskBuffer
+        ) == kCVReturnSuccess, let mask = maskBuffer else { return nil }
+
+        CVPixelBufferLockBaseAddress(mask, [])
+        guard let maskBase = CVPixelBufferGetBaseAddress(mask) else {
+            CVPixelBufferUnlockBaseAddress(mask, [])
+            return nil
+        }
+        let maskRowStride = CVPixelBufferGetBytesPerRow(mask)
+        let maskValues = maskBase.assumingMemoryBound(to: UInt8.self)
+
+        for y in 0..<depthHeight {
+            let depthRow = depthValues.advanced(by: y * depthRowStride)
+            let maskRow = maskValues.advanced(by: y * maskRowStride)
+            for x in 0..<depthWidth {
+                let d = depthRow[x]
+                maskRow[x] = (d > 0 && d <= foregroundUpperBound) ? 255 : 0
+            }
+        }
+        CVPixelBufferUnlockBaseAddress(mask, [])
+
+        var depthMask = CIImage(cvPixelBuffer: mask)
+        let scaleX = targetExtent.width / depthMask.extent.width
+        let scaleY = targetExtent.height / depthMask.extent.height
+        depthMask = depthMask.transformed(by: CGAffineTransform(scaleX: scaleX, y: scaleY))
+
+        let blurRadius = max(1.0, min(targetExtent.width, targetExtent.height) * 0.0025)
+        depthMask = depthMask
+            .applyingFilter("CIGaussianBlur", parameters: [kCIInputRadiusKey: blurRadius])
+            .cropped(to: targetExtent)
+
+        return depthMask.applyingFilter("CIMaskToAlpha")
     }
+
+    // MARK: - Simple fallback
 
     private func performSimpleBackgroundRemoval(image: UIImage, completion: @escaping (UIImage?) -> Void) {
         let processedImage = performSimpleBackgroundRemovalSync(image: image)
@@ -421,31 +430,20 @@ class BackgroundRemover: ObservableObject {
             bytesPerRow: bytesPerRow,
             space: colorSpace,
             bitmapInfo: bitmapInfo
-        ) else {
-            return nil
-        }
+        ) else { return nil }
 
-        // Draw the original image
         context.draw(cgImage, in: CGRect(x: 0, y: 0, width: width, height: height))
 
-        // Get pixel data
         guard let data = context.data else { return nil }
         let pixels = data.assumingMemoryBound(to: UInt8.self)
 
-        // Simple background removal: make white/light areas transparent
-        for pixelNumber in 0..<(width * height) {
-            let pixelIndex = pixelNumber * 4
-            let red = pixels[pixelIndex]
-            let green = pixels[pixelIndex + 1]
-            let blue = pixels[pixelIndex + 2]
-
-            // Calculate brightness
-            let brightness = (Int(red) + Int(green) + Int(blue)) / 3
-
-            // Simple heuristic: if pixel is very light (white/background), make it transparent
-            if brightness > 220 { // Adjust threshold as needed
-                pixels[pixelIndex + 3] = 0 // Make transparent
-            }
+        for i in 0..<(width * height) {
+            let idx = i * 4
+            let r = pixels[idx]
+            let g = pixels[idx + 1]
+            let b = pixels[idx + 2]
+            let brightness = (Int(r) + Int(g) + Int(b)) / 3
+            if brightness > 220 { pixels[idx + 3] = 0 }
         }
 
         guard let outputCGImage = context.makeImage() else { return nil }
@@ -459,49 +457,116 @@ extension UIImage {
     func heifData() -> Data? {
         guard let cgImage = self.cgImage else { return nil }
 
-        // Try HEIF first, fallback to JPEG if it fails
         let data = NSMutableData()
-
-        // Try HEIF format first
         if let destination = CGImageDestinationCreateWithData(data, "public.heif" as CFString, 1, nil) {
             let options: [CFString: Any] = [
                 kCGImageDestinationLossyCompressionQuality: 0.9,
                 kCGImagePropertyHasAlpha: true
             ]
-
             CGImageDestinationAddImage(destination, cgImage, options as CFDictionary)
             CGImageDestinationFinalize(destination)
-
             return data as Data
         } else {
-            // Fallback to JPEG if HEIF is not supported
             print("BackgroundRemover: HEIF not supported, falling back to JPEG")
             return self.jpegData(compressionQuality: 0.9)
         }
     }
 }
 
-extension CGImagePropertyOrientation {
+fileprivate extension CGImagePropertyOrientation {
     init(_ orientation: UIImage.Orientation) {
         switch orientation {
-        case .up:
-            self = .up
-        case .down:
-            self = .down
-        case .left:
-            self = .left
-        case .right:
-            self = .right
-        case .upMirrored:
-            self = .upMirrored
-        case .downMirrored:
-            self = .downMirrored
-        case .leftMirrored:
-            self = .leftMirrored
-        case .rightMirrored:
-            self = .rightMirrored
-        @unknown default:
-            self = .up
+        case .up: self = .up
+        case .upMirrored: self = .upMirrored
+        case .down: self = .down
+        case .downMirrored: self = .downMirrored
+        case .left: self = .left
+        case .leftMirrored: self = .leftMirrored
+        case .right: self = .right
+        case .rightMirrored: self = .rightMirrored
+        @unknown default: self = .up
         }
+    }
+}
+
+@available(iOS 17.0, *)
+private struct DepthStatistics {
+    let foregroundUpperBound: Float
+
+    init?(depthPixelBuffer: CVPixelBuffer, subjectMask: CVPixelBuffer?) {
+        CVPixelBufferLockBaseAddress(depthPixelBuffer, .readOnly)
+        defer { CVPixelBufferUnlockBaseAddress(depthPixelBuffer, .readOnly) }
+
+        guard let depthBase = CVPixelBufferGetBaseAddress(depthPixelBuffer) else { return nil }
+
+        let depthWidth = CVPixelBufferGetWidth(depthPixelBuffer)
+        let depthHeight = CVPixelBufferGetHeight(depthPixelBuffer)
+        let depthRowStride = CVPixelBufferGetBytesPerRow(depthPixelBuffer) / MemoryLayout<Float32>.stride
+        let depthValues = depthBase.assumingMemoryBound(to: Float32.self)
+
+        var samples: [Float] = []
+        samples.reserveCapacity(5000)
+
+        func appendSample(_ value: Float32) {
+            if value.isFinite && value > 0 { samples.append(value) }
+        }
+
+        if let subjectMask = subjectMask {
+            CVPixelBufferLockBaseAddress(subjectMask, .readOnly)
+            defer { CVPixelBufferUnlockBaseAddress(subjectMask, .readOnly) }
+
+            guard let maskBase = CVPixelBufferGetBaseAddress(subjectMask) else { return nil }
+
+            let maskWidth = CVPixelBufferGetWidth(subjectMask)
+            let maskHeight = CVPixelBufferGetHeight(subjectMask)
+            let maskRowStride = CVPixelBufferGetBytesPerRow(subjectMask)
+            let maskValues = maskBase.assumingMemoryBound(to: UInt8.self)
+
+            let stepX = max(1, maskWidth / 200)
+            let stepY = max(1, maskHeight / 200)
+
+            for maskY in stride(from: 0, to: maskHeight, by: stepY) {
+                let maskRow = maskValues.advanced(by: maskY * maskRowStride)
+                let depthY = min(depthHeight - 1, Int(round(Float(maskY) * Float(depthHeight) / Float(maskHeight))))
+                let depthRow = depthValues.advanced(by: depthY * depthRowStride)
+
+                for maskX in stride(from: 0, to: maskWidth, by: stepX) {
+                    let maskValue = maskRow[maskX]
+                    if maskValue < 170 { continue }
+                    let depthX = min(depthWidth - 1, Int(round(Float(maskX) * Float(depthWidth) / Float(maskWidth))))
+                    appendSample(depthRow[depthX])
+                }
+            }
+        }
+
+        if samples.isEmpty {
+            let stepX = max(1, depthWidth / 200)
+            let stepY = max(1, depthHeight / 200)
+            for y in stride(from: 0, to: depthHeight, by: stepY) {
+                let depthRow = depthValues.advanced(by: y * depthRowStride)
+                for x in stride(from: 0, to: depthWidth, by: stepX) { appendSample(depthRow[x]) }
+            }
+        }
+
+        guard !samples.isEmpty else { return nil }
+        samples.sort()
+
+        func percentile(_ p: Double) -> Float {
+            let clamped = min(1.0, max(0.0, p))
+            let idx = Int(clamped * Double(samples.count - 1))
+            return samples[idx]
+        }
+
+        let median = percentile(0.5)
+        let lower = percentile(0.1)
+        let upper = percentile(0.9)
+        let spread = max(0.05, upper - lower)
+
+        let bufferedUpper = min(
+            max(upper + spread * 0.35, median + spread * 0.25),
+            median + spread * 1.25
+        ) + 0.05
+
+        foregroundUpperBound = max(bufferedUpper, 0.25)
     }
 }
