@@ -58,6 +58,13 @@ class CameraManager: NSObject, ObservableObject {
     // Orientation handling
     private var lastVideoOrientation: AVCaptureVideoOrientation?
     private var orientationUpdateTimer: Timer?
+
+    @available(iOS 17.0, *)
+    private var rotationCoordinator: AVCaptureDevice.RotationCoordinator?
+
+    @available(iOS 17.0, *)
+    private var lastVideoRotationAngle: CGFloat?
+
     var lastLiDARProcessingState: Bool?
     enum AutoCaptureWorkflowState {
         case idle
@@ -728,6 +735,39 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
             return
         }
 
+        if #available(iOS 17.0, *) {
+            // Lazily create the rotation coordinator if needed
+            if rotationCoordinator == nil, let device = captureDevice {
+                rotationCoordinator = AVCaptureDevice.RotationCoordinator(device: device, previewLayer: previewLayer)
+            }
+
+            guard let coordinator = rotationCoordinator else {
+                print("CameraManager: No rotation coordinator available")
+                return
+            }
+
+            let angle = coordinator.videoRotationAngleForHorizonLevelCapture
+            if connection.isVideoRotationAngleSupported(angle) {
+                if let lastAngle = lastVideoRotationAngle, lastAngle == angle {
+                    print("CameraManager: Video rotation angle unchanged: \(angle)")
+                } else {
+                    print("CameraManager: Applying video rotation angle: \(angle)")
+                    connection.videoRotationAngle = angle
+                    lastVideoRotationAngle = angle
+                    print("CameraManager: Video rotation angle set successfully")
+                }
+            } else {
+                print("CameraManager: Video rotation angle \(angle) not supported on this connection")
+            }
+            return
+        }
+
+        // iOS < 17 fallback using deprecated orientation API (isolated in a legacy helper to avoid deprecation warnings on iOS 17+)
+        legacyPerformVideoOrientationUpdate(connection: connection)
+    }
+
+    @available(iOS, introduced: 13.0, deprecated: 17.0)
+    private func legacyPerformVideoOrientationUpdate(connection: AVCaptureConnection) {
         // Use device orientation instead of interface orientation for more reliable detection
         let deviceOrientation = UIDevice.current.orientation
 
@@ -957,3 +997,4 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
         }
     }
 }
+

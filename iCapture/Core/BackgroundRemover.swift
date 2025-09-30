@@ -172,8 +172,7 @@ class BackgroundRemover: ObservableObject {
                 let blend = CIFilter.blendWithMask()
                 blend.inputImage = inputCIImage
                 blend.maskImage = visionMask
-                let transparentBackground = CIImage(color: .clear).cropped(to: inputCIImage.extent)
-                blend.backgroundImage = transparentBackground
+                blend.backgroundImage = CIImage.empty()
 
                 guard let outputCI = blend.outputImage,
                       let outputCG = ciContext.createCGImage(outputCI, from: outputCI.extent) else {
