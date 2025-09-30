@@ -112,9 +112,10 @@ extension CameraManager {
             if let processedImage = UIImage(data: processedData) {
                 UIImageWriteToSavedPhotosAlbum(processedImage, nil, nil, nil)
                 print("CameraManager: Background-removed photo saved to photo library")
+            } else {
+                print("CameraManager: Unable to decode processed image data; saving original instead")
+                self.saveToPhotoLibrary(imageData: originalData)
             }
-
-            self.saveToPhotoLibrary(imageData: originalData)
         }
     }
 }
