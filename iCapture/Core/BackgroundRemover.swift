@@ -20,6 +20,7 @@ class BackgroundRemover: ObservableObject {
 
     private let processingQueue = DispatchQueue(label: "background.removal.queue", qos: .userInitiated)
     private let ciContext = CIContext()
+    private let depthForegroundThreshold: Float = 15.0
 
     // MARK: - Public Interface
 
@@ -155,8 +156,8 @@ class BackgroundRemover: ObservableObject {
                 var visionMask = CIImage(cvPixelBuffer: maskPixelBuffer)
 
                 // If a depth map is provided (15 Pro/Max with LiDAR), convert it to a mask and intersect with the Vision mask
-                if let depthMap = depthMap {
-                    let depthMask = makeDepthMask(from: depthMap, targetExtent: visionMask.extent)
+                if let depthMap = depthMap,
+                   let depthMask = makeDepthMask(from: depthMap, targetExtent: visionMask.extent) {
                     // Intersect masks via multiply compositing (logical AND for [0,1] masks)
                     let multiply = CIFilter.multiplyCompositing()
                     multiply.inputImage = depthMask
@@ -189,24 +190,65 @@ class BackgroundRemover: ObservableObject {
     }
 
     @available(iOS 17.0, *)
-    private func makeDepthMask(from depthPixelBuffer: CVPixelBuffer, targetExtent: CGRect) -> CIImage {
-        // Convert depth to CIImage (typically 32-bit float, 1 channel)
-        var depth = CIImage(cvPixelBuffer: depthPixelBuffer)
+    private func makeDepthMask(from depthPixelBuffer: CVPixelBuffer, targetExtent: CGRect) -> CIImage? {
+        CVPixelBufferLockBaseAddress(depthPixelBuffer, .readOnly)
+        defer { CVPixelBufferUnlockBaseAddress(depthPixelBuffer, .readOnly) }
 
-        // Scale depth map to match the target extent (Vision mask/original image size)
-        let sx = targetExtent.width / depth.extent.width
-        let sy = targetExtent.height / depth.extent.height
-        depth = depth.transformed(by: CGAffineTransform(scaleX: sx, y: sy))
+        guard let depthBaseAddress = CVPixelBufferGetBaseAddress(depthPixelBuffer) else {
+            return nil
+        }
 
-        // Convert luminance to alpha; then invert so nearer points (car) become white in the mask.
-        let alpha = depth.applyingFilter("CIMaskToAlpha")
-        let inverted = alpha.applyingFilter("CIColorInvert")
+        let depthValues = depthBaseAddress.assumingMemoryBound(to: Float32.self)
+        let width = CVPixelBufferGetWidth(depthPixelBuffer)
+        let height = CVPixelBufferGetHeight(depthPixelBuffer)
 
-        // Optional smoothing to avoid jagged edges
-        let blurred = inverted.applyingFilter("CIGaussianBlur", parameters: [kCIInputRadiusKey: 1.5])
+        let maskAttributes: [String: Any] = [
+            kCVPixelBufferIOSurfacePropertiesKey as String: [:]
+        ]
 
-        // Clamp to the target extent
-        return blurred.cropped(to: targetExtent)
+        var maskPixelBuffer: CVPixelBuffer?
+        let status = CVPixelBufferCreate(
+            kCFAllocatorDefault,
+            width,
+            height,
+            kCVPixelFormatType_OneComponent8,
+            maskAttributes as CFDictionary,
+            &maskPixelBuffer
+        )
+
+        guard status == kCVReturnSuccess, let maskPixelBuffer else {
+            return nil
+        }
+
+        CVPixelBufferLockBaseAddress(maskPixelBuffer, [])
+        defer { CVPixelBufferUnlockBaseAddress(maskPixelBuffer, []) }
+
+        guard let maskBaseAddress = CVPixelBufferGetBaseAddress(maskPixelBuffer) else {
+            return nil
+        }
+
+        let maskValues = maskBaseAddress.assumingMemoryBound(to: UInt8.self)
+
+        for row in 0..<height {
+            let rowOffset = row * width
+            for column in 0..<width {
+                let index = rowOffset + column
+                let depth = depthValues[index]
+                let keep = depth > 0 && depth <= depthForegroundThreshold
+                maskValues[index] = keep ? 255 : 0
+            }
+        }
+
+        var maskImage = CIImage(cvPixelBuffer: maskPixelBuffer)
+        maskImage = maskImage.applyingFilter("CIMaskToAlpha")
+
+        let scaleX = targetExtent.width / maskImage.extent.width
+        let scaleY = targetExtent.height / maskImage.extent.height
+        maskImage = maskImage.transformed(by: CGAffineTransform(scaleX: scaleX, y: scaleY))
+
+        maskImage = maskImage.applyingFilter("CIGaussianBlur", parameters: [kCIInputRadiusKey: 1.5])
+
+        return maskImage.cropped(to: targetExtent)
     }
 
     private func performSimpleBackgroundRemoval(image: UIImage, completion: @escaping (UIImage?) -> Void) {
