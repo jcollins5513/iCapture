@@ -34,18 +34,38 @@ extension CameraManager {
         sessionFileURL: URL?
     ) {
         print("CameraManager: Using photo depth data for background removal")
+        let convertedDepth = depthData.converting(toDepthDataType: kCVPixelFormatType_DepthFloat32)
+        let depthMap = convertedDepth.depthDataMap
 
-        lidarBackgroundRemover.removeBackgroundFromPhotoData(
-            imageData: imageData,
-            depthData: depthData
+        backgroundRemover.removeBackgroundFromPhotoData(
+            imageData,
+            depthMap: depthMap
         ) { [weak self] processedData in
-            self?.handleBackgroundRemovalCompletion(
-                processedData: processedData,
-                originalData: imageData,
-                filename: filename,
-                sourceDescription: "photo depth",
-                sessionFileURL: sessionFileURL
-            )
+            guard let self else { return }
+
+            if let processedData = processedData {
+                self.handleBackgroundRemovalCompletion(
+                    processedData: processedData,
+                    originalData: imageData,
+                    filename: filename,
+                    sourceDescription: "Vision + photo depth",
+                    sessionFileURL: sessionFileURL
+                )
+            } else {
+                print("CameraManager: Vision+depth removal failed, falling back to LiDAR-only mask")
+                self.lidarBackgroundRemover.removeBackgroundFromPhotoData(
+                    imageData: imageData,
+                    depthData: convertedDepth
+                ) { [weak self] fallbackData in
+                    self?.handleBackgroundRemovalCompletion(
+                        processedData: fallbackData,
+                        originalData: imageData,
+                        filename: filename,
+                        sourceDescription: "LiDAR-only fallback",
+                        sessionFileURL: sessionFileURL
+                    )
+                }
+            }
         }
     }
 
@@ -58,17 +78,35 @@ extension CameraManager {
            lidarDetector.isLiDARAvailable,
            let latestDepth = lidarDetector.latestDepthData {
             print("CameraManager: Using cached LiDAR depth data for background removal")
-            lidarBackgroundRemover.removeBackgroundFromPhotoData(
-                imageData: imageData,
-                depthData: latestDepth
+            backgroundRemover.removeBackgroundFromPhotoData(
+                imageData,
+                depthMap: latestDepth.depthMap
             ) { [weak self] processedData in
-                self?.handleBackgroundRemovalCompletion(
-                    processedData: processedData,
-                    originalData: imageData,
-                    filename: filename,
-                    sourceDescription: "LiDAR scan",
-                    sessionFileURL: sessionFileURL
-                )
+                guard let self else { return }
+
+                if let processedData = processedData {
+                    self.handleBackgroundRemovalCompletion(
+                        processedData: processedData,
+                        originalData: imageData,
+                        filename: filename,
+                        sourceDescription: "Vision + LiDAR scan",
+                        sessionFileURL: sessionFileURL
+                    )
+                } else {
+                    print("CameraManager: Cached LiDAR depth fusion failed, using LiDAR-only mask")
+                    self.lidarBackgroundRemover.removeBackgroundFromPhotoData(
+                        imageData: imageData,
+                        depthData: latestDepth
+                    ) { [weak self] fallbackData in
+                        self?.handleBackgroundRemovalCompletion(
+                            processedData: fallbackData,
+                            originalData: imageData,
+                            filename: filename,
+                            sourceDescription: "LiDAR scan fallback",
+                            sessionFileURL: sessionFileURL
+                        )
+                    }
+                }
             }
         } else {
             print("CameraManager: Falling back to Vision-based background removal")
