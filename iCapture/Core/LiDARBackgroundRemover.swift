@@ -208,7 +208,8 @@ class LiDARBackgroundRemover: ObservableObject {
         let blend = CIFilter.blendWithMask()
         blend.inputImage = input
         blend.maskImage = maskCI
-        blend.backgroundImage = CIImage.empty() // transparent
+        let transparentBackground = CIImage(color: .clear).cropped(to: input.extent)
+        blend.backgroundImage = transparentBackground // transparent
 
         guard let out = blend.outputImage,
               let outCG = ciContext.createCGImage(out, from: out.extent) else {
