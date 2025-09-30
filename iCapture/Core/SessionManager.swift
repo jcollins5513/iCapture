@@ -266,6 +266,7 @@ class SessionManager: ObservableObject {
 
     // MARK: - Session Statistics
 
+    @MainActor
     private func updateSessionStatistics() {
         totalCaptures = sessionAssets.count
         photoCount = sessionAssets.filter { $0.type == .photo }.count
@@ -454,3 +455,4 @@ extension Notification.Name {
     static let sessionDidStart = Notification.Name("SessionDidStart")
     static let sessionDidEnd = Notification.Name("SessionDidEnd")
 }
+

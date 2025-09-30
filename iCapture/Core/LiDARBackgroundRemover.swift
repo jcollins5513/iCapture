@@ -9,6 +9,7 @@ import ARKit
 import AVFoundation
 import UIKit
 import CoreImage
+import CoreImage.CIFilterBuiltins
 import Combine
 
 @MainActor
@@ -16,6 +17,8 @@ class LiDARBackgroundRemover: ObservableObject {
     @Published var isProcessing = false
     @Published var processingProgress: Double = 0.0
     @Published var processedImage: UIImage?
+
+    private let ciContext = CIContext()
 
     // LiDAR configuration
     private let backgroundDepthThreshold: Float = 15.0 // 15+ meters is background
@@ -191,70 +194,27 @@ class LiDARBackgroundRemover: ObservableObject {
     }
 
     private func applyMaskToImage(cgImage: CGImage, mask: CVPixelBuffer) -> UIImage? {
-        let width = cgImage.width
-        let height = cgImage.height
+        let input = CIImage(cgImage: cgImage)
+        var maskCI = CIImage(cvPixelBuffer: mask)
 
-        // Create context for processing
-        let colorSpace = CGColorSpaceCreateDeviceRGB()
-        let bitmapInfo = CGImageAlphaInfo.premultipliedLast.rawValue
+        // Scale mask to match image extent
+        let sx = input.extent.width / maskCI.extent.width
+        let sy = input.extent.height / maskCI.extent.height
+        maskCI = maskCI.transformed(by: CGAffineTransform(scaleX: sx, y: sy))
 
-        guard let context = CGContext(
-            data: nil,
-            width: width,
-            height: height,
-            bitsPerComponent: 8,
-            bytesPerRow: 0,
-            space: colorSpace,
-            bitmapInfo: bitmapInfo
-        ) else { return nil }
+        // Lightly blur for softer edges
+        maskCI = maskCI.applyingFilter("CIGaussianBlur", parameters: [kCIInputRadiusKey: 1.2])
 
-        // Draw original image
-        context.draw(cgImage, in: CGRect(x: 0, y: 0, width: width, height: height))
+        let blend = CIFilter.blendWithMask()
+        blend.inputImage = input
+        blend.maskImage = maskCI
+        blend.backgroundImage = CIImage.empty() // transparent
 
-        // Apply mask
-        applyMaskToContext(context, mask: mask, imageSize: CGSize(width: width, height: height))
-
-        // Create result image
-        guard let resultCGImage = context.makeImage() else { return nil }
-        return UIImage(cgImage: resultCGImage)
-    }
-
-    private func applyMaskToContext(_ context: CGContext, mask: CVPixelBuffer, imageSize: CGSize) {
-        CVPixelBufferLockBaseAddress(mask, .readOnly)
-        defer { CVPixelBufferUnlockBaseAddress(mask, .readOnly) }
-
-        guard let maskData = CVPixelBufferGetBaseAddress(mask) else { return }
-        let maskValues = maskData.assumingMemoryBound(to: UInt8.self)
-
-        let width = CVPixelBufferGetWidth(mask)
-        let height = CVPixelBufferGetHeight(mask)
-
-        // Scale mask to image size
-        let scaleX = imageSize.width / CGFloat(width)
-        let scaleY = imageSize.height / CGFloat(height)
-
-        // Apply mask to image data
-        guard let imageData = context.data else { return }
-        let pixels = imageData.assumingMemoryBound(to: UInt8.self)
-
-        for row in 0..<Int(imageSize.height) {
-            for col in 0..<Int(imageSize.width) {
-                let pixelIndex = (row * Int(imageSize.width) + col) * 4
-
-                // Calculate corresponding mask coordinates
-                let maskRow = Int(CGFloat(row) / scaleY)
-                let maskCol = Int(CGFloat(col) / scaleX)
-
-                if maskRow < height && maskCol < width {
-                    let maskIndex = maskRow * width + maskCol
-                    let maskValue = maskValues[maskIndex]
-
-                    // Apply mask (0 = transparent, 255 = opaque)
-                    let alpha = maskValue
-                    pixels[pixelIndex + 3] = alpha
-                }
-            }
+        guard let out = blend.outputImage,
+              let outCG = ciContext.createCGImage(out, from: out.extent) else {
+            return nil
         }
+        return UIImage(cgImage: outCG)
     }
 }
 

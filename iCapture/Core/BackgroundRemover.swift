@@ -9,6 +9,7 @@ import AVFoundation
 import Vision
 import UIKit
 import CoreImage
+import CoreImage.CIFilterBuiltins
 import Combine
 
 @MainActor
@@ -18,6 +19,7 @@ class BackgroundRemover: ObservableObject {
     @Published var processedImage: UIImage?
 
     private let processingQueue = DispatchQueue(label: "background.removal.queue", qos: .userInitiated)
+    private let ciContext = CIContext()
 
     // MARK: - Public Interface
 
@@ -32,7 +34,29 @@ class BackgroundRemover: ObservableObject {
         processingProgress = 0.0
 
         processingQueue.async { [weak self] in
-            self?.performBackgroundRemoval(image: image) { result in
+            self?.performBackgroundRemoval(image: image, depthMap: nil) { result in
+                Task { @MainActor in
+                    self?.isProcessing = false
+                    self?.processingProgress = 1.0
+                    self?.processedImage = result
+                    completion(result)
+                }
+            }
+        }
+    }
+
+    func removeBackground(from image: UIImage, depthMap: CVPixelBuffer?, completion: @escaping (UIImage?) -> Void) {
+        guard !isProcessing else {
+            print("BackgroundRemover: Already processing, skipping request")
+            completion(nil)
+            return
+        }
+
+        isProcessing = true
+        processingProgress = 0.0
+
+        processingQueue.async { [weak self] in
+            self?.performBackgroundRemoval(image: image, depthMap: depthMap) { result in
                 Task { @MainActor in
                     self?.isProcessing = false
                     self?.processingProgress = 1.0
@@ -68,59 +92,120 @@ class BackgroundRemover: ObservableObject {
 
     // MARK: - Private Methods
 
-    private func performBackgroundRemoval(image: UIImage, completion: @escaping (UIImage?) -> Void) {
+    private func performBackgroundRemoval(image: UIImage, depthMap: CVPixelBuffer?, completion: @escaping (UIImage?) -> Void) {
         guard let cgImage = image.cgImage else {
             print("BackgroundRemover: Failed to get CGImage")
             completion(nil)
             return
         }
-
         // Use Vision framework's foreground instance mask generation
-        performForegroundSegmentation(cgImage: cgImage, originalImage: image, completion: completion)
+        performForegroundSegmentation(cgImage: cgImage, depthMap: depthMap, originalImage: image, completion: completion)
     }
 
     private func performForegroundSegmentation(
         cgImage: CGImage,
+        depthMap: CVPixelBuffer?,
         originalImage: UIImage,
         completion: @escaping (UIImage?) -> Void
     ) {
-        let request = VNGenerateForegroundInstanceMaskRequest { request, error in
-            if let error = error {
-                print("BackgroundRemover: Foreground segmentation failed: \(error)")
-                // Fallback to simple background removal
-                self.performSimpleBackgroundRemoval(image: originalImage, completion: completion)
-                return
+        if #available(iOS 17.0, *) {
+            let request = VNGenerateForegroundInstanceMaskRequest { [weak self] request, error in
+                guard let self = self else { return }
+                if let error = error {
+                    print("BackgroundRemover: Foreground segmentation failed: \(error)")
+                    self.performSimpleBackgroundRemoval(image: originalImage, completion: completion)
+                    return
+                }
+
+                guard let results = request.results, let result = results.first else {
+                    print("BackgroundRemover: No segmentation results")
+                    self.performSimpleBackgroundRemoval(image: originalImage, completion: completion)
+                    return
+                }
+
+                let processedImage = self.applyForegroundMask(result, to: originalImage, cgImage: cgImage, depthMap: depthMap)
+                completion(processedImage)
             }
 
-            guard let results = request.results, let result = results.first else {
-                print("BackgroundRemover: No segmentation results")
-                // Fallback to simple background removal
-                self.performSimpleBackgroundRemoval(image: originalImage, completion: completion)
-                return
+            let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
+
+            do {
+                try handler.perform([request])
+            } catch {
+                print("BackgroundRemover: Failed to perform foreground segmentation: \(error)")
+                performSimpleBackgroundRemoval(image: originalImage, completion: completion)
             }
-
-            // Apply the segmentation mask to create transparent background
-            let processedImage = self.applyForegroundMask(result, to: originalImage, cgImage: cgImage)
-            completion(processedImage)
-        }
-
-        let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
-
-        do {
-            try handler.perform([request])
-        } catch {
-            print("BackgroundRemover: Failed to perform foreground segmentation: \(error)")
-            // Fallback to simple background removal
+        } else {
+            // Older OS: fallback to simple removal
             performSimpleBackgroundRemoval(image: originalImage, completion: completion)
         }
     }
 
-    private func applyForegroundMask(_ segmentationResult: Any, to image: UIImage, cgImage: CGImage) -> UIImage? {
-        print("BackgroundRemover: Applying foreground mask to image")
+    private func applyForegroundMask(_ segmentationResult: Any, to image: UIImage, cgImage: CGImage, depthMap: CVPixelBuffer?) -> UIImage? {
+        print("BackgroundRemover: Applying foreground + (optional) depth mask")
 
-        // For now, use the simple background removal approach
-        // In a future implementation, we would properly handle the Vision framework results
-        return performSimpleBackgroundRemovalSync(image: image)
+        guard let observation = segmentationResult as? VNInstanceMaskObservation else {
+            return performSimpleBackgroundRemovalSync(image: image)
+        }
+
+        if #available(iOS 17.0, *) {
+            do {
+                let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
+                let maskPixelBuffer = try observation.generateScaledMaskForImage(forInstances: observation.allInstances, from: handler)
+                var visionMask = CIImage(cvPixelBuffer: maskPixelBuffer)
+
+                // If a depth map is provided (15 Pro/Max with LiDAR), convert it to a mask and intersect with the Vision mask
+                if let depthMap = depthMap {
+                    let depthMask = makeDepthMask(from: depthMap, targetExtent: visionMask.extent)
+                    // Intersect masks via multiply compositing (logical AND for [0,1] masks)
+                    let multiply = CIFilter.multiplyCompositing()
+                    multiply.inputImage = depthMask
+                    multiply.backgroundImage = visionMask
+                    if let combined = multiply.outputImage {
+                        visionMask = combined
+                    }
+                }
+
+                // Blend original image over transparent background using the (combined) mask
+                let inputCIImage = CIImage(cgImage: cgImage)
+                let blend = CIFilter.blendWithMask()
+                blend.inputImage = inputCIImage
+                blend.maskImage = visionMask
+                blend.backgroundImage = CIImage.empty()
+
+                guard let outputCI = blend.outputImage,
+                      let outputCG = ciContext.createCGImage(outputCI, from: outputCI.extent) else {
+                    return performSimpleBackgroundRemovalSync(image: image)
+                }
+                return UIImage(cgImage: outputCG, scale: image.scale, orientation: image.imageOrientation)
+            } catch {
+                print("BackgroundRemover: Failed to apply mask: \(error)")
+                return performSimpleBackgroundRemovalSync(image: image)
+            }
+        } else {
+            return performSimpleBackgroundRemovalSync(image: image)
+        }
+    }
+
+    @available(iOS 17.0, *)
+    private func makeDepthMask(from depthPixelBuffer: CVPixelBuffer, targetExtent: CGRect) -> CIImage {
+        // Convert depth to CIImage (typically 32-bit float, 1 channel)
+        var depth = CIImage(cvPixelBuffer: depthPixelBuffer)
+
+        // Scale depth map to match the target extent (Vision mask/original image size)
+        let sx = targetExtent.width / depth.extent.width
+        let sy = targetExtent.height / depth.extent.height
+        depth = depth.transformed(by: CGAffineTransform(scaleX: sx, y: sy))
+
+        // Convert luminance to alpha; then invert so nearer points (car) become white in the mask.
+        let alpha = depth.applyingFilter("CIMaskToAlpha")
+        let inverted = alpha.applyingFilter("CIColorInvert")
+
+        // Optional smoothing to avoid jagged edges
+        let blurred = inverted.applyingFilter("CIGaussianBlur", parameters: [kCIInputRadiusKey: 1.5])
+
+        // Clamp to the target extent
+        return blurred.cropped(to: targetExtent)
     }
 
     private func performSimpleBackgroundRemoval(image: UIImage, completion: @escaping (UIImage?) -> Void) {
