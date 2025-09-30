@@ -147,16 +147,15 @@ extension VideoRecordingManager: AVCaptureFileOutputRecordingDelegate {
 
         print("Video recording completed: \(outputFileURL.path)")
 
-        // Save video to session if active
-        videoQueue.async { [weak self] in
-            guard let self = self else { return }
-
+        // Save video to session if active (ensure main-actor context for model updates)
+        Task { @MainActor in
             if let sessionManager = self.sessionManager, sessionManager.isSessionActive {
                 self.saveVideoToSession(fileURL: outputFileURL)
             }
         }
     }
 
+    @MainActor
     private func saveVideoToSession(fileURL: URL) {
         guard let sessionManager = sessionManager,
               let session = sessionManager.currentSession else {
@@ -196,3 +195,4 @@ extension VideoRecordingManager: AVCaptureFileOutputRecordingDelegate {
         }
     }
 }
+
