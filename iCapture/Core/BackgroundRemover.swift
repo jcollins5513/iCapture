@@ -120,12 +120,19 @@ class BackgroundRemover: ObservableObject {
     // MARK: - Private Methods
 
     private func performBackgroundRemoval(image: UIImage, depthMap: CVPixelBuffer?, completion: @escaping (UIImage?) -> Void) {
-        guard let cgImage = image.cgImage else {
+        let normalizedImage = image.normalizedForProcessing()
+
+        guard let cgImage = normalizedImage.cgImage else {
             print("BackgroundRemover: Failed to get CGImage")
             completion(nil)
             return
         }
-        performForegroundSegmentation(cgImage: cgImage, depthMap: depthMap, originalImage: image, completion: completion)
+        performForegroundSegmentation(
+            cgImage: cgImage,
+            depthMap: depthMap,
+            originalImage: normalizedImage,
+            completion: completion
+        )
     }
 
     private func performForegroundSegmentation(
@@ -228,7 +235,7 @@ class BackgroundRemover: ObservableObject {
                       let outputCG = ciContext.createCGImage(outputCI, from: outputCI.extent) else {
                     return performSimpleBackgroundRemovalSync(image: image)
                 }
-                return UIImage(cgImage: outputCG, scale: image.scale, orientation: image.imageOrientation)
+                return UIImage(cgImage: outputCG, scale: image.scale, orientation: .up)
             } catch {
                 print("BackgroundRemover: Failed to apply mask: \(error)")
                 return performSimpleBackgroundRemovalSync(image: image)
@@ -447,7 +454,89 @@ class BackgroundRemover: ObservableObject {
         }
 
         guard let outputCGImage = context.makeImage() else { return nil }
-        return UIImage(cgImage: outputCGImage)
+        return UIImage(cgImage: outputCGImage, scale: image.scale, orientation: .up)
+    }
+
+    // MARK: - Sticker Generation
+
+    func createStickerImage(from image: UIImage, padding: CGFloat = 24) -> UIImage? {
+        let baseImage = image.normalizedForProcessing()
+
+        guard let cgImage = baseImage.cgImage else { return nil }
+        guard let dataProvider = cgImage.dataProvider,
+              let data = dataProvider.data,
+              let pointer = CFDataGetBytePtr(data) else {
+            return nil
+        }
+
+        let width = cgImage.width
+        let height = cgImage.height
+        let bytesPerPixel = 4
+        let bytesPerRow = cgImage.bytesPerRow
+
+        var minX = width
+        var maxX = -1
+        var minY = height
+        var maxY = -1
+
+        for y in 0..<height {
+            let row = pointer.advanced(by: y * bytesPerRow)
+            for x in 0..<width {
+                let alpha = row[x * bytesPerPixel + 3]
+                if alpha > 12 { // Small threshold to ignore halo pixels
+                    if x < minX { minX = x }
+                    if x > maxX { maxX = x }
+                    if y < minY { minY = y }
+                    if y > maxY { maxY = y }
+                }
+            }
+        }
+
+        guard minX <= maxX, minY <= maxY else {
+            return nil
+        }
+
+        let scaledPadding = Int((padding * baseImage.scale).rounded(.toNearestOrAwayFromZero))
+        let cropMinX = max(0, minX - scaledPadding)
+        let cropMaxX = min(width - 1, maxX + scaledPadding)
+        let cropMinY = max(0, minY - scaledPadding)
+        let cropMaxY = min(height - 1, maxY + scaledPadding)
+
+        let cropRect = CGRect(
+            x: cropMinX,
+            y: cropMinY,
+            width: cropMaxX - cropMinX + 1,
+            height: cropMaxY - cropMinY + 1
+        )
+
+        guard let cropped = cgImage.cropping(to: cropRect) else { return nil }
+
+        let outputSize = CGSize(
+            width: CGFloat(cropRect.width) / baseImage.scale,
+            height: CGFloat(cropRect.height) / baseImage.scale
+        )
+
+        let rendererFormat = UIGraphicsImageRendererFormat()
+        rendererFormat.scale = baseImage.scale
+        rendererFormat.opaque = false
+
+        let renderer = UIGraphicsImageRenderer(size: outputSize, format: rendererFormat)
+
+        let sticker = renderer.image { context in
+            UIColor.clear.setFill()
+            context.fill(CGRect(origin: .zero, size: outputSize))
+
+            let oriented = UIImage(cgImage: cropped, scale: baseImage.scale, orientation: .up)
+            oriented.draw(in: CGRect(origin: .zero, size: outputSize))
+        }
+
+        return sticker
+    }
+
+    func createStickerData(from imageData: Data, padding: CGFloat = 24) -> Data? {
+        guard let image = UIImage(data: imageData) else { return nil }
+        guard let stickerImage = createStickerImage(from: image, padding: padding) else { return nil }
+        return stickerImage.pngData()
     }
 }
 
@@ -469,6 +558,22 @@ extension UIImage {
         } else {
             print("BackgroundRemover: HEIF not supported, falling back to JPEG")
             return self.jpegData(compressionQuality: 0.9)
+        }
+    }
+}
+
+private extension UIImage {
+    func normalizedForProcessing() -> UIImage {
+        guard imageOrientation != .up else { return self }
+        guard size != .zero else { return self }
+
+        let format = UIGraphicsImageRendererFormat()
+        format.scale = scale
+        format.opaque = false
+
+        let renderer = UIGraphicsImageRenderer(size: size, format: format)
+        return renderer.image { _ in
+            draw(in: CGRect(origin: .zero, size: size))
         }
     }
 }
