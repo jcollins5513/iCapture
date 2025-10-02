@@ -148,12 +148,60 @@ extension CameraManager {
             }
 
             if let processedImage = UIImage(data: processedData) {
+                if let stickerImage = self.backgroundRemover.createStickerImage(from: processedImage) {
+                    self.persistStickerImage(
+                        stickerImage,
+                        originalFilename: filename
+                    )
+                }
+
                 UIImageWriteToSavedPhotosAlbum(processedImage, nil, nil, nil)
                 print("CameraManager: Background-removed photo saved to photo library")
             } else {
                 print("CameraManager: Unable to decode processed image data; saving original instead")
                 self.saveToPhotoLibrary(imageData: originalData)
             }
+        }
+    }
+
+    private func persistStickerImage(
+        _ stickerImage: UIImage,
+        originalFilename: String
+    ) {
+        guard let sessionManager = sessionManager,
+              sessionManager.isSessionActive,
+              let sessionDirectory = sessionManager.sessionDirectory else {
+            return
+        }
+
+        let stickersDirectory = sessionDirectory.appendingPathComponent("stickers", isDirectory: true)
+        let fileManager = FileManager.default
+
+        do {
+            if !fileManager.fileExists(atPath: stickersDirectory.path) {
+                try fileManager.createDirectory(
+                    at: stickersDirectory,
+                    withIntermediateDirectories: true
+                )
+            }
+
+            let baseName = (originalFilename as NSString).deletingPathExtension
+            let stickerFilename = "\(baseName)_sticker.png"
+            let stickerURL = stickersDirectory.appendingPathComponent(stickerFilename)
+
+            guard let stickerData = stickerImage.pngData() else {
+                print("CameraManager: Failed to create PNG data for sticker")
+                return
+            }
+
+            try stickerData.write(to: stickerURL, options: .atomic)
+            sessionManager.attachSticker(
+                toOriginalFilename: originalFilename,
+                stickerFilename: stickerFilename
+            )
+            print("CameraManager: Saved sticker to \(stickerURL.lastPathComponent)")
+        } catch {
+            print("CameraManager: Failed to persist sticker image: \(error)")
         }
     }
 }

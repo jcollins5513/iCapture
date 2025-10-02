@@ -32,6 +32,7 @@ struct CaptureAsset: Codable, Identifiable {
     let exposureISO: Double?
     let exposureDuration: Double?
     let focusDistance: Double?
+    var stickerFilename: String?
 
     // File system properties
     var fileURL: URL {
@@ -49,6 +50,13 @@ struct CaptureAsset: Codable, Identifiable {
         let subdirectory = type == .photo ? "photos" : "video"
         return sessionDirectory.appendingPathComponent(subdirectory)
             .appendingPathComponent(filename)
+    }
+
+    func getStickerURL(with sessionDirectory: URL) -> URL? {
+        guard let stickerFilename = stickerFilename else { return nil }
+        return sessionDirectory
+            .appendingPathComponent("stickers")
+            .appendingPathComponent(stickerFilename)
     }
 
     var fileSize: Int64? {
@@ -72,7 +80,8 @@ struct CaptureAsset: Codable, Identifiable {
 
     init(sessionId: String, type: AssetType, filename: String, width: Int, height: Int,
          roiRect: CGRect, triggerType: TriggerType, exposureISO: Double? = nil,
-         exposureDuration: Double? = nil, focusDistance: Double? = nil) {
+         exposureDuration: Double? = nil, focusDistance: Double? = nil,
+         stickerFilename: String? = nil) {
         self.id = UUID().uuidString
         self.sessionId = sessionId
         self.type = type
@@ -85,6 +94,7 @@ struct CaptureAsset: Codable, Identifiable {
         self.exposureISO = exposureISO
         self.exposureDuration = exposureDuration
         self.focusDistance = focusDistance
+        self.stickerFilename = stickerFilename
     }
 
     // MARK: - File Operations
@@ -95,9 +105,20 @@ struct CaptureAsset: Codable, Identifiable {
         }
     }
 
-    func copyToExportDirectory(exportURL: URL) throws {
+    func copyToExportDirectory(exportURL: URL, sessionDirectory: URL) throws {
         let destinationURL = exportURL.appendingPathComponent(filename)
         try FileManager.default.copyItem(at: fileURL, to: destinationURL)
+
+        if type == .photo,
+           let stickerFilename = stickerFilename,
+           let stickerSourceURL = getStickerURL(with: sessionDirectory),
+           FileManager.default.fileExists(atPath: stickerSourceURL.path) {
+            let stickerDestination = exportURL.appendingPathComponent(stickerFilename)
+            if FileManager.default.fileExists(atPath: stickerDestination.path) {
+                try FileManager.default.removeItem(at: stickerDestination)
+            }
+            try FileManager.default.copyItem(at: stickerSourceURL, to: stickerDestination)
+        }
     }
 }
 
