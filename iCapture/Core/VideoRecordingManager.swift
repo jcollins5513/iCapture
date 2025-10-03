@@ -45,7 +45,7 @@ class VideoRecordingManager: NSObject, ObservableObject {
         // Configure movie file output settings
         // 5 minutes max duration
         movieFileOutput.maxRecordedDuration = CMTime(seconds: 300, preferredTimescale: 600)
-        movieFileOutput.maxRecordedFileSize = 100 * 1024 * 1024 // 100MB max
+        movieFileOutput.maxRecordedFileSize = 100 * 1_024 * 1_024 // 100MB max
     }
 
     func configure(sessionManager: SessionManager?, roiDetector: ROIDetector?) {
@@ -54,7 +54,7 @@ class VideoRecordingManager: NSObject, ObservableObject {
     }
 
     func getMovieFileOutput() -> AVCaptureMovieFileOutput {
-        return movieFileOutput
+        movieFileOutput
     }
 
     func startVideoRecording() {
@@ -179,8 +179,8 @@ extension VideoRecordingManager: AVCaptureFileOutputRecordingDelegate {
                 sessionId: session.id,
                 type: .video,
                 filename: fileURL.lastPathComponent, // Use actual filename
-                width: 1920, // 1080p width
-                height: 1080, // 1080p height
+                width: 1_920, // 1080p width
+                height: 1_080, // 1080p height
                 roiRect: roiDetector?.getROIRect() ?? CGRect.zero,
                 triggerType: .manual
             )
@@ -195,4 +195,3 @@ extension VideoRecordingManager: AVCaptureFileOutputRecordingDelegate {
         }
     }
 }
-

@@ -45,7 +45,7 @@ class MotionDetector: ObservableObject {
     }
 
     func getROIRect() -> CGRect {
-        return roiRect
+        roiRect
     }
 
     func processFrame(_ pixelBuffer: CVPixelBuffer) {
@@ -103,13 +103,13 @@ class MotionDetector: ObservableObject {
     }
 
     func getMotionThreshold() -> Double {
-        return motionThreshold
+        motionThreshold
     }
 
     // MARK: - Private Methods
 
     private func convertROIToBufferCoordinates(roiRect: CGRect, bufferWidth: Int, bufferHeight: Int) -> CGRect {
-        return CGRect(
+        CGRect(
             x: roiRect.origin.x * CGFloat(bufferWidth) / 400, // Assuming 400pt screen width
             y: roiRect.origin.y * CGFloat(bufferHeight) / 800, // Assuming 800pt screen height
             width: roiRect.width * CGFloat(bufferWidth) / 400,

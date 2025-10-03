@@ -173,7 +173,7 @@ struct StockNumberInputView: View {
     // MARK: - Computed Properties
 
     private var canStartSession: Bool {
-        return isValidStockNumber && !sessionManager.isSessionActive
+        isValidStockNumber && !sessionManager.isSessionActive
     }
 
     // MARK: - Actions
