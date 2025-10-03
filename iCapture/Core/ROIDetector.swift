@@ -27,6 +27,7 @@ class ROIDetector: ObservableObject {
     private var backgroundSampleStartTime: Date?
     private var backgroundSampleFrames: [CVPixelBuffer] = []
     private let maxBackgroundSamples = 30 // 30 frames at 30fps
+    private var lastLoggedBackgroundProgress = -1.0
 
     // ROI configuration
     private var roiRect: CGRect = CGRect(x: 50, y: 200, width: 300, height: 200)
@@ -55,6 +56,7 @@ class ROIDetector: ObservableObject {
         backgroundSampleStartTime = Date()
         backgroundSampleFrames.removeAll()
         isBackgroundLearned = false
+        lastLoggedBackgroundProgress = -1.0
 
         print("ROIDetector: Starting background sampling...")
     }
@@ -74,6 +76,7 @@ class ROIDetector: ObservableObject {
         isBackgroundSampling = false
         backgroundSampleProgress = 0.0
         backgroundSampleFrames.removeAll()
+        lastLoggedBackgroundProgress = -1.0
     }
 
     func setOccupancyThreshold(_ threshold: Double) {
@@ -98,6 +101,12 @@ class ROIDetector: ObservableObject {
         // Update progress on main thread
         Task { @MainActor in
             self.backgroundSampleProgress = progress
+        }
+
+        if progress - lastLoggedBackgroundProgress >= 0.25 || progress >= 0.99 {
+            lastLoggedBackgroundProgress = progress
+            let percent = Int(progress * 100)
+            print("ROIDetector: Background sampling progress \(percent)% (frames: \(backgroundSampleFrames.count))")
         }
 
         // Check if sampling is complete
@@ -127,7 +136,9 @@ class ROIDetector: ObservableObject {
             self.backgroundSampleProgress = 1.0
         }
 
-        print("ROIDetector: Background sampling complete. Threshold: \(occupancyThreshold)")
+        print(
+            "ROIDetector: Background sampling complete (frames: \(backgroundSampleFrames.count)). Threshold: \(occupancyThreshold)"
+        )
         NotificationCenter.default.post(name: .BackgroundSamplingCompleted, object: self)
     }
 

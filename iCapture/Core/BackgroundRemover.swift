@@ -12,6 +12,7 @@ import CoreImage
 import CoreImage.CIFilterBuiltins
 import Combine
 import ImageIO
+import UniformTypeIdentifiers
 
 @MainActor
 class BackgroundRemover: ObservableObject {
@@ -566,7 +567,14 @@ extension UIImage {
         guard let cgImage = self.cgImage else { return nil }
 
         let data = NSMutableData()
-        if let destination = CGImageDestinationCreateWithData(data, "public.heif" as CFString, 1, nil) {
+        let heicIdentifier: CFString
+        if #available(iOS 14.0, *) {
+            heicIdentifier = (UTType.heic.identifier as CFString)
+        } else {
+            heicIdentifier = AVFileType.heic.rawValue as CFString
+        }
+
+        if let destination = CGImageDestinationCreateWithData(data, heicIdentifier, 1, nil) {
             let options: [CFString: Any] = [
                 kCGImageDestinationLossyCompressionQuality: 0.9,
                 kCGImagePropertyHasAlpha: true
