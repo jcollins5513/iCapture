@@ -27,6 +27,7 @@ class ROIDetector: ObservableObject {
     private var backgroundSampleStartTime: Date?
     private var backgroundSampleFrames: [CVPixelBuffer] = []
     private let maxBackgroundSamples = 30 // 30 frames at 30fps
+    @Published private(set) var backgroundSampleFrameCount = 0
     private var lastLoggedBackgroundProgress = -1.0
 
     // ROI configuration
@@ -57,6 +58,7 @@ class ROIDetector: ObservableObject {
         backgroundSampleFrames.removeAll()
         isBackgroundLearned = false
         lastLoggedBackgroundProgress = -1.0
+        backgroundSampleFrameCount = 0
 
         print("ROIDetector: Starting background sampling...")
     }
@@ -77,6 +79,7 @@ class ROIDetector: ObservableObject {
         backgroundSampleProgress = 0.0
         backgroundSampleFrames.removeAll()
         lastLoggedBackgroundProgress = -1.0
+        backgroundSampleFrameCount = 0
     }
 
     func setOccupancyThreshold(_ threshold: Double) {
@@ -98,9 +101,12 @@ class ROIDetector: ObservableObject {
         // Store frame for background learning
         backgroundSampleFrames.append(pixelBuffer)
 
+        let frameCount = backgroundSampleFrames.count
+
         // Update progress on main thread
         Task { @MainActor in
             self.backgroundSampleProgress = progress
+            self.backgroundSampleFrameCount = frameCount
         }
 
         if progress - lastLoggedBackgroundProgress >= 0.25 || progress >= 0.99 {
@@ -136,6 +142,7 @@ class ROIDetector: ObservableObject {
             self.isBackgroundSampling = false
             self.isBackgroundLearned = true
             self.backgroundSampleProgress = 1.0
+            self.backgroundSampleFrameCount = self.backgroundSampleFrames.count
         }
 
         print(

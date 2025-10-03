@@ -159,6 +159,17 @@ extension CameraManager {
                 }
 
                 if elapsed >= self.backgroundSamplingTimeout {
+                    let framesCollected = self.roiDetector.backgroundSampleFrameCount
+
+                    if self.useLiDARDetection && (!self.lidarDetector.isTrackingNormal || framesCollected <= 2) {
+                        print(
+                            "CameraManager: Background sampling collected \(framesCollected) frame(s) with limited LiDAR tracking; disabling LiDAR and retrying with Vision-only sampling"
+                        )
+                        self.disableLiDARDetection()
+                        self.scheduleAutomaticBackgroundSampling(delay: 0.3)
+                        return
+                    }
+
                     if attempt >= self.maxBackgroundSamplingAttempts {
                         print("CameraManager: Background sampling timed out after \(attempt) attempts; finalizing")
                         self.finalizeAutomaticCaptureWorkflow(reason: "background sampling timeout")
