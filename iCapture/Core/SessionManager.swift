@@ -366,22 +366,6 @@ class SessionManager: ObservableObject {
         }
     }
 
-    func attachSticker(toOriginalFilename originalFilename: String, stickerFilename: String) {
-        guard let index = sessionAssets.firstIndex(where: { asset in
-            asset.filename == originalFilename && asset.type == .photo
-        }) else {
-            return
-        }
-
-        sessionAssets[index].stickerFilename = stickerFilename
-
-        do {
-            try saveSessionMetadata()
-        } catch {
-            print("SessionManager: Failed to persist sticker metadata: \(error)")
-        }
-    }
-
     func attachCutout(toOriginalFilename originalFilename: String, cutoutFilename: String) {
         guard let index = sessionAssets.firstIndex(where: { asset in
             asset.filename == originalFilename && asset.type == .photo
@@ -515,3 +499,4 @@ extension Notification.Name {
     static let sessionDidStart = Notification.Name("SessionDidStart")
     static let sessionDidEnd = Notification.Name("SessionDidEnd")
 }
+
