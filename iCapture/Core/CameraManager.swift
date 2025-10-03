@@ -80,6 +80,7 @@ class CameraManager: NSObject, ObservableObject {
     let maxBackgroundSamplingAttempts = 3
     var backgroundSamplingAttempt = 0
     private var pendingTriggerType: TriggerType = .manual
+    private var preferredPhotoDimensions: CMVideoDimensions?
 
     fileprivate final class PixelBufferBox: @unchecked Sendable {
         let buffer: CVPixelBuffer
@@ -254,6 +255,71 @@ extension CameraManager {
         }
     }
 
+    private func configureBestPhotoFormat(for device: AVCaptureDevice) {
+        var selectedFormat: AVCaptureDevice.Format?
+        var selectedDimensions: CMVideoDimensions?
+        var selectedArea: Int = 0
+
+        if #available(iOS 16.0, *) {
+            for format in device.formats {
+                let dimensions = format.supportedMaxPhotoDimensions
+                guard !dimensions.isEmpty else { continue }
+
+                for dimension in dimensions {
+                    let area = Int(dimension.width) * Int(dimension.height)
+                    let isTwelveMPOrGreater = dimension.width >= 4_000 && dimension.height >= 3_000
+
+                    if isTwelveMPOrGreater && area > selectedArea {
+                        selectedFormat = format
+                        selectedDimensions = dimension
+                        selectedArea = area
+                    } else if selectedFormat == nil && area > selectedArea {
+                        selectedFormat = format
+                        selectedDimensions = dimension
+                        selectedArea = area
+                    }
+                }
+            }
+        } else {
+            let dimension = device.activeFormat.highResolutionStillImageDimensions
+            selectedFormat = device.activeFormat
+            selectedDimensions = dimension
+            selectedArea = Int(dimension.width) * Int(dimension.height)
+        }
+
+        guard let format = selectedFormat, let dimensions = selectedDimensions else {
+            if #available(iOS 16.0, *) {
+                print("CameraManager: Unable to find a suitable high-resolution format; using device active format")
+                if let fallback = device.activeFormat.supportedMaxPhotoDimensions.max(by: { (lhs, rhs) in
+                    (Int(lhs.width) * Int(lhs.height)) < (Int(rhs.width) * Int(rhs.height))
+                }) {
+                    preferredPhotoDimensions = fallback
+                }
+            } else {
+                preferredPhotoDimensions = device.activeFormat.highResolutionStillImageDimensions
+            }
+            return
+        }
+
+        do {
+            try device.lockForConfiguration()
+            if device.activeFormat != format {
+                device.activeFormat = format
+                print("CameraManager: Updated activeFormat for high-resolution capture")
+            } else {
+                print("CameraManager: Active format already optimal for high-resolution capture")
+            }
+            device.unlockForConfiguration()
+        } catch {
+            print("CameraManager: Failed to configure device format: \(error)")
+        }
+
+        preferredPhotoDimensions = dimensions
+        let description = "\(dimensions.width)x\(dimensions.height)"
+        let megapixels = Double(dimensions.width * dimensions.height) / 1_000_000.0
+        print("CameraManager: Preferred photo dimensions set to \(description) (~\(String(format: "%.1f", megapixels))MP)")
+    }
+
     private func addVideoInput() -> Bool {
         guard let videoDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back),
               let videoInput = try? AVCaptureDeviceInput(device: videoDevice),
@@ -264,6 +330,7 @@ extension CameraManager {
 
         captureSession.addInput(videoInput)
         captureDevice = videoDevice
+        configureBestPhotoFormat(for: videoDevice)
         print("CameraManager: Video input added successfully")
         return true
     }
@@ -422,21 +489,30 @@ extension CameraManager {
             if #available(iOS 16.0, *) {
                 if let device = self.captureDevice {
                     let supported = device.activeFormat.supportedMaxPhotoDimensions
-                    let descriptions = supported.map { "\($0.width)x\($0.height)" }.joined(separator: ", ")
-                    print("CameraManager: supportedMaxPhotoDimensions = [\(descriptions)]")
-
-                    let desired = supported.first(where: { $0.width >= 4000 && $0.height >= 3000 })
-
-                    if let desired {
-                        photoSettings.maxPhotoDimensions = desired
-                        print("CameraManager: Requested photo dimensions: \(desired.width)x\(desired.height)")
+                    if !supported.isEmpty {
+                        let descriptions = supported.map { "\($0.width)x\($0.height)" }.joined(separator: ", ")
+                        print("CameraManager: supportedMaxPhotoDimensions = [\(descriptions)]")
                     } else {
-                        print("CameraManager: Falling back to default 12MP dimensions")
+                        print("CameraManager: supportedMaxPhotoDimensions is empty on current format")
                     }
+                }
+
+                if let preferred = self.preferredPhotoDimensions {
+                    photoSettings.maxPhotoDimensions = preferred
+                    let megapixels = Double(preferred.width * preferred.height) / 1_000_000.0
+                    print(
+                        "CameraManager: Requested photo dimensions: \(preferred.width)x\(preferred.height) (~\(String(format: "%.1f", megapixels))MP)"
+                    )
+                } else {
+                    print("CameraManager: No preferred photo dimensions set; relying on system defaults")
                 }
             } else if let device = self.captureDevice {
                 let highRes = device.activeFormat.highResolutionStillImageDimensions
-                print("CameraManager: Active format high-resolution dimensions: \(highRes.width)x\(highRes.height)")
+                preferredPhotoDimensions = highRes
+                let megapixels = Double(highRes.width * highRes.height) / 1_000_000.0
+                print(
+                    "CameraManager: Active format high-resolution dimensions: \(highRes.width)x\(highRes.height) (~\(String(format: "%.1f", megapixels))MP)"
+                )
             }
 
             // Note: Custom metadata keys are not allowed by AVFoundation

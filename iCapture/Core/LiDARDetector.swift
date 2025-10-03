@@ -18,6 +18,8 @@ class LiDARDetector: NSObject, ObservableObject {
     @Published var depthConfidence: Float = 0.0
     @Published var isBackgroundLearned = false
     @Published private(set) var hasCompletedInitialScan = false
+    @Published private(set) var isTrackingNormal = false
+    @Published private(set) var lastTrackingStateDescription: String = "unknown"
 
     // LiDAR configuration
     private let minVehicleDistance: Float = 1.0  // 1 meter minimum
@@ -413,7 +415,7 @@ class LiDARDetector: NSObject, ObservableObject {
         return Float(sumSquaredDiffs / Double(depths.count))
     }
 
-    private func getScreenBounds() -> CGRect {
+private func getScreenBounds() -> CGRect {
         if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
             return windowScene.screen.bounds
         } else {
@@ -432,6 +434,32 @@ class LiDARDetector: NSObject, ObservableObject {
     }
 }
 
+private extension ARCamera.TrackingState {
+    var readableDescription: String {
+        switch self {
+        case .notAvailable:
+            return "notAvailable"
+        case .limited(let reason):
+            switch reason {
+            case .excessiveMotion:
+                return "limited(excessiveMotion)"
+            case .insufficientFeatures:
+                return "limited(insufficientFeatures)"
+            case .initializing:
+                return "limited(initializing)"
+            case .relocalizing:
+                return "limited(relocalizing)"
+            @unknown default:
+                return "limited(unknown)"
+            }
+        case .normal:
+            return "normal"
+        @unknown default:
+            return "unknown"
+        }
+    }
+}
+
 // MARK: - ARSessionDelegate
 
 extension LiDARDetector: ARSessionDelegate {
@@ -441,11 +469,18 @@ extension LiDARDetector: ARSessionDelegate {
         print("LiDARDetector: Frame has scene depth confidence: \(frame.sceneDepth?.confidenceMap != nil)")
 
         // Check if we're getting any frames at all
-        print("LiDARDetector: Frame camera tracking state: \(frame.camera.trackingState)")
+        let trackingState = frame.camera.trackingState
+        let trackingDescription = trackingState.readableDescription
+        print("LiDARDetector: Frame camera tracking state: \(trackingDescription)")
 
         // Check if we're getting frames with proper tracking
-        if frame.camera.trackingState != .normal {
-            print("LiDARDetector: Camera tracking state is not normal: \(frame.camera.trackingState)")
+        if trackingState != .normal {
+            print("LiDARDetector: Camera tracking state is not normal: \(trackingDescription)")
+        }
+
+        Task { @MainActor in
+            self.isTrackingNormal = (trackingState == .normal)
+            self.lastTrackingStateDescription = trackingDescription
         }
 
         guard let depthData = frame.sceneDepth else {
