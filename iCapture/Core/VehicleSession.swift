@@ -24,7 +24,7 @@ struct VehicleSession: Codable, Identifiable {
     }
 
     var isActive: Bool {
-        return endedAt == nil
+        endedAt == nil
     }
 
     init(stockNumber: String, notes: String? = nil) {
@@ -55,13 +55,14 @@ extension VehicleSession {
 
         let startTime = formatter.string(from: startedAt)
         let durationText = duration != nil ? formatDuration(duration!) : "Active"
-
         return "Stock: \(stockNumber) | Started: \(startTime) | Duration: \(durationText)"
     }
 
     private func formatDuration(_ duration: TimeInterval) -> String {
-        let minutes = Int(duration) / 60
-        let seconds = Int(duration) % 60
-        return String(format: "%d:%02d", minutes, seconds)
+        String(
+            format: "%d:%02d",
+            Int(duration) / 60,
+            Int(duration) % 60
+        )
     }
 }

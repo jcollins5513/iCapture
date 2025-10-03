@@ -77,7 +77,7 @@ class CameraManager: NSObject, ObservableObject {
     var backgroundSamplingTimeoutWorkItem: DispatchWorkItem?
     private var pendingTriggerType: TriggerType = .manual
 
-    private final class PixelBufferBox: @unchecked Sendable {
+    fileprivate final class PixelBufferBox: @unchecked Sendable {
         let buffer: CVPixelBuffer
         init(_ buffer: CVPixelBuffer) {
             self.buffer = buffer
@@ -89,10 +89,18 @@ class CameraManager: NSObject, ObservableObject {
         checkAuthorization()
 
         // Configure trigger engine with dependencies
-        triggerEngine.configure(cameraManager: self, roiDetector: roiDetector, motionDetector: motionDetector, vehicleDetector: vehicleDetector)
+        triggerEngine.configure(
+            cameraManager: self,
+            roiDetector: roiDetector,
+            motionDetector: motionDetector,
+            vehicleDetector: vehicleDetector
+        )
 
         // Configure video recording manager
-        videoRecordingManager.configure(sessionManager: sessionManager, roiDetector: roiDetector)
+        videoRecordingManager.configure(
+            sessionManager: sessionManager,
+            roiDetector: roiDetector
+        )
 
         // Initialize LiDAR detection if available
         initializeLiDARDetection()
@@ -130,7 +138,9 @@ class CameraManager: NSObject, ObservableObject {
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
+}
 
+extension CameraManager {
     @objc private func handleLiDARTimeout() {
         print("CameraManager: LiDAR detection timeout - disabling LiDAR and switching to traditional detection")
         disableLiDARDetection()
@@ -165,60 +175,16 @@ class CameraManager: NSObject, ObservableObject {
             print("CameraManager: Setting up capture session...")
             self.captureSession.beginConfiguration()
 
-            // Configure session preset for high quality
-            if self.captureSession.canSetSessionPreset(.photo) {
-                self.captureSession.sessionPreset = .photo
-                print("CameraManager: Session preset set to photo")
-            }
+            configureSessionPreset()
 
-            // Add video input
-            guard let videoDevice = AVCaptureDevice.default(.builtInWideAngleCamera,
-                                                            for: .video,
-                                                            position: .back),
-                  let videoInput = try? AVCaptureDeviceInput(device: videoDevice),
-                  self.captureSession.canAddInput(videoInput) else {
-                print("CameraManager: ERROR - Failed to create video input")
+            guard addVideoInput() else {
                 self.captureSession.commitConfiguration()
                 return
             }
 
-            self.captureSession.addInput(videoInput)
-            self.captureDevice = videoDevice
-            print("CameraManager: Video input added successfully")
-
-            // Add video output for preview
-            if self.captureSession.canAddOutput(self.videoOutput) {
-                self.captureSession.addOutput(self.videoOutput)
-                self.videoOutput.setSampleBufferDelegate(self, queue: self.videoDataQueue)
-                print("CameraManager: Video output added successfully")
-            } else {
-                print("CameraManager: WARNING - Cannot add video output")
-            }
-
-            // Add photo output
-            if self.captureSession.canAddOutput(self.photoOutput) {
-                self.captureSession.addOutput(self.photoOutput)
-                if self.photoOutput.isDepthDataDeliverySupported {
-                    self.photoOutput.isDepthDataDeliveryEnabled = true
-                    print("CameraManager: Depth data delivery enabled for photo output")
-                } else {
-                    print("CameraManager: Depth data delivery not supported")
-                }
-                print("CameraManager: Photo output added successfully")
-            } else {
-                print("CameraManager: WARNING - Cannot add photo output")
-            }
-
-            // Add movie file output for video recording
-            let movieFileOutput = DispatchQueue.main.sync {
-                return self.videoRecordingManager.getMovieFileOutput()
-            }
-            if self.captureSession.canAddOutput(movieFileOutput) {
-                self.captureSession.addOutput(movieFileOutput)
-                print("CameraManager: Movie file output added successfully")
-            } else {
-                print("CameraManager: WARNING - Cannot add movie file output")
-            }
+            addVideoOutput()
+            addPhotoOutput()
+            addMovieOutput()
 
             self.captureSession.commitConfiguration()
             print("CameraManager: Session configuration committed")
@@ -228,17 +194,83 @@ class CameraManager: NSObject, ObservableObject {
                 self.configurePhotoOutputForHighResolution()
             }
 
-            let previewLayer = AVCaptureVideoPreviewLayer(session: self.captureSession)
-            previewLayer.videoGravity = .resizeAspectFill
-
             DispatchQueue.main.async {
-                self.previewLayer = previewLayer
-                print("CameraManager: Preview layer created and configured")
-                print("CameraManager: Preview layer session: \(previewLayer.session != nil)")
-                print("CameraManager: Preview layer videoGravity: \(previewLayer.videoGravity)")
-                print("CameraManager: Preview layer connection: \(previewLayer.connection != nil)")
+                self.createPreviewLayer()
             }
         }
+    }
+
+    private func configureSessionPreset() {
+        if captureSession.canSetSessionPreset(.photo) {
+            captureSession.sessionPreset = .photo
+            print("CameraManager: Session preset set to photo")
+        }
+    }
+
+    private func addVideoInput() -> Bool {
+        guard let videoDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back),
+              let videoInput = try? AVCaptureDeviceInput(device: videoDevice),
+              captureSession.canAddInput(videoInput) else {
+            print("CameraManager: ERROR - Failed to create video input")
+            return false
+        }
+
+        captureSession.addInput(videoInput)
+        captureDevice = videoDevice
+        print("CameraManager: Video input added successfully")
+        return true
+    }
+
+    private func addVideoOutput() {
+        guard captureSession.canAddOutput(videoOutput) else {
+            print("CameraManager: WARNING - Cannot add video output")
+            return
+        }
+
+        captureSession.addOutput(videoOutput)
+        videoOutput.setSampleBufferDelegate(self, queue: videoDataQueue)
+        print("CameraManager: Video output added successfully")
+    }
+
+    private func addPhotoOutput() {
+        guard captureSession.canAddOutput(photoOutput) else {
+            print("CameraManager: WARNING - Cannot add photo output")
+            return
+        }
+
+        captureSession.addOutput(photoOutput)
+        if photoOutput.isDepthDataDeliverySupported {
+            photoOutput.isDepthDataDeliveryEnabled = true
+            print("CameraManager: Depth data delivery enabled for photo output")
+        } else {
+            print("CameraManager: Depth data delivery not supported")
+        }
+        print("CameraManager: Photo output added successfully")
+    }
+
+    private func addMovieOutput() {
+        let movieFileOutput = DispatchQueue.main.sync {
+            videoRecordingManager.getMovieFileOutput()
+        }
+
+        guard captureSession.canAddOutput(movieFileOutput) else {
+            print("CameraManager: WARNING - Cannot add movie file output")
+            return
+        }
+
+        captureSession.addOutput(movieFileOutput)
+        print("CameraManager: Movie file output added successfully")
+    }
+
+    private func createPreviewLayer() {
+        let previewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
+        previewLayer.videoGravity = .resizeAspectFill
+
+        self.previewLayer = previewLayer
+        print("CameraManager: Preview layer created and configured")
+        print("CameraManager: Preview layer session: \(previewLayer.session != nil)")
+        print("CameraManager: Preview layer videoGravity: \(previewLayer.videoGravity)")
+        print("CameraManager: Preview layer connection: \(previewLayer.connection != nil)")
     }
 
     func startSession() {
@@ -325,22 +357,25 @@ class CameraManager: NSObject, ObservableObject {
             }
 
             // Enable high resolution capture if supported
-        if #available(iOS 16.0, *) {
-            if let device = self.captureDevice,
-               let maxDimensions = device.activeFormat.supportedMaxPhotoDimensions.max(by: { $0.width * $0.height < $1.width * $1.height }),
-               maxDimensions.width >= 8000 {
-                if self.photoOutput.isDepthDataDeliveryEnabled {
-                    print("CameraManager: Depth data enabled - using standard resolution for compatibility")
-                } else if self.photoOutput.maxPhotoDimensions.width >= maxDimensions.width {
-                    photoSettings.maxPhotoDimensions = maxDimensions
-                    print("CameraManager: Capturing 48MP high-resolution photo")
+            if #available(iOS 16.0, *) {
+                if let device = self.captureDevice,
+                   let maxDimensions = device.activeFormat.supportedMaxPhotoDimensions
+                    .max(by: { lhs, rhs in
+                        (lhs.width * lhs.height) < (rhs.width * rhs.height)
+                    }),
+                   maxDimensions.width >= 8_000 {
+                    if self.photoOutput.isDepthDataDeliveryEnabled {
+                        print("CameraManager: Depth data enabled - using standard resolution for compatibility")
+                    } else if self.photoOutput.maxPhotoDimensions.width >= maxDimensions.width {
+                        photoSettings.maxPhotoDimensions = maxDimensions
+                        print("CameraManager: Capturing 48MP high-resolution photo")
+                    } else {
+                        print("CameraManager: Photo output doesn't support 48MP, using standard resolution")
+                    }
                 } else {
-                    print("CameraManager: Photo output doesn't support 48MP, using standard resolution")
+                    print("CameraManager: Capturing standard resolution photo")
                 }
-            } else {
-                print("CameraManager: Capturing standard resolution photo")
             }
-        }
 
             // Note: Custom metadata keys are not allowed by AVFoundation
             // We'll store trigger info in session data instead
@@ -369,7 +404,7 @@ class CameraManager: NSObject, ObservableObject {
         impactFeedback.impactOccurred()
 
         // Sound feedback
-        AudioServicesPlaySystemSound(1108) // Camera shutter sound
+        AudioServicesPlaySystemSound(1_108) // Camera shutter sound
     }
 
     // MARK: - Video Recording Methods
@@ -383,15 +418,15 @@ class CameraManager: NSObject, ObservableObject {
     }
 
     var isVideoRecording: Bool {
-        return videoRecordingManager.isVideoRecording
+        videoRecordingManager.isVideoRecording
     }
 
     var videoRecordingDuration: TimeInterval {
-        return videoRecordingManager.videoRecordingDuration
+        videoRecordingManager.videoRecordingDuration
     }
 
     func getFormattedVideoDuration() -> String {
-        return videoRecordingManager.getFormattedVideoDuration()
+        videoRecordingManager.getFormattedVideoDuration()
     }
 
     // MARK: - High-Resolution Photo Configuration
@@ -417,8 +452,11 @@ class CameraManager: NSObject, ObservableObject {
         // We'll set it per capture to avoid conflicts
         if #available(iOS 16.0, *) {
             if let device = captureDevice,
-               let maxDimensions = device.activeFormat.supportedMaxPhotoDimensions.max(by: { $0.width * $0.height < $1.width * $1.height }),
-               maxDimensions.width >= 8000 {
+               let maxDimensions = device.activeFormat.supportedMaxPhotoDimensions
+                .max(by: { lhs, rhs in
+                    (lhs.width * lhs.height) < (rhs.width * rhs.height)
+                }),
+               maxDimensions.width >= 8_000 {
                 print("CameraManager: 48MP high-resolution capture supported")
             } else {
                 print("CameraManager: 48MP capture not available, using standard resolution")
@@ -434,39 +472,48 @@ class CameraManager: NSObject, ObservableObject {
     @MainActor
     func getMaxPhotoResolution() -> CGSize {
         guard let device = captureDevice else {
-            return CGSize(width: 4032, height: 3024) // Default 12MP
+            return CGSize(width: 4_032, height: 3_024) // Default 12MP
         }
 
         // Return the maximum supported resolution
         if #available(iOS 16.0, *),
-           let maxDimensions = device.activeFormat.supportedMaxPhotoDimensions.max(by: { $0.width * $0.height < $1.width * $1.height }),
-           maxDimensions.width >= 8000 {
-            return CGSize(width: 8064, height: 6048) // 48MP
+           let maxDimensions = device.activeFormat.supportedMaxPhotoDimensions
+            .max(by: { lhs, rhs in
+                (lhs.width * lhs.height) < (rhs.width * rhs.height)
+            }),
+           maxDimensions.width >= 8_000 {
+            return CGSize(width: 8_064, height: 6_048) // 48MP
         } else {
-            return CGSize(width: 4032, height: 3024) // 12MP
+            return CGSize(width: 4_032, height: 3_024) // 12MP
         }
     }
 
     @MainActor
     func getCurrentPhotoResolution() -> CGSize {
-        return getMaxPhotoResolution()
+        getMaxPhotoResolution()
     }
 
     @MainActor
-    func getPhotoCaptureInfo() -> (resolution: CGSize, format: String, is48MPSupported: Bool) {
+    func getPhotoCaptureInfo() -> PhotoCaptureInfo {
         let resolution = getCurrentPhotoResolution()
         let format = photoOutput.availablePhotoCodecTypes.contains(.hevc) ? "HEIF" : "JPEG"
-        let is48MPSupported = (resolution.width >= 8000 || resolution.height >= 6000)
+        let is48MPSupported = (resolution.width >= 8_000 || resolution.height >= 6_000)
 
-        return (resolution: resolution, format: format, is48MPSupported: is48MPSupported)
+        return PhotoCaptureInfo(
+            resolution: resolution,
+            format: format,
+            is48MPSupported: is48MPSupported
+        )
     }
 }
 
 // MARK: - AVCaptureVideoDataOutputSampleBufferDelegate
 extension CameraManager: AVCaptureVideoDataOutputSampleBufferDelegate {
-    nonisolated func captureOutput(_ output: AVCaptureOutput,
-                       didOutput sampleBuffer: CMSampleBuffer,
-                       from connection: AVCaptureConnection) {
+    nonisolated func captureOutput(
+        _ output: AVCaptureOutput,
+        didOutput sampleBuffer: CMSampleBuffer,
+        from connection: AVCaptureConnection
+    ) {
         // Process frame for ROI detection
         guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { return }
         let pixelBufferBox = PixelBufferBox(pixelBuffer)
@@ -509,9 +556,11 @@ extension CameraManager: AVCaptureVideoDataOutputSampleBufferDelegate {
 
 // MARK: - AVCapturePhotoCaptureDelegate
 extension CameraManager: AVCapturePhotoCaptureDelegate {
-    nonisolated func photoOutput(_ output: AVCapturePhotoOutput,
-                                 didFinishProcessingPhoto photo: AVCapturePhoto,
-                                 error: Error?) {
+    nonisolated func photoOutput(
+        _ output: AVCapturePhotoOutput,
+        didFinishProcessingPhoto photo: AVCapturePhoto,
+        error: Error?
+    ) {
         if let error = error {
             print("Error capturing photo: \(error)")
             return
@@ -547,11 +596,11 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
             }
 
             let timestamp = Date().timeIntervalSince1970
-            let resolutionSuffix = (width >= 8000 || height >= 6000) ? "_48MP" : "_12MP"
+            let resolutionSuffix = (width >= 8_000 || height >= 6_000) ? "_48MP" : "_12MP"
             let filename = "photo_\(Int(timestamp))\(resolutionSuffix).heic"
 
-            let fileSizeMB = Double(imageData.count) / (1024 * 1024)
-            let isHighResolution = (width >= 8000 || height >= 6000)
+            let fileSizeMB = Double(imageData.count) / (1_024 * 1_024)
+            let isHighResolution = (width >= 8_000 || height >= 6_000)
             let maxSizeMB = isHighResolution ? 15.0 : 5.0
 
             print("CameraManager: Captured photo - Resolution: \(width)x\(height), Size: \(String(format: "%.2f", fileSizeMB))MB")
@@ -892,7 +941,7 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
 
     // MARK: - LiDAR Initialization
 
-    private func initializeLiDARDetection() {
+    func initializeLiDARDetection() {
         print("CameraManager: Initializing LiDAR detection...")
         print("CameraManager: - LiDAR available: \(lidarDetector.isLiDARAvailable)")
 
@@ -981,7 +1030,6 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
 
     // MARK: - Automatic Capture Workflow
 
-
     func restartCaptureSessionIfNeeded() {
         sessionQueue.async { [weak self] in
             guard let self = self else { return }
@@ -997,4 +1045,3 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
         }
     }
 }
-

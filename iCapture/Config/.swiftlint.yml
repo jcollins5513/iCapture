@@ -20,3 +20,24 @@ line_length:
 identifier_name:
   min_length: 2
   allowed_symbols: [_]
+  excluded:
+    - x
+    - y
+    - z
+    - r
+    - g
+    - b
+    - p
+    - v
+file_length:
+  warning: 1200
+  error: 1500
+type_body_length:
+  warning: 900
+  error: 1100
+function_body_length:
+  warning: 80
+  error: 110
+cyclomatic_complexity:
+  warning: 12
+  error: 20
