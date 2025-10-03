@@ -394,3 +394,14 @@ PerformanceMonitor: Capture latency: 0.0741109848022461s
 CameraManager: Captured photo - Resolution: 1920x1440, Size: 0.33MB
 CameraManager: Photo size within target limits
 Test shot saved: file:///var/mobile/Containers/Data/Application/7B3038E1-414E-4815-9733-FED3111C4E81/Documents/TestShots/photo_1759498011_12MP.heic
+
+Current Focus
+We’ve been tuning iCapture for high-quality subject lifting on the iPhone 15 Pro Max. Recent changes prioritize photo quality: we now select the Pro back camera, log every available capture format, and switch to the one that advertises 12 MP/48 MP stills. Manual captures re-apply the preferred dimensions per shot so Vision-based background removal receives the largest image. To remove friction from LiDAR issues, the automatic background sampling/trigger workflow is temporarily disabled while we validate the new subject‑lift pipeline. Logs now show not only the capture resolution but also LiDAR tracking state, frame counts, and fallback behavior so we can see why sampling stalls.
+
+Next Tasks
+
+Confirm the device is actually using a format with ≥4032×3024 stills (check console for supportedMaxPhotoDimensions output, capture a photo, verify metadata).
+If formats still top out at ~2 MP, force format selection more aggressively (e.g., pick by matching the format identifier Apple uses for ProRAW/48 MP).
+Re-enable automatic detection once high-res captures are reliable: either restore the LiDAR workflow or create a Vision-only background learner so auto capture works without LiDAR.
+Resolve the session asset-copy failures (Code=260) so saved HEICs are available inside the app’s session directories.
+Decide on final capture defaults (e.g., 12 MP vs 48 MP, HEIC vs JPEG) and ensure export/subject-lift pipeline persists the selected format correctly.
