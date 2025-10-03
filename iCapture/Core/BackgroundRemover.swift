@@ -222,17 +222,20 @@ extension BackgroundRemover {
                     }
                 }
 
-                // blend over transparent background
-                let blend = CIFilter.blendWithMask()
-                blend.inputImage = inputCIImage
-                blend.maskImage = visionMask
-                let transparentBackground = CIImage(color: .clear).cropped(to: inputCIImage.extent)
-                blend.backgroundImage = transparentBackground
-
-                guard let outputCI = blend.outputImage,
-                      let outputCG = ciContext.createCGImage(outputCI, from: outputCI.extent) else {
+                guard let liftedCIImage = subjectLiftedImage(from: inputCIImage, mask: visionMask) else {
                     return performSimpleBackgroundRemovalSync(image: image)
                 }
+
+                let colorSpace = cgImage.colorSpace ?? CGColorSpaceCreateDeviceRGB()
+                guard let outputCG = ciContext.createCGImage(
+                    liftedCIImage,
+                    from: liftedCIImage.extent,
+                    format: .RGBA16,
+                    colorSpace: colorSpace
+                ) else {
+                    return performSimpleBackgroundRemovalSync(image: image)
+                }
+
                 return UIImage(cgImage: outputCG, scale: image.scale, orientation: .up)
             } catch {
                 print("BackgroundRemover: Failed to apply mask: \(error)")
@@ -241,6 +244,23 @@ extension BackgroundRemover {
         } else {
             return performSimpleBackgroundRemovalSync(image: image)
         }
+    }
+
+    @available(iOS 17.0, *)
+    private func subjectLiftedImage(from inputImage: CIImage, mask: CIImage) -> CIImage? {
+        let blend = CIFilter.blendWithMask()
+        blend.inputImage = inputImage
+        blend.maskImage = mask
+        blend.backgroundImage = CIImage.empty()
+
+        if let output = blend.outputImage {
+            return output
+        }
+
+        // Fallback for platforms that require an explicit extent
+        let clearBackground = CIImage(color: .clear).cropped(to: inputImage.extent)
+        blend.backgroundImage = clearBackground
+        return blend.outputImage
     }
 
     // MARK: - Mask refinement helpers (iOS 17+)
@@ -676,4 +696,3 @@ private struct DepthStatistics {
         foregroundUpperBound = max(bufferedUpper, 0.25)
     }
 }
-
