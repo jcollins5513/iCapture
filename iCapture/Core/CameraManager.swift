@@ -489,11 +489,15 @@ extension CameraManager {
             if #available(iOS 16.0, *) {
                 if let device = self.captureDevice {
                     let supported = device.activeFormat.supportedMaxPhotoDimensions
-                    if !supported.isEmpty {
-                        let descriptions = supported.map { "\($0.width)x\($0.height)" }.joined(separator: ", ")
-                        print("CameraManager: supportedMaxPhotoDimensions = [\(descriptions)]")
+                    let descriptions = supported.map { "\($0.width)x\($0.height)" }.joined(separator: ", ")
+                    print("CameraManager: supportedMaxPhotoDimensions = [\(descriptions)]")
+
+                    if let preferred = supported.first(where: { $0.width >= 4_000 && $0.height >= 3_000 }) {
+                        preferredPhotoDimensions = preferred
+                    } else if let first = supported.first {
+                        preferredPhotoDimensions = first
                     } else {
-                        print("CameraManager: supportedMaxPhotoDimensions is empty on current format")
+                        preferredPhotoDimensions = nil
                     }
                 }
 
