@@ -44,7 +44,7 @@ class ROIDetector: ObservableObject {
     }
 
     func getROIRect() -> CGRect {
-        return roiRect
+        roiRect
     }
 
     func startBackgroundSampling() {
@@ -81,7 +81,7 @@ class ROIDetector: ObservableObject {
     }
 
     func getOccupancyThreshold() -> Double {
-        return occupancyThreshold
+        occupancyThreshold
     }
 
     // MARK: - Private Methods
@@ -164,7 +164,9 @@ class ROIDetector: ObservableObject {
 
             // Debug logging every 30 frames (about once per second at 30fps)
             if self.occupancyPercentage > 0 {
-                print("ROIDetector: Occupancy: \(String(format: "%.1f", self.occupancyPercentage))%, Threshold: \(String(format: "%.1f", self.occupancyThreshold * 100))%, Occupied: \(isOccupied)")
+                let occupancyText = String(format: "%.1f", self.occupancyPercentage)
+                let thresholdText = String(format: "%.1f", self.occupancyThreshold * 100)
+                print("ROIDetector: Occupancy: \(occupancyText)%, Threshold: \(thresholdText)%, Occupied: \(isOccupied)")
             }
         }
     }
@@ -252,7 +254,7 @@ class ROIDetector: ObservableObject {
 
         // Normalize variance to occupancy percentage
         // Higher variance indicates more movement/change in the ROI
-        let normalizedVariance = min(variance / 1000.0, 1.0) // Scale factor may need adjustment
+        let normalizedVariance = min(variance / 1_000.0, 1.0) // Scale factor may need adjustment
 
         return normalizedVariance
     }

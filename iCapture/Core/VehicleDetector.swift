@@ -16,21 +16,21 @@ class VehicleDetector: ObservableObject {
     @Published var vehicleConfidence: Float = 0.0
     @Published var vehicleBoundingBox: CGRect = .zero
     @Published var detectionCount: Int = 0
-    
+
     private var vehicleDetectionRequest: VNClassifyImageRequest?
     private let processingQueue = DispatchQueue(label: "vehicle.detection.queue", qos: .userInitiated)
-    
+
     // Detection parameters
     private let confidenceThreshold: Float = 0.6
     private let detectionHistorySize = 10
     private var detectionHistory: [Bool] = []
-    
+
     init() {
         setupVehicleDetection()
     }
-    
+
     // MARK: - Public Interface
-    
+
     func processFrame(_ pixelBuffer: CVPixelBuffer) {
         processingQueue.async { [weak self] in
             Task { @MainActor in
@@ -38,7 +38,7 @@ class VehicleDetector: ObservableObject {
             }
         }
     }
-    
+
     func resetDetectionHistory() {
         detectionHistory.removeAll()
         Task { @MainActor in
@@ -48,9 +48,9 @@ class VehicleDetector: ObservableObject {
             self.detectionCount = 0
         }
     }
-    
+
     // MARK: - Private Methods
-    
+
     private func setupVehicleDetection() {
         // Use VNClassifyImageRequest for general object detection
         // This will detect cars, trucks, buses, etc.
@@ -59,22 +59,22 @@ class VehicleDetector: ObservableObject {
                 print("VehicleDetector: Error in vehicle detection: \(error)")
                 return
             }
-            
+
             self?.handleVehicleDetectionResults(request.results)
         }
-        
+
         vehicleDetectionRequest = request
     }
-    
+
     private func performVehicleDetection(_ pixelBuffer: CVPixelBuffer) async {
         guard let request = vehicleDetectionRequest else {
             // Fallback to basic object detection if custom model fails
             await performBasicVehicleDetection(pixelBuffer)
             return
         }
-        
+
         let handler = VNImageRequestHandler(cvPixelBuffer: pixelBuffer, options: [:])
-        
+
         do {
             try handler.perform([request])
         } catch {
@@ -83,7 +83,7 @@ class VehicleDetector: ObservableObject {
             await performBasicVehicleDetection(pixelBuffer)
         }
     }
-    
+
     private func performBasicVehicleDetection(_ pixelBuffer: CVPixelBuffer) async {
         // Fallback detection using VNClassifyImageRequest without custom model
         let request = VNClassifyImageRequest { [weak self] request, error in
@@ -91,19 +91,19 @@ class VehicleDetector: ObservableObject {
                 print("VehicleDetector: Error in basic vehicle detection: \(error)")
                 return
             }
-            
+
             self?.handleVehicleDetectionResults(request.results)
         }
-        
+
         let handler = VNImageRequestHandler(cvPixelBuffer: pixelBuffer, options: [:])
-        
+
         do {
             try handler.perform([request])
         } catch {
             print("VehicleDetector: Failed to perform basic vehicle detection: \(error)")
         }
     }
-    
+
     private func handleVehicleDetectionResults(_ results: [Any]?) {
         guard let observations = results as? [VNClassificationObservation] else {
             Task { @MainActor in
@@ -111,22 +111,22 @@ class VehicleDetector: ObservableObject {
             }
             return
         }
-        
+
         // Look for vehicle-related classifications
         var bestVehicleDetection: (confidence: Float, boundingBox: CGRect) = (0.0, .zero)
-        
+
         for observation in observations {
             // Check if the classification indicates a vehicle
             let labelText = observation.identifier.lowercased()
-            let isVehicle = labelText.contains("car") || 
-                           labelText.contains("truck") || 
-                           labelText.contains("bus") || 
+            let isVehicle = labelText.contains("car") ||
+                           labelText.contains("truck") ||
+                           labelText.contains("bus") ||
                            labelText.contains("vehicle") ||
                            labelText.contains("automobile") ||
                            labelText.contains("suv") ||
                            labelText.contains("van") ||
                            labelText.contains("motorcycle")
-            
+
             if isVehicle {
                 let confidence = observation.confidence
                 if confidence > bestVehicleDetection.confidence {
@@ -134,9 +134,9 @@ class VehicleDetector: ObservableObject {
                 }
             }
         }
-        
+
         let isDetected = bestVehicleDetection.confidence >= confidenceThreshold
-        
+
         Task { @MainActor in
             self.updateVehicleDetection(
                 detected: isDetected,
@@ -145,18 +145,18 @@ class VehicleDetector: ObservableObject {
             )
         }
     }
-    
+
     private func updateVehicleDetection(detected: Bool, confidence: Float, boundingBox: CGRect) {
         // Add to detection history
         detectionHistory.append(detected)
         if detectionHistory.count > detectionHistorySize {
             detectionHistory.removeFirst()
         }
-        
+
         // Use majority voting to reduce false positives
         let positiveDetections = detectionHistory.filter { $0 }.count
         let finalDetection = positiveDetections > detectionHistory.count / 2
-        
+
         if finalDetection != isVehicleDetected {
             isVehicleDetected = finalDetection
             if finalDetection {
@@ -166,7 +166,7 @@ class VehicleDetector: ObservableObject {
                 print("VehicleDetector: Vehicle lost")
             }
         }
-        
+
         vehicleConfidence = confidence
         vehicleBoundingBox = boundingBox
     }

@@ -211,7 +211,7 @@ class LiDARDetector: NSObject, ObservableObject {
     }
 
     func getROIRect() -> CGRect {
-        return roiRect
+        roiRect
     }
 
     func debugARSessionStatus() {

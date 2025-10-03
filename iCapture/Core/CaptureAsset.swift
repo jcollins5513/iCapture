@@ -45,7 +45,7 @@ struct CaptureAsset: Codable, Identifiable {
         return sessionPath.appendingPathComponent(subdirectory)
             .appendingPathComponent(filename)
     }
-    
+
     // Helper method to get file URL with actual session directory
     func getFileURL(with sessionDirectory: URL) -> URL {
         let subdirectory = type == .photo ? "photos" : "video"
@@ -77,9 +77,9 @@ struct CaptureAsset: Codable, Identifiable {
     }
 
     var fileExists: Bool {
-        return FileManager.default.fileExists(atPath: fileURL.path)
+        FileManager.default.fileExists(atPath: fileURL.path)
     }
-    
+
     // Helper method to check if file exists with specific session directory
     func fileExists(with sessionDirectory: URL) -> Bool {
         let assetFileURL = getFileURL(with: sessionDirectory)
@@ -150,17 +150,18 @@ extension CaptureAsset {
     }
 
     var formattedDimensions: String {
-        return "\(width) × \(height)"
+        "\(width) × \(height)"
     }
 
     var assetSummary: String {
         let formatter = DateFormatter()
         formatter.timeStyle = .medium
-
-        let timeString = formatter.string(from: createdAt)
-        let sizeString = formattedFileSize
-
-        return "\(type.rawValue.capitalized) | \(timeString) | \(sizeString) | \(triggerType.rawValue.capitalized)"
+        return [
+            type.rawValue.capitalized,
+            formatter.string(from: createdAt),
+            formattedFileSize,
+            triggerType.rawValue.capitalized
+        ].joined(separator: " | ")
     }
 }
 

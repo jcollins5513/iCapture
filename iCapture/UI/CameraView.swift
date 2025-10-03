@@ -171,8 +171,7 @@ struct CameraView: View {
                 }
             }
         }
-        .padding(.horizontal, isCompactHeight ? 12 : 16)
-        .padding(.top, isCompactHeight ? 6 : 0)
+        .padding(.horizontal, 16)
     }
 
     private func topOverlayContainer<Content: View>(@ViewBuilder content: () -> Content) -> some View {
@@ -365,11 +364,11 @@ struct CameraView: View {
             statusRow
 
             HStack(alignment: .bottom, spacing: 20) {
-                detectionControls(compact: false)
-                Spacer(minLength: 0)
-                captureButton(compact: false)
-                Spacer(minLength: 0)
-                sessionControls(compact: false)
+                detectionControls
+                Spacer()
+                captureButton
+                Spacer()
+                sessionControls
             }
         }
         .padding(.horizontal, 16)
