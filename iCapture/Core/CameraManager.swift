@@ -433,7 +433,7 @@ extension CameraManager {
             // We'll store trigger info in session data instead
 
             if self.photoOutput.isDepthDataDeliveryEnabled {
-                let shouldCaptureDepth = !(self.useLiDARDetection && self.lidarDetector.isSessionRunning)
+                let shouldCaptureDepth = false
                 photoSettings.isDepthDataDeliveryEnabled = shouldCaptureDepth
                 if shouldCaptureDepth, #available(iOS 16.0, *) {
                     photoSettings.isDepthDataFiltered = true
@@ -588,6 +588,11 @@ extension CameraManager: AVCaptureVideoDataOutputSampleBufferDelegate {
                     print("CameraManager: - LiDAR session running: \(self.lidarDetector.isSessionRunning)")
                 }
                 self.lastLiDARProcessingState = true
+
+                if self.roiDetector.isBackgroundSampling {
+                    let buffer = pixelBufferBox.buffer
+                    self.roiDetector.processFrame(buffer)
+                }
             } else {
                 if self.lastLiDARProcessingState != false {
                     print("CameraManager: Using traditional frame processing")
