@@ -421,27 +421,17 @@ extension CameraManager {
 
             if #available(iOS 16.0, *) {
                 if let device = self.captureDevice {
-                    let supported = device.activeFormat.supportedMaxPhotoDimensions.sorted { (lhs, rhs) in
-                        let lhsArea = Int(lhs.width) * Int(lhs.height)
-                        let rhsArea = Int(rhs.width) * Int(rhs.height)
-                        return lhsArea > rhsArea
-                    }
+                    let supported = device.activeFormat.supportedMaxPhotoDimensions
+                    let descriptions = supported.map { "\($0.width)x\($0.height)" }.joined(separator: ", ")
+                    print("CameraManager: supportedMaxPhotoDimensions = [\(descriptions)]")
 
-                    if supported.isEmpty {
-                        print("CameraManager: supportedMaxPhotoDimensions is empty; relying on default output dimensions")
-                    } else {
-                        let descriptions = supported.map { "\($0.width)x\($0.height)" }.joined(separator: ", ")
-                        print("CameraManager: supportedMaxPhotoDimensions = [\(descriptions)]")
-                    }
-
-                    let desired = supported.first(where: { $0.width >= 8000 || $0.height >= 6000 })
-                        ?? supported.first
+                    let desired = supported.first(where: { $0.width >= 4000 && $0.height >= 3000 })
 
                     if let desired {
                         photoSettings.maxPhotoDimensions = desired
                         print("CameraManager: Requested photo dimensions: \(desired.width)x\(desired.height)")
                     } else {
-                        print("CameraManager: No supported max photo dimensions available; using default")
+                        print("CameraManager: Falling back to default 12MP dimensions")
                     }
                 }
             } else if let device = self.captureDevice {
