@@ -205,6 +205,11 @@ extension CameraManager {
                     print("CameraManager: Depth data delivery not supported")
                 }
 
+                if #available(iOS 16.0, *) {
+                    self.photoOutput.maxPhotoDimensions = CMVideoDimensions(width: 0, height: 0)
+                    print("CameraManager: Reset photo output max dimensions to system default")
+                }
+
                 self.photoOutput.isHighResolutionCaptureEnabled = true
                 if #available(iOS 15.0, *) {
                     self.photoOutput.maxPhotoQualityPrioritization = .quality
@@ -291,6 +296,11 @@ extension CameraManager {
             print("CameraManager: Depth data delivery supported; defaulting to disabled for full resolution")
         } else {
             print("CameraManager: Depth data delivery not supported")
+        }
+
+        if #available(iOS 16.0, *) {
+            photoOutput.maxPhotoDimensions = CMVideoDimensions(width: 0, height: 0)
+            print("CameraManager: Reset photo output max dimensions to system default")
         }
         print("CameraManager: Photo output added successfully")
     }
@@ -419,13 +429,28 @@ extension CameraManager {
             photoSettings.isDepthDataDeliveryEnabled = false
 
             if #available(iOS 16.0, *) {
-                if let device = self.captureDevice,
-                   let maxDimensions = device.activeFormat.supportedMaxPhotoDimensions.max(by: { ($0.width * $0.height) < ($1.width * $1.height) }) {
-                    photoSettings.maxPhotoDimensions = maxDimensions
-                    let description = "\(maxDimensions.width)x\(maxDimensions.height)"
-                    print("CameraManager: Requested photo dimensions: \(description)")
-                } else {
-                    print("CameraManager: Using default photo dimensions (iOS 16+)")
+                if let device = self.captureDevice {
+                    let supported = device.activeFormat.supportedMaxPhotoDimensions
+                    let descriptions = supported.map { "\($0.width)x\($0.height)" }.joined(separator: ", ")
+                    if !supported.isEmpty {
+                        print("CameraManager: supportedMaxPhotoDimensions = [\(descriptions)]")
+                    } else {
+                        print("CameraManager: supportedMaxPhotoDimensions is empty; relying on default output dimensions")
+                    }
+
+                    let ultraHigh = supported.first(where: { $0.width >= 8000 || $0.height >= 6000 })
+                    let twelveMP = supported.first(where: { $0.width >= 4000 || $0.height >= 3000 })
+
+                    if let ultraHigh {
+                        photoSettings.maxPhotoDimensions = ultraHigh
+                        print("CameraManager: Requested photo dimensions: \(ultraHigh.width)x\(ultraHigh.height) (ultra-high)")
+                    } else if let twelveMP {
+                        photoSettings.maxPhotoDimensions = twelveMP
+                        print("CameraManager: Requested photo dimensions: \(twelveMP.width)x\(twelveMP.height) (12MP)")
+                    } else {
+                        photoSettings.maxPhotoDimensions = CMVideoDimensions(width: 0, height: 0)
+                        print("CameraManager: No high-res override available; using default dimensions")
+                    }
                 }
             } else if let device = self.captureDevice {
                 let highRes = device.activeFormat.highResolutionStillImageDimensions
