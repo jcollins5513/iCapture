@@ -33,6 +33,7 @@ struct CaptureAsset: Codable, Identifiable {
     let exposureDuration: Double?
     let focusDistance: Double?
     var stickerFilename: String?
+    var cutoutFilename: String?
 
     // File system properties
     var fileURL: URL {
@@ -59,6 +60,13 @@ struct CaptureAsset: Codable, Identifiable {
             .appendingPathComponent(stickerFilename)
     }
 
+    func getCutoutURL(with sessionDirectory: URL) -> URL? {
+        guard let cutoutFilename = cutoutFilename else { return nil }
+        return sessionDirectory
+            .appendingPathComponent("cutouts")
+            .appendingPathComponent(cutoutFilename)
+    }
+
     var fileSize: Int64? {
         do {
             let attributes = try FileManager.default.attributesOfItem(atPath: fileURL.path)
@@ -81,7 +89,7 @@ struct CaptureAsset: Codable, Identifiable {
     init(sessionId: String, type: AssetType, filename: String, width: Int, height: Int,
          roiRect: CGRect, triggerType: TriggerType, exposureISO: Double? = nil,
          exposureDuration: Double? = nil, focusDistance: Double? = nil,
-         stickerFilename: String? = nil) {
+         stickerFilename: String? = nil, cutoutFilename: String? = nil) {
         self.id = UUID().uuidString
         self.sessionId = sessionId
         self.type = type
@@ -95,6 +103,7 @@ struct CaptureAsset: Codable, Identifiable {
         self.exposureDuration = exposureDuration
         self.focusDistance = focusDistance
         self.stickerFilename = stickerFilename
+        self.cutoutFilename = cutoutFilename
     }
 
     // MARK: - File Operations
@@ -109,15 +118,26 @@ struct CaptureAsset: Codable, Identifiable {
         let destinationURL = exportURL.appendingPathComponent(filename)
         try FileManager.default.copyItem(at: fileURL, to: destinationURL)
 
-        if type == .photo,
-           let stickerFilename = stickerFilename,
-           let stickerSourceURL = getStickerURL(with: sessionDirectory),
-           FileManager.default.fileExists(atPath: stickerSourceURL.path) {
-            let stickerDestination = exportURL.appendingPathComponent(stickerFilename)
-            if FileManager.default.fileExists(atPath: stickerDestination.path) {
-                try FileManager.default.removeItem(at: stickerDestination)
+        if type == .photo {
+            if let stickerFilename = stickerFilename,
+               let stickerSourceURL = getStickerURL(with: sessionDirectory),
+               FileManager.default.fileExists(atPath: stickerSourceURL.path) {
+                let stickerDestination = exportURL.appendingPathComponent(stickerFilename)
+                if FileManager.default.fileExists(atPath: stickerDestination.path) {
+                    try FileManager.default.removeItem(at: stickerDestination)
+                }
+                try FileManager.default.copyItem(at: stickerSourceURL, to: stickerDestination)
             }
-            try FileManager.default.copyItem(at: stickerSourceURL, to: stickerDestination)
+
+            if let cutoutFilename = cutoutFilename,
+               let cutoutSourceURL = getCutoutURL(with: sessionDirectory),
+               FileManager.default.fileExists(atPath: cutoutSourceURL.path) {
+                let cutoutDestination = exportURL.appendingPathComponent(cutoutFilename)
+                if FileManager.default.fileExists(atPath: cutoutDestination.path) {
+                    try FileManager.default.removeItem(at: cutoutDestination)
+                }
+                try FileManager.default.copyItem(at: cutoutSourceURL, to: cutoutDestination)
+            }
         }
     }
 }

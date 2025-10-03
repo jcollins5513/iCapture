@@ -182,9 +182,56 @@ extension CameraManager {
                 return
             }
 
-            addVideoOutput()
-            addPhotoOutput()
-            addMovieOutput()
+            self.captureSession.addInput(videoInput)
+            self.captureDevice = videoDevice
+            print("CameraManager: Video input added successfully")
+
+            // Add video output for preview
+            if self.captureSession.canAddOutput(self.videoOutput) {
+                self.captureSession.addOutput(self.videoOutput)
+                self.videoOutput.setSampleBufferDelegate(self, queue: self.videoDataQueue)
+                print("CameraManager: Video output added successfully")
+            } else {
+                print("CameraManager: WARNING - Cannot add video output")
+            }
+
+            // Add photo output
+            if self.captureSession.canAddOutput(self.photoOutput) {
+                self.captureSession.addOutput(self.photoOutput)
+                if self.photoOutput.isDepthDataDeliverySupported {
+                    self.photoOutput.isDepthDataDeliveryEnabled = true
+                    print("CameraManager: Depth data delivery enabled for photo output")
+                } else {
+                    print("CameraManager: Depth data delivery not supported")
+                }
+
+                self.photoOutput.isHighResolutionCaptureEnabled = true
+                if #available(iOS 15.0, *) {
+                    self.photoOutput.maxPhotoQualityPrioritization = .quality
+                }
+
+                if self.photoOutput.isLivePhotoCaptureSupported {
+                    self.photoOutput.isLivePhotoCaptureEnabled = false
+                }
+
+                if self.photoOutput.isDualCameraDualPhotoDeliverySupported {
+                    self.photoOutput.isDualCameraDualPhotoDeliveryEnabled = false
+                }
+                print("CameraManager: Photo output added successfully")
+            } else {
+                print("CameraManager: WARNING - Cannot add photo output")
+            }
+
+            // Add movie file output for video recording
+            let movieFileOutput = DispatchQueue.main.sync {
+                return self.videoRecordingManager.getMovieFileOutput()
+            }
+            if self.captureSession.canAddOutput(movieFileOutput) {
+                self.captureSession.addOutput(movieFileOutput)
+                print("CameraManager: Movie file output added successfully")
+            } else {
+                print("CameraManager: WARNING - Cannot add movie file output")
+            }
 
             self.captureSession.commitConfiguration()
             print("CameraManager: Session configuration committed")
@@ -356,15 +403,20 @@ extension CameraManager {
                 photoSettings = AVCapturePhotoSettings()
             }
 
+            photoSettings.isHighResolutionPhotoEnabled = true
+            if #available(iOS 15.0, *) {
+                photoSettings.photoQualityPrioritization = .quality
+            }
+
+            photoSettings.isAutoStillImageStabilizationEnabled = true
+            photoSettings.isAutoDualCameraFusionEnabled = true
+
             // Enable high resolution capture if supported
             if #available(iOS 16.0, *) {
                 if let device = self.captureDevice,
-                   let maxDimensions = device.activeFormat.supportedMaxPhotoDimensions
-                    .max(by: { lhs, rhs in
-                        (lhs.width * lhs.height) < (rhs.width * rhs.height)
-                    }),
-                   maxDimensions.width >= 8_000 {
-                    if self.photoOutput.isDepthDataDeliveryEnabled {
+                   let maxDimensions = device.activeFormat.supportedMaxPhotoDimensions.max(by: { $0.width * $0.height < $1.width * $1.height }),
+                   maxDimensions.width >= 8000 {
+                    if self.photoOutput.isDepthDataDeliveryEnabled && !(self.useLiDARDetection && self.lidarDetector.isSessionRunning) {
                         print("CameraManager: Depth data enabled - using standard resolution for compatibility")
                     } else if self.photoOutput.maxPhotoDimensions.width >= maxDimensions.width {
                         photoSettings.maxPhotoDimensions = maxDimensions
@@ -381,8 +433,9 @@ extension CameraManager {
             // We'll store trigger info in session data instead
 
             if self.photoOutput.isDepthDataDeliveryEnabled {
-                photoSettings.isDepthDataDeliveryEnabled = true
-                if #available(iOS 16.0, *) {
+                let shouldCaptureDepth = !(self.useLiDARDetection && self.lidarDetector.isSessionRunning)
+                photoSettings.isDepthDataDeliveryEnabled = shouldCaptureDepth
+                if shouldCaptureDepth, #available(iOS 16.0, *) {
                     photoSettings.isDepthDataFiltered = true
                 }
             }

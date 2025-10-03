@@ -195,6 +195,10 @@ class SessionManager: ObservableObject {
         let stickersPath = sessionPath.appendingPathComponent("stickers")
         try fileManager.createDirectory(at: stickersPath, withIntermediateDirectories: true)
 
+        // Create cutouts subdirectory for full-resolution transparent renders
+        let cutoutsPath = sessionPath.appendingPathComponent("cutouts")
+        try fileManager.createDirectory(at: cutoutsPath, withIntermediateDirectories: true)
+
         return sessionPath
     }
 
@@ -207,7 +211,7 @@ class SessionManager: ObservableObject {
             session: session,
             assets: sessionAssets,
             createdAt: Date(),
-            version: "1.0"
+            version: "1.1"
         )
 
         let encoder = JSONEncoder()
@@ -359,6 +363,38 @@ class SessionManager: ObservableObject {
             try saveSessionMetadata()
         } catch {
             print("SessionManager: Failed to persist sticker metadata: \(error)")
+        }
+    }
+
+    func attachSticker(toOriginalFilename originalFilename: String, stickerFilename: String) {
+        guard let index = sessionAssets.firstIndex(where: { asset in
+            asset.filename == originalFilename && asset.type == .photo
+        }) else {
+            return
+        }
+
+        sessionAssets[index].stickerFilename = stickerFilename
+
+        do {
+            try saveSessionMetadata()
+        } catch {
+            print("SessionManager: Failed to persist sticker metadata: \(error)")
+        }
+    }
+
+    func attachCutout(toOriginalFilename originalFilename: String, cutoutFilename: String) {
+        guard let index = sessionAssets.firstIndex(where: { asset in
+            asset.filename == originalFilename && asset.type == .photo
+        }) else {
+            return
+        }
+
+        sessionAssets[index].cutoutFilename = cutoutFilename
+
+        do {
+            try saveSessionMetadata()
+        } catch {
+            print("SessionManager: Failed to persist cutout metadata: \(error)")
         }
     }
 

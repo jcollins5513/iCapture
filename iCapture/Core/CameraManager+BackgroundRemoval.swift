@@ -139,24 +139,23 @@ extension CameraManager {
 
             print("CameraManager: Background removal completed for \(filename) using \(sourceDescription)")
 
-            if let sessionFileURL = sessionFileURL {
-                do {
-                    try processedData.write(to: sessionFileURL, options: .atomic)
-                    print("CameraManager: Overwrote session photo with background-removed version")
-                } catch {
-                    print("CameraManager: Failed to write processed photo to session directory: \(error)")
-                }
-            }
-
             if let processedImage = UIImage(data: processedData) {
-                if let stickerImage = self.backgroundRemover.createStickerImage(from: processedImage) {
+                let normalizedImage = processedImage
+
+                if let stickerImage = self.backgroundRemover.createStickerImage(from: normalizedImage) {
                     self.persistStickerImage(
                         stickerImage,
                         originalFilename: filename
                     )
                 }
 
-                UIImageWriteToSavedPhotosAlbum(processedImage, nil, nil, nil)
+                self.persistCutoutImage(
+                    normalizedImage,
+                    originalFilename: filename,
+                    sessionFileURL: sessionFileURL
+                )
+
+                UIImageWriteToSavedPhotosAlbum(normalizedImage, nil, nil, nil)
                 print("CameraManager: Background-removed photo saved to photo library")
             } else {
                 print("CameraManager: Unable to decode processed image data; saving original instead")
@@ -203,6 +202,46 @@ extension CameraManager {
             print("CameraManager: Saved sticker to \(stickerURL.lastPathComponent)")
         } catch {
             print("CameraManager: Failed to persist sticker image: \(error)")
+        }
+    }
+
+    private func persistCutoutImage(
+        _ cutoutImage: UIImage,
+        originalFilename: String,
+        sessionFileURL: URL?
+    ) {
+        guard let sessionManager = sessionManager,
+              sessionManager.isSessionActive,
+              let sessionDirectory = sessionManager.sessionDirectory,
+              let pngData = cutoutImage.pngData() else {
+            return
+        }
+
+        let cutoutsDirectory = sessionDirectory.appendingPathComponent("cutouts", isDirectory: true)
+        let fileManager = FileManager.default
+
+        do {
+            if !fileManager.fileExists(atPath: cutoutsDirectory.path) {
+                try fileManager.createDirectory(at: cutoutsDirectory, withIntermediateDirectories: true)
+            }
+
+            let baseName = (originalFilename as NSString).deletingPathExtension
+            let cutoutFilename = "\(baseName)_cutout.png"
+            let cutoutURL = cutoutsDirectory.appendingPathComponent(cutoutFilename)
+            try pngData.write(to: cutoutURL, options: .atomic)
+
+            sessionManager.attachCutout(
+                toOriginalFilename: originalFilename,
+                cutoutFilename: cutoutFilename
+            )
+
+            print("CameraManager: Saved transparent cutout to \(cutoutURL.lastPathComponent)")
+
+            if let sessionFileURL {
+                print("CameraManager: Original capture preserved at \(sessionFileURL.lastPathComponent)")
+            }
+        } catch {
+            print("CameraManager: Failed to persist cutout image: \(error)")
         }
     }
 }
