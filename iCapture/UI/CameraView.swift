@@ -9,6 +9,7 @@ import SwiftUI
 import AVFoundation
 
 struct CameraView: View {
+    @Environment(\.verticalSizeClass) private var verticalSizeClass
     @StateObject private var cameraManager = CameraManager()
     @StateObject private var sessionManager = SessionManager()
     @ObservedObject var authManager: AuthManager
@@ -16,6 +17,22 @@ struct CameraView: View {
     @State private var showStockNumberInput = false
     @State private var showPerformanceOverlay = false
     @State private var isAdjustingROI = false
+
+    private var isCompactHeight: Bool {
+        verticalSizeClass == .compact
+    }
+
+    private var controlButtonDimension: CGFloat {
+        isCompactHeight ? 64 : 76
+    }
+
+    private var controlIconFont: Font {
+        isCompactHeight ? .system(size: 20, weight: .semibold) : .title3.weight(.semibold)
+    }
+
+    private var controlLabelFont: Font {
+        isCompactHeight ? .caption.weight(.semibold) : .caption2.weight(.semibold)
+    }
 
     var body: some View {
         ZStack {
@@ -159,7 +176,7 @@ struct CameraView: View {
 
     private func topOverlayContainer<Content: View>(@ViewBuilder content: () -> Content) -> some View {
         content()
-            .padding(16)
+            .padding(isCompactHeight ? 12 : 16)
             .background(.ultraThinMaterial.opacity(0.85))
             .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
     }
@@ -192,6 +209,17 @@ struct CameraView: View {
                 tint: .green
             ) {
                 cameraManager.backgroundRemovalEnabled.toggle()
+            }
+
+            iconControl(
+                systemImage: isAdjustingROI ? "rectangle.dashed.badge.record" : "rectangle.dashed", 
+                title: isAdjustingROI ? "Lock Frame" : "Adjust Frame",
+                isActive: isAdjustingROI,
+                tint: .cyan
+            ) {
+                withAnimation(.spring(response: 0.28, dampingFraction: 0.8)) {
+                    isAdjustingROI.toggle()
+                }
             }
 
             iconControl(
@@ -322,6 +350,16 @@ struct CameraView: View {
     }
 
     private var bottomOverlay: some View {
+        Group {
+            if isCompactHeight {
+                compactBottomOverlay
+            } else {
+                regularBottomOverlay
+            }
+        }
+    }
+
+    private var regularBottomOverlay: some View {
         VStack(spacing: 16) {
             statusRow
 
@@ -341,8 +379,32 @@ struct CameraView: View {
         .padding(.bottom, 24)
     }
 
-    private var detectionControls: some View {
-        HStack(spacing: 12) {
+    private var compactBottomOverlay: some View {
+        VStack(spacing: 12) {
+            statusRow
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(alignment: .center, spacing: 12) {
+                    detectionControls(compact: true)
+                    captureButton(compact: true)
+                    sessionControls(compact: true)
+                }
+                .padding(.horizontal, 4)
+            }
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 14)
+        .background(.ultraThinMaterial.opacity(0.94))
+        .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
+        .padding(.horizontal, 12)
+        .padding(.bottom, 12)
+    }
+
+    @ViewBuilder
+    private func detectionControls(compact: Bool) -> some View {
+        let spacing: CGFloat = compact ? 10 : 12
+
+        HStack(spacing: spacing) {
             if cameraManager.useLiDARDetection {
                 iconControl(
                     systemImage: "sensor.tag.radiowaves.forward",
@@ -389,28 +451,32 @@ struct CameraView: View {
                 }
             }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .frame(maxWidth: compact ? nil : .infinity, alignment: .leading)
     }
 
-    private var captureButton: some View {
+    private func captureButton(compact: Bool) -> some View {
         Button {
             print("CameraView: Manual capture triggered")
             cameraManager.capturePhoto(triggerType: .manual)
         } label: {
-            VStack(spacing: 8) {
+            VStack(spacing: compact ? 6 : 8) {
+                let outer: CGFloat = compact ? 72 : 86
+                let middle: CGFloat = compact ? 60 : 72
+                let inner: CGFloat = compact ? 52 : 64
+
                 ZStack {
                     Circle()
                         .fill(Color.white.opacity(0.9))
-                        .frame(width: 86, height: 86)
+                        .frame(width: outer, height: outer)
                     Circle()
                         .fill(Color.black)
-                        .frame(width: 72, height: 72)
+                        .frame(width: middle, height: middle)
                     Circle()
                         .fill(cameraManager.isSessionRunning ? Color.white : Color.gray.opacity(0.6))
-                        .frame(width: 64, height: 64)
+                        .frame(width: inner, height: inner)
                 }
                 Text("Capture")
-                    .font(.caption.weight(.semibold))
+                    .font(controlLabelFont)
                     .foregroundColor(cameraManager.isSessionRunning ? .white : .gray)
             }
         }
@@ -418,8 +484,9 @@ struct CameraView: View {
         .disabled(!cameraManager.isSessionRunning)
     }
 
-    private var sessionControls: some View {
-        VStack(spacing: 12) {
+    @ViewBuilder
+    private func sessionControls(compact: Bool) -> some View {
+        VStack(spacing: compact ? 10 : 12) {
             iconControl(
                 systemImage: sessionManager.isSessionActive ? "stop.circle.fill" : "play.circle.fill",
                 title: sessionManager.isSessionActive ? "End Session" : "Start Session",
@@ -453,7 +520,7 @@ struct CameraView: View {
                 }
             }
         }
-        .frame(maxWidth: .infinity, alignment: .trailing)
+        .frame(maxWidth: compact ? nil : .infinity, alignment: compact ? .leading : .trailing)
     }
 
     private func iconControl(
@@ -465,17 +532,17 @@ struct CameraView: View {
         action: @escaping () -> Void
     ) -> some View {
         Button(action: action) {
-            VStack(spacing: 6) {
+            VStack(spacing: isCompactHeight ? 4 : 6) {
                 Image(systemName: systemImage)
-                    .font(.title3.weight(.semibold))
+                    .font(controlIconFont)
                     .foregroundColor(.white)
                 Text(title)
-                    .font(.caption2.weight(.semibold))
+                    .font(controlLabelFont)
                     .foregroundColor(.white)
                     .multilineTextAlignment(.center)
                     .lineLimit(2)
             }
-            .frame(width: 76, height: 76)
+            .frame(width: controlButtonDimension, height: controlButtonDimension)
             .background((isActive ? tint : Color.black.opacity(0.55)))
             .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
         }
