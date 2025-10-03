@@ -21,11 +21,11 @@ class SessionManager: ObservableObject {
     @Published var photoCount = 0
     @Published var videoCount = 0
     @Published var sessionDuration: TimeInterval = 0
-    
+
     // Storage management
     @Published var currentStorageUsage: Int64 = 0
-    @Published var maxStorageLimit: Int64 = 60 * 15 * 1024 * 1024 // 60 photos * 15MB = 900MB
-    @Published var storageWarningThreshold: Int64 = 80 * 15 * 1024 * 1024 // 80% of limit
+    @Published var maxStorageLimit: Int64 = 60 * 15 * 1_024 * 1_024 // 60 photos * 15MB = 900MB
+    @Published var storageWarningThreshold: Int64 = 80 * 15 * 1_024 * 1_024 // 80% of limit
 
     private let fileManager = FileManager.default
     private let documentsPath: URL
@@ -71,7 +71,7 @@ class SessionManager: ObservableObject {
 
         // Save session metadata
         try saveSessionMetadata()
-        
+
         // Cleanup old sessions to manage storage
         try cleanupOldSessions()
 
@@ -238,12 +238,12 @@ class SessionManager: ObservableObject {
         let exportURL = exportPath.appendingPathComponent(
             "\(session.stockNumber)_\(session.id)"
         )
-        
+
         // Remove existing export directory if it exists
         if fileManager.fileExists(atPath: exportURL.path) {
             try fileManager.removeItem(at: exportURL)
         }
-        
+
         try fileManager.createDirectory(
             at: exportURL,
             withIntermediateDirectories: true
@@ -252,7 +252,7 @@ class SessionManager: ObservableObject {
         // Copy session.json
         let sessionJSONURL = sessionURL.appendingPathComponent("session.json")
         let exportSessionJSONURL = exportURL.appendingPathComponent("session.json")
-        
+
         if fileManager.fileExists(atPath: sessionJSONURL.path) {
             try fileManager.copyItem(at: sessionJSONURL, to: exportSessionJSONURL)
         } else {
@@ -335,19 +335,35 @@ class SessionManager: ObservableObject {
     // MARK: - Public Getters
 
     func getSessionSummary() -> String? {
-        return currentSession?.sessionSummary
+        currentSession?.sessionSummary
     }
 
     func getAssetCount() -> Int {
-        return sessionAssets.count
+        sessionAssets.count
     }
 
     func getPhotosCount() -> Int {
-        return photoCount
+        photoCount
     }
 
     func getVideosCount() -> Int {
-        return videoCount
+        videoCount
+    }
+
+    func attachSticker(toOriginalFilename originalFilename: String, stickerFilename: String) {
+        guard let index = sessionAssets.firstIndex(where: { asset in
+            asset.filename == originalFilename && asset.type == .photo
+        }) else {
+            return
+        }
+
+        sessionAssets[index].stickerFilename = stickerFilename
+
+        do {
+            try saveSessionMetadata()
+        } catch {
+            print("SessionManager: Failed to persist sticker metadata: \(error)")
+        }
     }
 
     func attachSticker(toOriginalFilename originalFilename: String, stickerFilename: String) {
@@ -383,18 +399,20 @@ class SessionManager: ObservableObject {
     }
 
     func getFormattedDuration() -> String {
-        let minutes = Int(sessionDuration) / 60
-        let seconds = Int(sessionDuration) % 60
-        return String(format: "%d:%02d", minutes, seconds)
+        String(
+            format: "%d:%02d",
+            Int(sessionDuration) / 60,
+            Int(sessionDuration) % 60
+        )
     }
-    
+
     // MARK: - Storage Management
-    
+
     func getStorageUsage() -> Int64 {
         guard let sessionURL = sessionDirectory else { return 0 }
-        
+
         var totalSize: Int64 = 0
-        
+
         do {
             let contents = try fileManager.contentsOfDirectory(at: sessionURL, includingPropertiesForKeys: [.fileSizeKey])
             for url in contents {
@@ -406,55 +424,54 @@ class SessionManager: ObservableObject {
         } catch {
             print("Failed to calculate storage usage: \(error)")
         }
-        
+
         currentStorageUsage = totalSize
         return totalSize
     }
-    
+
     func getFormattedStorageUsage() -> String {
-        let usage = getStorageUsage()
-        return ByteCountFormatter.string(fromByteCount: usage, countStyle: .file)
+        ByteCountFormatter.string(fromByteCount: getStorageUsage(), countStyle: .file)
     }
-    
+
     func isStorageLimitReached() -> Bool {
-        return getStorageUsage() >= maxStorageLimit
+        getStorageUsage() >= maxStorageLimit
     }
-    
+
     func isStorageWarningThresholdReached() -> Bool {
-        return getStorageUsage() >= storageWarningThreshold
+        getStorageUsage() >= storageWarningThreshold
     }
-    
+
     func cleanupOldSessions() throws {
         let capturesPath = documentsPath.appendingPathComponent("Captures")
-        
+
         guard fileManager.fileExists(atPath: capturesPath.path) else { return }
-        
+
         let contents = try fileManager.contentsOfDirectory(at: capturesPath, includingPropertiesForKeys: [.creationDateKey])
-        
+
         // Sort by creation date (oldest first)
         let sortedContents = contents.sorted { url1, url2 in
             let date1 = (try? url1.resourceValues(forKeys: [.creationDateKey]).creationDate) ?? Date.distantPast
             let date2 = (try? url2.resourceValues(forKeys: [.creationDateKey]).creationDate) ?? Date.distantPast
             return date1 < date2
         }
-        
+
         // Keep only the 10 most recent sessions
         let sessionsToDelete = sortedContents.dropLast(10)
-        
+
         for sessionURL in sessionsToDelete {
             try fileManager.removeItem(at: sessionURL)
             print("SessionManager: Cleaned up old session: \(sessionURL.lastPathComponent)")
         }
     }
-    
+
     func getStorageStatus() -> String {
         let usage = getStorageUsage()
         let limit = maxStorageLimit
         let percentage = Double(usage) / Double(limit) * 100
-        
+
         let usageString = ByteCountFormatter.string(fromByteCount: usage, countStyle: .file)
         let limitString = ByteCountFormatter.string(fromByteCount: limit, countStyle: .file)
-        
+
         return "Storage: \(usageString) / \(limitString) (\(String(format: "%.1f", percentage))%)"
     }
 }
@@ -498,4 +515,3 @@ extension Notification.Name {
     static let sessionDidStart = Notification.Name("SessionDidStart")
     static let sessionDidEnd = Notification.Name("SessionDidEnd")
 }
-

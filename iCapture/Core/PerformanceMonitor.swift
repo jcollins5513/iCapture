@@ -145,12 +145,12 @@ class PerformanceMonitor: ObservableObject {
 
         return report
     }
-    
+
     // MARK: - Thermal Management
-    
+
     func getThermalManagementRecommendations() -> [String] {
         var recommendations: [String] = []
-        
+
         switch thermalState {
         case .nominal:
             recommendations.append("Thermal state is normal - optimal performance")
@@ -168,34 +168,34 @@ class PerformanceMonitor: ObservableObject {
         @unknown default:
             recommendations.append("Unknown thermal state - monitor closely")
         }
-        
+
         return recommendations
     }
-    
+
     func getThermalEventSummary() -> String {
         guard !thermalEvents.isEmpty else {
             return "No thermal events recorded"
         }
-        
+
         var summary = "Thermal Events (\(thermalEvents.count)):\n"
         for event in thermalEvents.suffix(5) { // Show last 5 events
             summary += "• \(event.description)\n"
         }
-        
+
         if isThermalThrottling {
             summary += "\n⚠️ Currently experiencing thermal throttling"
         }
-        
+
         return summary
     }
-    
+
     func startThermalStressTest() {
         print("PerformanceMonitor: Starting thermal stress test")
         // In a real implementation, this would trigger intensive operations
         // For now, we'll just enable enhanced monitoring
         isQAMode = true
     }
-    
+
     func stopThermalStressTest() {
         print("PerformanceMonitor: Stopping thermal stress test")
         isQAMode = false
@@ -236,7 +236,7 @@ class PerformanceMonitor: ObservableObject {
         }
 
         if result == KERN_SUCCESS {
-            let memoryUsageMB = Double(memoryInfo.resident_size) / 1024.0 / 1024.0
+            let memoryUsageMB = Double(memoryInfo.resident_size) / 1_024.0 / 1_024.0
             memoryUsage = memoryUsageMB
 
             if memoryUsageMB > peakMemoryUsage {
@@ -262,7 +262,7 @@ class PerformanceMonitor: ObservableObject {
 
     private func updateThermalState() {
         let currentThermalState = ProcessInfo.processInfo.thermalState
-        
+
         // Check for thermal state changes
         if currentThermalState != lastThermalState {
             let event = ThermalEvent(
@@ -271,9 +271,9 @@ class PerformanceMonitor: ObservableObject {
                 toState: currentThermalState,
                 sessionDuration: sessionDuration
             )
-            
+
             thermalEvents.append(event)
-            
+
             // Track thermal throttling
             if currentThermalState == .serious || currentThermalState == .critical {
                 if !isThermalThrottling {
@@ -289,10 +289,10 @@ class PerformanceMonitor: ObservableObject {
                 }
                 thermalThrottlingStartTime = nil
             }
-            
+
             lastThermalState = currentThermalState
         }
-        
+
         thermalState = currentThermalState
     }
 
@@ -362,21 +362,21 @@ struct ThermalEvent: Codable {
     let fromState: String
     let toState: String
     let sessionDuration: TimeInterval
-    
+
     init(timestamp: Date, fromState: ProcessInfo.ThermalState, toState: ProcessInfo.ThermalState, sessionDuration: TimeInterval) {
         self.timestamp = timestamp
         self.fromState = ThermalEvent.thermalStateText(fromState)
         self.toState = ThermalEvent.thermalStateText(toState)
         self.sessionDuration = sessionDuration
     }
-    
+
     var description: String {
         let formatter = DateFormatter()
         formatter.timeStyle = .medium
-        
+
         return "\(formatter.string(from: timestamp)): \(fromState) → \(toState)"
     }
-    
+
     private static func thermalStateText(_ state: ProcessInfo.ThermalState) -> String {
         switch state {
         case .nominal: return "Nominal"

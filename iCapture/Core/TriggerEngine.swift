@@ -39,7 +39,12 @@ class TriggerEngine: ObservableObject {
         // Will be configured with dependencies after initialization
     }
 
-    func configure(cameraManager: CameraManager, roiDetector: ROIDetector, motionDetector: MotionDetector, vehicleDetector: VehicleDetector) {
+    func configure(
+        cameraManager: CameraManager,
+        roiDetector: ROIDetector,
+        motionDetector: MotionDetector,
+        vehicleDetector: VehicleDetector
+    ) {
         self.cameraManager = cameraManager
         self.roiDetector = roiDetector
         self.motionDetector = motionDetector
@@ -51,7 +56,7 @@ class TriggerEngine: ObservableObject {
                 self?.handleROIOccupancyChange(isOccupied)
             }
             .store(in: &cancellables)
-        
+
         // Subscribe to vehicle detection changes
         vehicleDetector.$isVehicleDetected
             .sink { [weak self] isVehicleDetected in
@@ -148,7 +153,7 @@ class TriggerEngine: ObservableObject {
             }
         }
     }
-    
+
     private func handleVehicleDetectionChange(_ isVehicleDetected: Bool) {
         // Handle vehicle detection changes
         if isVehicleDetected {
@@ -341,7 +346,7 @@ class TriggerEngine: ObservableObject {
     }
 
     func isVideoRecording() -> Bool {
-        return cameraManager?.isVideoRecording ?? false
+        cameraManager?.isVideoRecording ?? false
     }
 
     // MARK: - Video Recording with Rotation Detection

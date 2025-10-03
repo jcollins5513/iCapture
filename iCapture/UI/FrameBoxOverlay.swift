@@ -68,7 +68,9 @@ struct FrameBoxOverlay: View {
         }
         .animation(.easeInOut(duration: 0.2), value: isEditing)
     }
+}
 
+private extension FrameBoxOverlay {
     private var overlayMask: some View {
         ZStack {
             if isEditing {
@@ -236,7 +238,7 @@ struct FrameBoxOverlay: View {
     }
 
     func getFrameRect() -> CGRect {
-        return frameRect
+        frameRect
     }
 
     // MARK: - Gesture Handling
