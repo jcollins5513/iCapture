@@ -537,88 +537,6 @@ extension BackgroundRemover {
         return stickerImage.pngData()
     }
 
-    // MARK: - Sticker Generation
-
-    func createStickerImage(from image: UIImage, padding: CGFloat = 24) -> UIImage? {
-        let baseImage = image.normalizedForProcessing()
-
-        guard let cgImage = baseImage.cgImage else { return nil }
-        guard let dataProvider = cgImage.dataProvider,
-              let data = dataProvider.data,
-              let pointer = CFDataGetBytePtr(data) else {
-            return nil
-        }
-
-        let width = cgImage.width
-        let height = cgImage.height
-        let bytesPerPixel = 4
-        let bytesPerRow = cgImage.bytesPerRow
-
-        var minX = width
-        var maxX = -1
-        var minY = height
-        var maxY = -1
-
-        for rowIndex in 0..<height {
-            let rowPointer = pointer.advanced(by: rowIndex * bytesPerRow)
-            for columnIndex in 0..<width {
-                let alpha = rowPointer[columnIndex * bytesPerPixel + 3]
-                if alpha > 12 { // Small threshold to ignore halo pixels
-                    if columnIndex < minX { minX = columnIndex }
-                    if columnIndex > maxX { maxX = columnIndex }
-                    if rowIndex < minY { minY = rowIndex }
-                    if rowIndex > maxY { maxY = rowIndex }
-                }
-            }
-        }
-
-        guard minX <= maxX, minY <= maxY else {
-            return nil
-        }
-
-        let scaledPadding = Int((padding * baseImage.scale).rounded(.toNearestOrAwayFromZero))
-        let cropMinX = max(0, minX - scaledPadding)
-        let cropMaxX = min(width - 1, maxX + scaledPadding)
-        let cropMinY = max(0, minY - scaledPadding)
-        let cropMaxY = min(height - 1, maxY + scaledPadding)
-
-        let cropRect = CGRect(
-            x: cropMinX,
-            y: cropMinY,
-            width: cropMaxX - cropMinX + 1,
-            height: cropMaxY - cropMinY + 1
-        )
-
-        guard let cropped = cgImage.cropping(to: cropRect) else { return nil }
-
-        let outputSize = CGSize(
-            width: CGFloat(cropRect.width) / baseImage.scale,
-            height: CGFloat(cropRect.height) / baseImage.scale
-        )
-
-        let rendererFormat = UIGraphicsImageRendererFormat()
-        rendererFormat.scale = baseImage.scale
-        rendererFormat.opaque = false
-
-        let renderer = UIGraphicsImageRenderer(size: outputSize, format: rendererFormat)
-
-        let sticker = renderer.image { context in
-            UIColor.clear.setFill()
-            context.fill(CGRect(origin: .zero, size: outputSize))
-
-            let oriented = UIImage(cgImage: cropped, scale: baseImage.scale, orientation: .up)
-            oriented.draw(in: CGRect(origin: .zero, size: outputSize))
-        }
-
-        return sticker
-    }
-
-    func createStickerData(from imageData: Data, padding: CGFloat = 24) -> Data? {
-        guard let image = UIImage(data: imageData) else { return nil }
-        guard let stickerImage = createStickerImage(from: image, padding: padding) else { return nil }
-        return stickerImage.pngData()
-    }
-
 }
 
 // MARK: - UIImage Extension for HEIF Support
@@ -758,3 +676,4 @@ private struct DepthStatistics {
         foregroundUpperBound = max(bufferedUpper, 0.25)
     }
 }
+
