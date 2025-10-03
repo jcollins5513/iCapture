@@ -146,12 +146,17 @@ extension CameraManager {
             Task { @MainActor in
                 guard let self = self, self.shouldAutoStartTriggers else { return }
 
+                let progress = self.roiDetector.backgroundSampleProgress
+                let learned = self.roiDetector.isBackgroundLearned
+                let elapsed = Date().timeIntervalSince(startedAt)
+                print(
+                    "CameraManager: Monitoring background sampling attempt \(attempt) - elapsed: \(String(format: "%.2f", elapsed))s, progress: \(Int(progress * 100))%, learned: \(learned)"
+                )
+
                 if self.roiDetector.isBackgroundLearned {
                     self.finalizeAutomaticCaptureWorkflow(reason: "background sampling completed")
                     return
                 }
-
-                let elapsed = Date().timeIntervalSince(startedAt)
 
                 if elapsed >= self.backgroundSamplingTimeout {
                     if attempt >= self.maxBackgroundSamplingAttempts {
