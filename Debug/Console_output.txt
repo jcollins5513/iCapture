@@ -26,12 +26,19 @@ CameraPreviewView: Updated UIView frame to: (0.0, 0.0, 430.0, 932.0)
 CameraPreviewView: Preview layer still not available in updateUIView
 CameraView: View appeared, starting camera session...
 CameraView: Preview appeared; layer ready: false
+Failed to send CA Event for app launch measurements for ca_event_type: 0 event_name: com.apple.app_launch_measurement.FirstFramePresentationMetric
+CameraView: Checking camera session status...
+CameraView: Is authorized: true
+CameraView: Is session running: false
+CameraView: Preview layer exists: false
+CameraManager: Cannot update frame - preview layer is nil
 CameraManager: Movie file output added successfully
+PerformanceMonitor: Thermal throttling started - State: Nominal
 CameraManager: Session configuration committed
 CameraManager: Starting capture session
 CameraManager: Camera device: Back Camera
 CameraManager: Camera position: 1
-CameraManager: Camera format: <AVCaptureDeviceFormat: 0x107657690 'vide'/'420v' 4032x3024, { 1- 30 fps}, photo dims:{4032x3024,8064x6048}, fov:72.044, max zoom:189.00 (upscales @1.00), secondary:2.00, system zoom range:1.0-10.0, AF System:2, ISO:55.0-12320.0, SS:0.000015-1.000000, system exposure bias range:-2.0-2.0, supports HDR, supports responsive capture, supports zero shutter lag, supports highest photo quality, supports Smudge Detection>
+CameraManager: Camera format: <AVCaptureDeviceFormat: 0x103a636b0 'vide'/'420v' 4032x3024, { 1- 30 fps}, photo dims:{4032x3024,8064x6048}, fov:72.044, max zoom:189.00 (upscales @1.00), secondary:2.00, system zoom range:1.0-10.0, AF System:2, ISO:55.0-12320.0, SS:0.000015-1.000000, system exposure bias range:-2.0-2.0, supports HDR, supports responsive capture, supports zero shutter lag, supports highest photo quality, supports Smudge Detection>
 CameraManager: 48MP high-resolution capture supported
 CameraManager: Photo output configured for high-resolution capture
 <<<< FigSharedMemPool >>>> Fig assert: "blkHdr->useCount > 0" at  (FigSharedMemPool.c:591) - (err=0)
@@ -50,42 +57,53 @@ CameraPreviewView: Preview layer opacity: 1.0
 CameraManager: Session running: true
 CameraManager: Preview layer exists, session: true
 CameraManager: Preview layer frame: (0.0, 0.0, 430.0, 932.0)
-CameraView: Checking camera session status...
-CameraView: Is authorized: true
-CameraView: Is session running: true
-CameraView: Preview layer exists: true
-CameraView: Preview layer session exists: true
-CameraView: Preview layer frame: (0.0, 0.0, 430.0, 932.0)
+CameraManager: Camera health check - Available: true
 CameraManager: Preview layer frame update requested - delegating to CameraPreviewView
 CameraManager: Using traditional frame processing
 CameraManager: - LiDAR session running: false
 CameraManager: - Depth data available: false
+CA Telemetry timedout after 20 seconds due to app launch has not reached all responsive milestones
+Failed to send CA Event for app launch measurements for ca_event_type: 1 event_name: com.apple.app_launch_measurement.ExtendedLaunchMetrics
 CameraManager: Applying video rotation angle: 90.0
 CameraManager: Video rotation angle set successfully
-CameraManager: Camera health check - Available: true
-CameraManager: Preview layer frame update requested - delegating to CameraPreviewView
-PerformanceMonitor: Thermal throttling started - State: Nominal
+CameraPreviewContainerView: Updated preview layer frame to bounds: (0.0, 0.0, 932.0, 430.0)
+CameraManager: Video rotation angle unchanged: 90.0
+CameraPreviewContainerView: Updated preview layer frame to bounds: (0.0, 0.0, 932.0, 430.0)
+CameraManager: Video rotation angle unchanged: 90.0
+CameraPreviewContainerView: Updated preview layer frame to bounds: (0.0, 0.0, 430.0, 932.0)
 Requesting visual style in an implementation that has disabled it, returning nil. Behavior of caller is undefined.
 Requesting visual style in an implementation that has disabled it, returning nil. Behavior of caller is undefined.
 Requesting visual style in an implementation that has disabled it, returning nil. Behavior of caller is undefined.
 Requesting visual style in an implementation that has disabled it, returning nil. Behavior of caller is undefined.
 Requesting visual style in an implementation that has disabled it, returning nil. Behavior of caller is undefined.
 UIKeyboardLayoutStar implements focusItemsInRect: - caching for linear focus movement is limited as long as this view is on screen.
-Reporter disconnected. { function=sendMessage, reporterID=2671469658113 }
-Reporter disconnected. { function=sendMessage, reporterID=2671469658113 }
-Reporter disconnected. { function=sendMessage, reporterID=2671469658113 }
-Reporter disconnected. { function=sendMessage, reporterID=2671469658113 }
-Reporter disconnected. { function=sendMessage, reporterID=2671469658113 }
-Reporter disconnected. { function=sendMessage, reporterID=2671469658113 }
-Reporter disconnected. { function=sendMessage, reporterID=2671469658113 }
-Reporter disconnected. { function=sendMessage, reporterID=2671469658113 }
-Reporter disconnected. { function=sendMessage, reporterID=2671469658113 }
-SessionManager: Cleaned up old session: WWW
-SessionManager: Started session for stock RRRRR
+XPC connection interrupted
+Reporter disconnected. { function=sendMessage, reporterID=2950642532353 }
+Reporter disconnected. { function=sendMessage, reporterID=2950642532353 }
+Reporter disconnected. { function=sendMessage, reporterID=2950642532353 }
+Reporter disconnected. { function=sendMessage, reporterID=2950642532353 }
+Reporter disconnected. { function=sendMessage, reporterID=2950642532353 }
+Reporter disconnected. { function=sendMessage, reporterID=2950642532353 }
+Reporter disconnected. { function=sendMessage, reporterID=2950642532353 }
+Reporter disconnected. { function=sendMessage, reporterID=2950642532353 }
+Reporter disconnected. { function=sendMessage, reporterID=2950642532353 }
+Reporter disconnected or already stopped. { func=stop, reporterID=2950642532353 }
+-[RTIInputSystemClient remoteTextInputSessionWithID:performInputOperation:]  perform input operation requires a valid sessionID. inputModality = Keyboard, inputOperation = <null selector>, customInfoType = UIEmojiSearchOperations
+Reporter disconnected. { function=sendMessage, reporterID=2950642532354 }
+Reporter disconnected. { function=sendMessage, reporterID=2950642532354 }
+Reporter disconnected. { function=sendMessage, reporterID=2950642532354 }
+Reporter disconnected. { function=sendMessage, reporterID=2950642532354 }
+Reporter disconnected. { function=sendMessage, reporterID=2950642532354 }
+Reporter disconnected. { function=sendMessage, reporterID=2950642532354 }
+Reporter disconnected. { function=sendMessage, reporterID=2950642532354 }
+Reporter disconnected. { function=sendMessage, reporterID=2950642532354 }
+Reporter disconnected. { function=sendMessage, reporterID=2950642532354 }
+SessionManager: Cleaned up old session: III
+SessionManager: Started session for stock DDD
 CameraManager: Beginning automatic capture workflow
 CameraManager: Temporarily stopping camera session for LiDAR...
 CameraManager: Automatic capture workflow already in progress
-Reporter disconnected or already stopped. { func=stop, reporterID=2671469658113 }
+Reporter disconnected or already stopped. { func=stop, reporterID=2950642532354 }
 <<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
 <<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
 CameraManager: Camera session stopped for LiDAR
@@ -96,14 +114,7 @@ LiDARDetector: Scene depth supported: true
 LiDARDetector: ARSession started successfully
 LiDARDetector: Started depth data timeout timer (10.0s)
 CameraManager: LiDAR detection started manually
-{"msg":"#Warning Error reading file", "file":"\/\/private\/var\/Managed Preferences\/mobile\/com.apple.CoreMotion.plist", "error":"Error Domain=NSCocoaErrorDomain Code=257 \"The file “com.apple.CoreMotion.plist” couldn’t be opened because you don’t have permission to view it.\" UserInfo={NSFilePath=\/\/private\/var\/Managed Preferences\/mobile\/com.apple.CoreMotion.plist, NSURL=file:\/\/\/\/private\/var\/Managed%20Preferences\/mobile\/com.apple.CoreMotion.plist, NSUnderlyingError=0x1222c2fd0 {Error Domain=NSPOSIXErrorDomain Code=1 \"Operation not permitted\"}}"}
-LiDARDetector: ARSession status check:
-LiDARDetector: - Session exists: true
-LiDARDetector: - Session running: true
-LiDARDetector: - Depth data available: false
-LiDARDetector: - Background learned: false
-LiDARDetector: - Vehicle detected: false
-LiDARDetector: - No depth data received yet
+{"msg":"#Warning Error reading file", "file":"\/\/private\/var\/Managed Preferences\/mobile\/com.apple.CoreMotion.plist", "error":"Error Domain=NSCocoaErrorDomain Code=257 \"The file “com.apple.CoreMotion.plist” couldn’t be opened because you don’t have permission to view it.\" UserInfo={NSFilePath=\/\/private\/var\/Managed Preferences\/mobile\/com.apple.CoreMotion.plist, NSURL=file:\/\/\/\/private\/var\/Managed%20Preferences\/mobile\/com.apple.CoreMotion.plist, NSUnderlyingError=0x11cbb72a0 {Error Domain=NSPOSIXErrorDomain Code=1 \"Operation not permitted\"}}"}
 <<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:276) - (err=-12784)
 <<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:513) - (err=-12784)
 <<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:276) - (err=-12784)
@@ -120,7 +131,7 @@ LiDARDetector: - No depth data received yet
 <<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
 (Fig) signalled err=-12710 at <>:601
 (Fig) signalled err=-12710 at <>:601
-LiDARDetector: ARSession didUpdate frame - Timestamp: 297.753659
+LiDARDetector: ARSession didUpdate frame - Timestamp: 675.288467166
 LiDARDetector: Frame has scene depth: false
 LiDARDetector: Frame has scene depth confidence: false
 LiDARDetector: Frame camera tracking state: notAvailable
@@ -131,7 +142,25 @@ LiDARDetector: - Device doesn't support scene depth
 LiDARDetector: - Poor lighting conditions
 LiDARDetector: - ARSession not properly configured
 LiDARDetector: - Tracking issues
-LiDARDetector: ARSession didUpdate frame - Timestamp: 297.786993958
+LiDARDetector: ARSession didUpdate frame - Timestamp: 675.321802458
+LiDARDetector: Frame has scene depth: false
+LiDARDetector: Frame has scene depth confidence: false
+LiDARDetector: Frame camera tracking state: notAvailable
+LiDARDetector: Camera tracking state is not normal: notAvailable
+LiDARDetector: No scene depth data in frame
+LiDARDetector: This could be due to:
+LiDARDetector: - Device doesn't support scene depth
+LiDARDetector: - Poor lighting conditions
+LiDARDetector: - ARSession not properly configured
+LiDARDetector: - Tracking issues
+LiDARDetector: ARSession status check:
+LiDARDetector: - Session exists: true
+LiDARDetector: - Session running: true
+LiDARDetector: - Depth data available: false
+LiDARDetector: - Background learned: false
+LiDARDetector: - Vehicle detected: false
+LiDARDetector: - No depth data received yet
+LiDARDetector: ARSession didUpdate frame - Timestamp: 677.988631208
 LiDARDetector: Frame has scene depth: false
 LiDARDetector: Frame has scene depth confidence: false
 LiDARDetector: Frame camera tracking state: notAvailable
@@ -144,128 +173,99 @@ LiDARDetector: - ARSession not properly configured
 LiDARDetector: - Tracking issues
 LiDARDetector: Camera tracking state changed: limited((extension in ARKit):__C.ARCamera.TrackingState.Reason.initializing)
 LiDARDetector: Camera tracking state: limited((extension in ARKit):__C.ARCamera.TrackingState.Reason.initializing)
-LiDARDetector: ARSession didUpdate frame - Timestamp: 297.820328916
-LiDARDetector: Frame has scene depth: false
-LiDARDetector: Frame has scene depth confidence: false
+LiDARDetector: ARSession didUpdate frame - Timestamp: 678.48865775
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
 LiDARDetector: Frame camera tracking state: limited(initializing)
 LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: ARSession didUpdate frame - Timestamp: 678.922022625
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: Camera tracking state changed: notAvailable
+LiDARDetector: Camera tracking state: notAvailable
+LiDARDetector: ARSession didUpdate frame - Timestamp: 678.455326875
+LiDARDetector: Frame has scene depth: false
+LiDARDetector: Frame has scene depth confidence: false
+LiDARDetector: Frame camera tracking state: notAvailable
+LiDARDetector: Camera tracking state is not normal: notAvailable
 LiDARDetector: No scene depth data in frame
 LiDARDetector: This could be due to:
 LiDARDetector: - Device doesn't support scene depth
 LiDARDetector: - Poor lighting conditions
 LiDARDetector: - ARSession not properly configured
 LiDARDetector: - Tracking issues
-LiDARDetector: ARSession didUpdate frame - Timestamp: 297.85366375
-LiDARDetector: Frame has scene depth: false
-LiDARDetector: Frame has scene depth confidence: false
-LiDARDetector: Frame camera tracking state: limited(initializing)
-LiDARDetector: Camera tracking state is not normal: limited(initializing)
-LiDARDetector: No scene depth data in frame
-LiDARDetector: This could be due to:
-LiDARDetector: - Device doesn't support scene depth
-LiDARDetector: - Poor lighting conditions
-LiDARDetector: - ARSession not properly configured
-LiDARDetector: - Tracking issues
-LiDARDetector: ARSession didUpdate frame - Timestamp: 297.886998833
-LiDARDetector: Frame has scene depth: false
-LiDARDetector: Frame has scene depth confidence: false
-LiDARDetector: Frame camera tracking state: limited(initializing)
-LiDARDetector: Camera tracking state is not normal: limited(initializing)
-LiDARDetector: No scene depth data in frame
-LiDARDetector: This could be due to:
-LiDARDetector: - Device doesn't support scene depth
-LiDARDetector: - Poor lighting conditions
-LiDARDetector: - ARSession not properly configured
-LiDARDetector: - Tracking issues
-LiDARDetector: ARSession didUpdate frame - Timestamp: 298.220348083
-LiDARDetector: Frame has scene depth: false
-LiDARDetector: Frame has scene depth confidence: false
-LiDARDetector: Frame camera tracking state: limited(initializing)
-LiDARDetector: Camera tracking state is not normal: limited(initializing)
-LiDARDetector: No scene depth data in frame
-LiDARDetector: This could be due to:
-LiDARDetector: - Device doesn't support scene depth
-LiDARDetector: - Poor lighting conditions
-LiDARDetector: - ARSession not properly configured
-LiDARDetector: - Tracking issues
-LiDARDetector: ARSession didUpdate frame - Timestamp: 298.253682916
+LiDARDetector: Camera tracking state changed: limited((extension in ARKit):__C.ARCamera.TrackingState.Reason.initializing)
+LiDARDetector: Camera tracking state: limited((extension in ARKit):__C.ARCamera.TrackingState.Reason.initializing)
+LiDARDetector: ARSession didUpdate frame - Timestamp: 678.955358
 LiDARDetector: Frame has scene depth: true
 LiDARDetector: Frame has scene depth confidence: true
 LiDARDetector: Frame camera tracking state: limited(initializing)
 LiDARDetector: Camera tracking state is not normal: limited(initializing)
 LiDARDetector: Received depth data - Size: 256x192
 LiDARDetector: Depth data received - timeout reset
-LiDARDetector: ARSession didUpdate frame - Timestamp: 298.287017875
+LiDARDetector: ARSession didUpdate frame - Timestamp: 678.988693333
 LiDARDetector: Frame has scene depth: true
 LiDARDetector: Frame has scene depth confidence: true
 LiDARDetector: Frame camera tracking state: limited(initializing)
 LiDARDetector: Camera tracking state is not normal: limited(initializing)
 LiDARDetector: Received depth data - Size: 256x192
 LiDARDetector: Depth data received - timeout reset
-LiDARDetector: ARSession didUpdate frame - Timestamp: 298.320352791
+LiDARDetector: ARSession didUpdate frame - Timestamp: 679.022028791
 LiDARDetector: Frame has scene depth: true
 LiDARDetector: Frame has scene depth confidence: true
 LiDARDetector: Frame camera tracking state: limited(initializing)
 LiDARDetector: Camera tracking state is not normal: limited(initializing)
 LiDARDetector: Received depth data - Size: 256x192
 LiDARDetector: Depth data received - timeout reset
-LiDARDetector: ARSession didUpdate frame - Timestamp: 298.353687791
+LiDARDetector: ARSession didUpdate frame - Timestamp: 679.055364125
 LiDARDetector: Frame has scene depth: true
 LiDARDetector: Frame has scene depth confidence: true
 LiDARDetector: Frame camera tracking state: limited(initializing)
 LiDARDetector: Camera tracking state is not normal: limited(initializing)
 LiDARDetector: Received depth data - Size: 256x192
 LiDARDetector: Depth data received - timeout reset
-LiDARDetector: ARSession didUpdate frame - Timestamp: 298.387022625
+LiDARDetector: ARSession didUpdate frame - Timestamp: 679.088699625
 LiDARDetector: Frame has scene depth: true
 LiDARDetector: Frame has scene depth confidence: true
 LiDARDetector: Frame camera tracking state: limited(initializing)
 LiDARDetector: Camera tracking state is not normal: limited(initializing)
 LiDARDetector: Received depth data - Size: 256x192
 LiDARDetector: Depth data received - timeout reset
-LiDARDetector: ARSession didUpdate frame - Timestamp: 298.420357541
+LiDARDetector: ARSession didUpdate frame - Timestamp: 679.122034708
 LiDARDetector: Frame has scene depth: true
 LiDARDetector: Frame has scene depth confidence: true
 LiDARDetector: Frame camera tracking state: limited(initializing)
 LiDARDetector: Camera tracking state is not normal: limited(initializing)
 LiDARDetector: Received depth data - Size: 256x192
 LiDARDetector: Depth data received - timeout reset
-LiDARDetector: ARSession didUpdate frame - Timestamp: 298.453692583
+LiDARDetector: ARSession didUpdate frame - Timestamp: 679.155370333
 LiDARDetector: Frame has scene depth: true
 LiDARDetector: Frame has scene depth confidence: true
 LiDARDetector: Frame camera tracking state: limited(initializing)
 LiDARDetector: Camera tracking state is not normal: limited(initializing)
 LiDARDetector: Received depth data - Size: 256x192
 LiDARDetector: Depth data received - timeout reset
-LiDARDetector: ARSession didUpdate frame - Timestamp: 298.487027541
+LiDARDetector: ARSession didUpdate frame - Timestamp: 679.188705666
 LiDARDetector: Frame has scene depth: true
 LiDARDetector: Frame has scene depth confidence: true
 LiDARDetector: Frame camera tracking state: limited(initializing)
 LiDARDetector: Camera tracking state is not normal: limited(initializing)
 LiDARDetector: Received depth data - Size: 256x192
 LiDARDetector: Depth data received - timeout reset
-LiDARDetector: ARSession didUpdate frame - Timestamp: 298.520362375
+LiDARDetector: ARSession didUpdate frame - Timestamp: 679.222041291
 LiDARDetector: Frame has scene depth: true
 LiDARDetector: Frame has scene depth confidence: true
 LiDARDetector: Frame camera tracking state: limited(initializing)
 LiDARDetector: Camera tracking state is not normal: limited(initializing)
 LiDARDetector: Received depth data - Size: 256x192
 LiDARDetector: Depth data received - timeout reset
-LiDARDetector: ARSession didUpdate frame - Timestamp: 298.553697291
-LiDARDetector: Frame has scene depth: true
-LiDARDetector: Frame has scene depth confidence: true
-LiDARDetector: Frame camera tracking state: limited(initializing)
-LiDARDetector: Camera tracking state is not normal: limited(initializing)
-LiDARDetector: Received depth data - Size: 256x192
-LiDARDetector: Depth data received - timeout reset
-LiDARDetector: ARSession didUpdate frame - Timestamp: 298.587032208
-LiDARDetector: Frame has scene depth: true
-LiDARDetector: Frame has scene depth confidence: true
-LiDARDetector: Frame camera tracking state: limited(initializing)
-LiDARDetector: Camera tracking state is not normal: limited(initializing)
-LiDARDetector: Received depth data - Size: 256x192
-LiDARDetector: Depth data received - timeout reset
-LiDARDetector: ARSession didUpdate frame - Timestamp: 298.620367208
+LiDARDetector: ARSession didUpdate frame - Timestamp: 679.255376583
 LiDARDetector: Frame has scene depth: true
 LiDARDetector: Frame has scene depth confidence: true
 LiDARDetector: Frame camera tracking state: limited(initializing)
@@ -279,6 +279,13 @@ CameraManager: LiDAR environment scan completed - resuming camera capture workfl
 LiDARDetector: Stopped LiDAR detection
 CameraManager: LiDAR detection stopped
 CameraManager: LiDAR depth data cached for background removal
+LiDARDetector: ARSession didUpdate frame - Timestamp: 679.288711916
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
 <<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
 <<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
 <<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
@@ -287,58 +294,103 @@ CameraManager: LiDAR depth data cached for background removal
 <<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
 <<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
 <<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
+CameraManager: Camera session restarted
 CameraManager: Using traditional frame processing
 CameraManager: - LiDAR session running: false
 CameraManager: - Depth data available: true
-CameraManager: Camera session restarted
 ROIDetector: Starting background sampling...
 CameraManager: Automatic background sampling started (attempt 1)
-ROIDetector: Background sampling progress 1% (frames: 1) elapsed=0.01
-ROIDetector: Background sampling progress 28% (frames: 9) elapsed=0.28
-CameraManager: Monitoring background sampling attempt 1 - elapsed: 0.52s, progress: 41%, learned: false
-CameraManager: Monitoring background sampling attempt 1 - elapsed: 1.03s, progress: 41%, learned: false
-CameraManager: Monitoring background sampling attempt 1 - elapsed: 1.55s, progress: 41%, learned: false
-CameraManager: Monitoring background sampling attempt 1 - elapsed: 2.07s, progress: 41%, learned: false
-CameraManager: Monitoring background sampling attempt 1 - elapsed: 2.59s, progress: 41%, learned: false
-CameraManager: Monitoring background sampling attempt 1 - elapsed: 3.11s, progress: 41%, learned: false
-CameraManager: Monitoring background sampling attempt 1 - elapsed: 3.63s, progress: 41%, learned: false
+ROIDetector: Background sampling progress 0% (frames: 1) elapsed=0.00
+ROIDetector: Background sampling progress 26% (frames: 9) elapsed=0.27
+CameraManager: Monitoring background sampling attempt 1 - elapsed: 0.51s, progress: 40%, learned: false
+CameraManager: Monitoring background sampling attempt 1 - elapsed: 1.04s, progress: 40%, learned: false
+CameraManager: Monitoring background sampling attempt 1 - elapsed: 1.54s, progress: 40%, learned: false
+CameraManager: Monitoring background sampling attempt 1 - elapsed: 2.06s, progress: 40%, learned: false
+CameraManager: Monitoring background sampling attempt 1 - elapsed: 2.58s, progress: 40%, learned: false
+CameraManager: Monitoring background sampling attempt 1 - elapsed: 3.10s, progress: 40%, learned: false
+CameraManager: Monitoring background sampling attempt 1 - elapsed: 3.62s, progress: 40%, learned: false
 CameraManager: Background sampling collected 13 frame(s) with limited LiDAR tracking; disabling LiDAR and retrying with Vision-only sampling
 CameraManager: LiDAR detection disabled - switching to traditional detection
 ROIDetector: Starting background sampling...
 CameraManager: Automatic background sampling started (attempt 2)
 CameraManager: Using traditional frame processing
-ROIDetector: Background sampling progress 3% (frames: 1) elapsed=0.04
-ROIDetector: Background sampling progress 30% (frames: 9) elapsed=0.31
-CameraManager: Monitoring background sampling attempt 2 - elapsed: 0.52s, progress: 44%, learned: false
-CameraManager: Monitoring background sampling attempt 2 - elapsed: 1.03s, progress: 44%, learned: false
-CameraManager: Monitoring background sampling attempt 2 - elapsed: 1.55s, progress: 44%, learned: false
-CameraManager: Monitoring background sampling attempt 2 - elapsed: 2.07s, progress: 44%, learned: false
-CameraManager: Monitoring background sampling attempt 2 - elapsed: 2.58s, progress: 44%, learned: false
-CameraManager: Monitoring background sampling attempt 2 - elapsed: 3.10s, progress: 44%, learned: false
-CameraManager: Monitoring background sampling attempt 2 - elapsed: 3.62s, progress: 44%, learned: false
+ROIDetector: Background sampling progress 1% (frames: 1) elapsed=0.02
+ROIDetector: Background sampling progress 27% (frames: 9) elapsed=0.28
+CameraManager: Monitoring background sampling attempt 2 - elapsed: 0.52s, progress: 41%, learned: false
+CameraManager: Monitoring background sampling attempt 2 - elapsed: 1.04s, progress: 41%, learned: false
+CameraManager: Monitoring background sampling attempt 2 - elapsed: 1.55s, progress: 41%, learned: false
+CameraManager: Monitoring background sampling attempt 2 - elapsed: 2.07s, progress: 41%, learned: false
+CameraManager: Monitoring background sampling attempt 2 - elapsed: 2.59s, progress: 41%, learned: false
+CameraManager: Monitoring background sampling attempt 2 - elapsed: 3.10s, progress: 41%, learned: false
+CameraManager: Monitoring background sampling attempt 2 - elapsed: 3.61s, progress: 41%, learned: false
 CameraManager: Background sampling attempt 2 timed out; retrying
 ROIDetector: Starting background sampling...
 CameraManager: Automatic background sampling started (attempt 3)
-ROIDetector: Background sampling progress 1% (frames: 1) elapsed=0.02
-ROIDetector: Background sampling progress 28% (frames: 9) elapsed=0.28
-CameraManager: Monitoring background sampling attempt 3 - elapsed: 0.52s, progress: 41%, learned: false
-CameraManager: Monitoring background sampling attempt 3 - elapsed: 1.05s, progress: 41%, learned: false
-CameraManager: Monitoring background sampling attempt 3 - elapsed: 1.57s, progress: 41%, learned: false
-CameraManager: Monitoring background sampling attempt 3 - elapsed: 2.08s, progress: 41%, learned: false
-CameraManager: Monitoring background sampling attempt 3 - elapsed: 2.60s, progress: 41%, learned: false
-CameraManager: Monitoring background sampling attempt 3 - elapsed: 3.12s, progress: 41%, learned: false
-CameraManager: Monitoring background sampling attempt 3 - elapsed: 3.64s, progress: 41%, learned: false
+ROIDetector: Background sampling progress 2% (frames: 1) elapsed=0.03
+ROIDetector: Background sampling progress 29% (frames: 9) elapsed=0.29
+CameraManager: Monitoring background sampling attempt 3 - elapsed: 0.52s, progress: 42%, learned: false
+CameraManager: Monitoring background sampling attempt 3 - elapsed: 1.05s, progress: 42%, learned: false
+CameraManager: Monitoring background sampling attempt 3 - elapsed: 1.57s, progress: 42%, learned: false
+CameraManager: Monitoring background sampling attempt 3 - elapsed: 2.08s, progress: 42%, learned: false
+CameraManager: Monitoring background sampling attempt 3 - elapsed: 2.60s, progress: 42%, learned: false
+CameraManager: Monitoring background sampling attempt 3 - elapsed: 3.11s, progress: 42%, learned: false
+CameraManager: Monitoring background sampling attempt 3 - elapsed: 3.63s, progress: 42%, learned: false
 CameraManager: Background sampling timed out after 3 attempts; finalizing
 TriggerEngine: Session started (interval + stop detection)
 CameraManager: Automatic capture workflow completed (background sampling timeout) - triggers started
 CameraView: Manual capture triggered
 CameraManager: supportedMaxPhotoDimensions = [1920x1440, 2016x1512]
-CameraManager: Requested photo dimensions: 8064x6048 (~48.8MP)
-*** Terminating app due to uncaught exception 'NSInvalidArgumentException', reason: '*** -[AVCapturePhotoOutput capturePhotoWithSettings:delegate:] If you specify a maxPhotoDimensions, it must match one of the supportedMaxPhotoDimensions of the video devices's active format'
-*** First throw call stack:
-(0x18bf528c8 0x188ec97c4 0x1b1a52e7c 0x10671a710 0x1066e938c 0x10561863c 0x1056322d0 0x105620b4c 0x1056217d4 0x10562db20 0x10562d1c4 0x1e6cdb3b8 0x1e6cda8c0)
-libc++abi: terminating due to uncaught exception of type NSException
-*** Terminating app due to uncaught exception 'NSInvalidArgumentException', reason: '*** -[AVCapturePhotoOutput capturePhotoWithSettings:delegate:] If you specify a maxPhotoDimensions, it must match one of the supportedMaxPhotoDimensions of the video devices's active format'
-*** First throw call stack:
-(0x18bf528c8 0x188ec97c4 0x1b1a52e7c 0x10671a710 0x1066e938c 0x10561863c 0x1056322d0 0x105620b4c 0x1056217d4 0x10562db20 0x10562d1c4 0x1e6cdb3b8 0x1e6cda8c0)
-terminating due to uncaught exception of type NSException
+CameraManager: Requested photo dimensions: 1920x1440 (~2.8MP)
+PerformanceMonitor: Capture latency: 0.1051861047744751s
+CameraManager: Captured photo - Resolution: 1920x1440, Size: 0.33MB
+CameraManager: Photo size within target limits
+SessionManager: Added photo asset: photo_1759497959_12MP.heic
+Photo saved to session: photo_1759497959_12MP.heic
+CameraManager: Starting background removal for photo_1759497959_12MP.heic
+CameraManager: Falling back to Vision-based background removal
+BackgroundRemover: Applying foreground + (optional) depth mask
+CameraManager: Background removal completed for photo_1759497959_12MP.heic using Vision fallback
+CameraManager: Saved sticker to photo_1759497959_12MP_sticker.png
+CameraManager: Saved transparent cutout to photo_1759497959_12MP_cutout.png
+CameraManager: Original capture preserved at photo_1759497959_12MP.heic
+CameraManager: Background-removed photo saved to photo library
+CameraView: Manual capture triggered
+CameraManager: supportedMaxPhotoDimensions = [1920x1440, 2016x1512]
+CameraManager: Requested photo dimensions: 1920x1440 (~2.8MP)
+PerformanceMonitor: Capture latency: 0.14125096797943115s
+CameraManager: Captured photo - Resolution: 1920x1440, Size: 0.34MB
+CameraManager: Photo size within target limits
+SessionManager: Added photo asset: photo_1759497973_12MP.heic
+Photo saved to session: photo_1759497973_12MP.heic
+CameraManager: Starting background removal for photo_1759497973_12MP.heic
+CameraManager: Falling back to Vision-based background removal
+BackgroundRemover: Applying foreground + (optional) depth mask
+CameraManager: Background removal completed for photo_1759497973_12MP.heic using Vision fallback
+CameraManager: Saved sticker to photo_1759497973_12MP_sticker.png
+CameraManager: Saved transparent cutout to photo_1759497973_12MP_cutout.png
+CameraManager: Original capture preserved at photo_1759497973_12MP.heic
+CameraManager: Background-removed photo saved to photo library
+VideoRecordingManager: Started video recording to /var/mobile/Containers/Data/Application/7B3038E1-414E-4815-9733-FED3111C4E81/Documents/Captures/DDD/video/turn.MOV
+SessionManager: Failed to copy asset photo_1759497959_12MP.heic: Error Domain=NSCocoaErrorDomain Code=260 "The file “photo_1759497959_12MP.heic” couldn’t be opened because there is no such file." UserInfo={NSFilePath=/var/mobile/Containers/Data/Application/7B3038E1-414E-4815-9733-FED3111C4E81/Documents/Captures/CD6108E7-835E-4286-96CB-63B97439BBAC/photos/photo_1759497959_12MP.heic, NSURL=file:///var/mobile/Containers/Data/Application/7B3038E1-414E-4815-9733-FED3111C4E81/Documents/Captures/CD6108E7-835E-4286-96CB-63B97439BBAC/photos/photo_1759497959_12MP.heic, NSUnderlyingError=0x12c313f30 {Error Domain=NSPOSIXErrorDomain Code=2 "No such file or directory"}}
+SessionManager: Failed to copy asset photo_1759497973_12MP.heic: Error Domain=NSCocoaErrorDomain Code=260 "The file “photo_1759497973_12MP.heic” couldn’t be opened because there is no such file." UserInfo={NSFilePath=/var/mobile/Containers/Data/Application/7B3038E1-414E-4815-9733-FED3111C4E81/Documents/Captures/CD6108E7-835E-4286-96CB-63B97439BBAC/photos/photo_1759497973_12MP.heic, NSURL=file:///var/mobile/Containers/Data/Application/7B3038E1-414E-4815-9733-FED3111C4E81/Documents/Captures/CD6108E7-835E-4286-96CB-63B97439BBAC/photos/photo_1759497973_12MP.heic, NSUnderlyingError=0x12c310f30 {Error Domain=NSPOSIXErrorDomain Code=2 "No such file or directory"}}
+SessionManager: Created export bundle at /var/mobile/Containers/Data/Application/7B3038E1-414E-4815-9733-FED3111C4E81/Documents/Exports/DDD_CD6108E7-835E-4286-96CB-63B97439BBAC
+SessionManager: Ended session for stock DDD. Total captures: 2
+TriggerEngine: Session stopped. Total captures: 0
+CameraManager: Automatic capture workflow cancelled
+ROIDetector: Starting background sampling...
+ROIDetector: Background sampling progress 1% (frames: 1) elapsed=0.01
+ROIDetector: Background sampling progress 27% (frames: 9) elapsed=0.28
+CameraView: Manual capture triggered
+CameraManager: supportedMaxPhotoDimensions = [1920x1440, 2016x1512]
+CameraManager: Requested photo dimensions: 1920x1440 (~2.8MP)
+PerformanceMonitor: Capture latency: 0.09573495388031006s
+CameraManager: Captured photo - Resolution: 1920x1440, Size: 0.34MB
+CameraManager: Photo size within target limits
+Test shot saved: file:///var/mobile/Containers/Data/Application/7B3038E1-414E-4815-9733-FED3111C4E81/Documents/TestShots/photo_1759498000_12MP.heic
+CameraView: Manual capture triggered
+CameraManager: supportedMaxPhotoDimensions = [1920x1440, 2016x1512]
+CameraManager: Requested photo dimensions: 1920x1440 (~2.8MP)
+PerformanceMonitor: Capture latency: 0.0741109848022461s
+CameraManager: Captured photo - Resolution: 1920x1440, Size: 0.33MB
+CameraManager: Photo size within target limits
+Test shot saved: file:///var/mobile/Containers/Data/Application/7B3038E1-414E-4815-9733-FED3111C4E81/Documents/TestShots/photo_1759498011_12MP.heic
