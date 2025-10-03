@@ -563,6 +563,22 @@ extension CameraManager {
                 }
 
                 if let preferred = self.preferredPhotoDimensions {
+                    if let currentMax = self.photoOutput.maxPhotoDimensions {
+                        let currentArea = Int(currentMax.width) * Int(currentMax.height)
+                        let preferredArea = Int(preferred.width) * Int(preferred.height)
+                        if preferredArea > currentArea {
+                            self.photoOutput.maxPhotoDimensions = preferred
+                            print(
+                                "CameraManager: Raised photo output maxPhotoDimensions to \(preferred.width)x\(preferred.height)"
+                            )
+                        }
+                    } else {
+                        self.photoOutput.maxPhotoDimensions = preferred
+                        print(
+                            "CameraManager: Set photo output maxPhotoDimensions to \(preferred.width)x\(preferred.height)"
+                        )
+                    }
+
                     photoSettings.maxPhotoDimensions = preferred
                     let megapixels = Double(preferred.width * preferred.height) / 1_000_000.0
                     print(
