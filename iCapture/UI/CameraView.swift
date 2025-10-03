@@ -7,6 +7,7 @@
 
 import SwiftUI
 import AVFoundation
+import UIKit
 
 struct CameraView: View {
     @Environment(\.verticalSizeClass) private var verticalSizeClass
@@ -18,20 +19,42 @@ struct CameraView: View {
     @State private var showPerformanceOverlay = false
     @State private var isAdjustingROI = false
 
+    private var screenSize: CGSize {
+        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+            return windowScene.screen.bounds.size
+        }
+        return UIScreen.main.bounds.size
+    }
+
     private var isCompactHeight: Bool {
         verticalSizeClass == .compact
     }
 
+    private var layoutScale: CGFloat {
+        let shortestSide = min(screenSize.width, screenSize.height)
+        let compactThreshold = CGFloat(350)
+        let smallThreshold = CGFloat(380)
+        let mediumThreshold = CGFloat(414)
+
+        if shortestSide < compactThreshold { return CGFloat(0.82) }
+        if shortestSide < smallThreshold { return CGFloat(0.88) }
+        if shortestSide < mediumThreshold { return CGFloat(0.94) }
+        return CGFloat(1.0)
+    }
+
     private var controlButtonDimension: CGFloat {
-        isCompactHeight ? 64 : 76
+        let base: CGFloat = isCompactHeight ? 64 : 76
+        return max(CGFloat(52), base * layoutScale)
     }
 
     private var controlIconFont: Font {
-        isCompactHeight ? .system(size: 20, weight: .semibold) : .title3.weight(.semibold)
+        let base: CGFloat = isCompactHeight ? 20 : 22
+        return .system(size: max(CGFloat(16), base * layoutScale), weight: .semibold)
     }
 
     private var controlLabelFont: Font {
-        isCompactHeight ? .caption.weight(.semibold) : .caption2.weight(.semibold)
+        let base: CGFloat = isCompactHeight ? 11 : 12
+        return .system(size: max(CGFloat(9), base * layoutScale), weight: .semibold)
     }
 
     var body: some View {
@@ -40,9 +63,11 @@ struct CameraView: View {
                 CameraPreviewView(previewLayer: cameraManager.previewLayer)
                     .ignoresSafeArea()
                     .onAppear {
-                        print("CameraView: Camera preview appeared, previewLayer exists: \(cameraManager.previewLayer != nil)")
+                        let hasPreviewLayer = cameraManager.previewLayer != nil
+                        print("CameraView: Preview appeared; layer ready: \(hasPreviewLayer)")
                         if let previewLayer = cameraManager.previewLayer {
-                            print("CameraView: Preview layer session exists: \(previewLayer.session != nil)")
+                            let hasSession = previewLayer.session != nil
+                            print("CameraView: Preview layer session exists: \(hasSession)")
                         }
                     }
 
@@ -140,16 +165,35 @@ struct CameraView: View {
     }
 
     private var hudLayer: some View {
-        VStack(spacing: 0) {
-            topOverlay
-            Spacer()
-            if cameraManager.roiDetector.isBackgroundSampling {
-                backgroundSamplingBanner
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
+        GeometryReader { geometry in
+            VStack(spacing: 0) {
+                topOverlay
+                    .padding(.horizontal, horizontalEdgePadding(for: geometry.size.width))
+                    .padding(
+                        .top,
+                        geometry.safeAreaInsets.top + topOverlayPadding(for: geometry.size.height)
+                    )
+
+                Spacer(minLength: 0)
+
+                if cameraManager.roiDetector.isBackgroundSampling {
+                    backgroundSamplingBanner
+                        .padding(.horizontal, horizontalEdgePadding(for: geometry.size.width))
+                        .frame(maxWidth: .infinity)
+                        .padding(.bottom, 12)
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                }
+
+                bottomOverlay
+                    .padding(.horizontal, horizontalEdgePadding(for: geometry.size.width))
+                    .padding(
+                        .bottom,
+                        geometry.safeAreaInsets.bottom + bottomOverlayPadding(for: geometry.size.height)
+                    )
             }
-            bottomOverlay
+            .frame(width: geometry.size.width, height: geometry.size.height)
         }
-        .ignoresSafeArea(edges: [.horizontal])
+        .ignoresSafeArea()
     }
 
     private var topOverlay: some View {
@@ -171,7 +215,24 @@ struct CameraView: View {
                 }
             }
         }
-        .padding(.horizontal, 16)
+    }
+
+    private func horizontalEdgePadding(for width: CGFloat) -> CGFloat {
+        if width < 360 { return 12 }
+        if width < 390 { return 14 }
+        return 16
+    }
+
+    private func topOverlayPadding(for height: CGFloat) -> CGFloat {
+        if height < 700 { return 6 }
+        if height < 780 { return 10 }
+        return 14
+    }
+
+    private func bottomOverlayPadding(for height: CGFloat) -> CGFloat {
+        if height < 700 { return 12 }
+        if height < 780 { return 18 }
+        return 24
     }
 
     private func topOverlayContainer<Content: View>(@ViewBuilder content: () -> Content) -> some View {
@@ -201,44 +262,35 @@ struct CameraView: View {
     }
 
     private var quickActionControls: some View {
-        VStack(spacing: 12) {
-            iconControl(
-                systemImage: cameraManager.backgroundRemovalEnabled ? "sparkles.rectangle.stack.fill" : "sparkles.rectangle.stack",
-                title: "Auto Sticker",
-                isActive: cameraManager.backgroundRemovalEnabled,
-                tint: .green
-            ) {
-                cameraManager.backgroundRemovalEnabled.toggle()
+        ViewThatFits {
+            HStack(spacing: 12) {
+                autoStickerControl()
+                adjustFrameControl()
+                performanceControl()
+                setupControl()
             }
 
-            iconControl(
-                systemImage: isAdjustingROI ? "rectangle.dashed.badge.record" : "rectangle.dashed", 
-                title: isAdjustingROI ? "Lock Frame" : "Adjust Frame",
-                isActive: isAdjustingROI,
-                tint: .cyan
-            ) {
-                withAnimation(.spring(response: 0.28, dampingFraction: 0.8)) {
-                    isAdjustingROI.toggle()
-                }
+            LazyVGrid(columns: quickActionColumns, spacing: 12) {
+                autoStickerControl()
+                adjustFrameControl()
+                performanceControl()
+                setupControl()
             }
 
-            iconControl(
-                systemImage: "chart.line.uptrend.xyaxis",
-                title: "Performance",
-                isActive: showPerformanceOverlay,
-                tint: .orange
-            ) {
-                showPerformanceOverlay.toggle()
-            }
-
-            iconControl(
-                systemImage: "gearshape.fill",
-                title: "Setup",
-                tint: .blue
-            ) {
-                showSetupWizard = true
+            VStack(spacing: 12) {
+                autoStickerControl()
+                adjustFrameControl()
+                performanceControl()
+                setupControl()
             }
         }
+    }
+
+    private var quickActionColumns: [GridItem] {
+        [
+            GridItem(.flexible(), spacing: 12),
+            GridItem(.flexible(), spacing: 12)
+        ]
     }
 
     private var sessionStatusView: some View {
@@ -248,12 +300,25 @@ struct CameraView: View {
                     .font(.headline.weight(.semibold))
                     .foregroundColor(.green)
 
-                infoRow(icon: "number", text: "Stock \(session.stockNumber)")
-                infoRow(icon: "clock.arrow.circlepath", text: "Duration \(sessionManager.getFormattedDuration())")
-                infoRow(icon: "camera.badge.ellipsis", text: "Captures \(sessionManager.getAssetCount())")
+                infoRow(
+                    icon: "number",
+                    text: "Stock \(session.stockNumber)"
+                )
+                infoRow(
+                    icon: "clock.arrow.circlepath",
+                    text: "Duration \(sessionManager.getFormattedDuration())"
+                )
+                infoRow(
+                    icon: "camera.badge.ellipsis",
+                    text: "Captures \(sessionManager.getAssetCount())"
+                )
 
                 if cameraManager.isVideoRecording {
-                    infoRow(icon: "record.circle", text: "Video \(cameraManager.getFormattedVideoDuration())", color: .red)
+                    infoRow(
+                        icon: "record.circle",
+                        text: "Video \(cameraManager.getFormattedVideoDuration())",
+                        color: .red
+                    )
                 }
             } else {
                 Text("No Active Session")
@@ -316,34 +381,83 @@ struct CameraView: View {
         var chips: [StatusChip] = []
 
         if sessionManager.isSessionActive {
-            chips.append(StatusChip(icon: "clock", text: sessionManager.getFormattedDuration(), color: .green))
-            chips.append(StatusChip(icon: "camera.on.rectangle", text: "Photos \(sessionManager.getPhotosCount())", color: .cyan))
+            chips.append(
+                StatusChip(
+                    icon: "clock",
+                    text: sessionManager.getFormattedDuration(),
+                    color: .green
+                )
+            )
+            chips.append(
+                StatusChip(
+                    icon: "camera.on.rectangle",
+                    text: "Photos \(sessionManager.getPhotosCount())",
+                    color: .cyan
+                )
+            )
         }
 
         if cameraManager.backgroundRemovalEnabled {
-            chips.append(StatusChip(icon: "sparkles", text: "Stickers On", color: .green))
+            chips.append(
+                StatusChip(
+                    icon: "sparkles",
+                    text: "Stickers On",
+                    color: .green
+                )
+            )
         }
 
         if cameraManager.triggerEngine.isIntervalCaptureActive {
             let occupancy = cameraManager.roiDetector.occupancyPercentage
             let occupancyText = String(format: "ROI %.0f%%", occupancy)
             let color: Color = cameraManager.roiDetector.isROIOccupied ? .green : .orange
-            chips.append(StatusChip(icon: "rectangle.inset.filled", text: occupancyText, color: color))
+            chips.append(
+                StatusChip(
+                    icon: "rectangle.inset.filled",
+                    text: occupancyText,
+                    color: color
+                )
+            )
 
             if cameraManager.motionDetector.isVehicleStopped {
-                chips.append(StatusChip(icon: "car.fill", text: "Vehicle Stopped", color: .red))
+                chips.append(
+                    StatusChip(
+                        icon: "car.fill",
+                        text: "Vehicle Stopped",
+                        color: .red
+                    )
+                )
             } else {
                 let motion = cameraManager.motionDetector.motionMagnitude
-                chips.append(StatusChip(icon: "speedometer", text: String(format: "Motion %.3f", motion), color: .yellow))
+                let motionText = String(format: "Motion %.3f", motion)
+                chips.append(
+                    StatusChip(
+                        icon: "speedometer",
+                        text: motionText,
+                        color: .yellow
+                    )
+                )
             }
         }
 
         if cameraManager.useLiDARDetection {
             let lidarColor: Color = cameraManager.lidarDetector.isSessionRunning ? .purple : .gray
             let text = cameraManager.lidarDetector.isSessionRunning ? "LiDAR Active" : "LiDAR Ready"
-            chips.append(StatusChip(icon: "sensor.tag.radiowaves.forward", text: text, color: lidarColor))
+            chips.append(
+                StatusChip(
+                    icon: "sensor.tag.radiowaves.forward",
+                    text: text,
+                    color: lidarColor
+                )
+            )
         } else {
-            chips.append(StatusChip(icon: "brain.head.profile", text: "Vision Detect", color: .blue))
+            chips.append(
+                StatusChip(
+                    icon: "brain.head.profile",
+                    text: "Vision Detect",
+                    color: .blue
+                )
+            )
         }
 
         return chips
@@ -360,31 +474,34 @@ struct CameraView: View {
     }
 
     private var regularBottomOverlay: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: max(CGFloat(12), 16 * layoutScale)) {
             statusRow
 
-            HStack(alignment: .bottom, spacing: 20) {
-                detectionControls
+            HStack(alignment: .bottom, spacing: max(CGFloat(14), 20 * layoutScale)) {
+                detectionControls(compact: false)
                 Spacer()
-                captureButton
+                captureButton(compact: false)
                 Spacer()
-                sessionControls
+                sessionControls(compact: false)
             }
         }
         .padding(.horizontal, 16)
-        .padding(.vertical, 18)
+        .padding(.vertical, max(CGFloat(14), 18 * layoutScale))
         .background(.ultraThinMaterial.opacity(0.9))
-        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
-        .padding(.horizontal, 16)
-        .padding(.bottom, 24)
+        .clipShape(
+            RoundedRectangle(
+                cornerRadius: max(CGFloat(18), 24 * layoutScale),
+                style: .continuous
+            )
+        )
     }
 
     private var compactBottomOverlay: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: max(CGFloat(10), 12 * layoutScale)) {
             statusRow
 
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(alignment: .center, spacing: 12) {
+                HStack(alignment: .center, spacing: max(CGFloat(10), 12 * layoutScale)) {
                     detectionControls(compact: true)
                     captureButton(compact: true)
                     sessionControls(compact: true)
@@ -393,16 +510,20 @@ struct CameraView: View {
             }
         }
         .padding(.horizontal, 12)
-        .padding(.vertical, 14)
+        .padding(.vertical, max(CGFloat(12), 14 * layoutScale))
         .background(.ultraThinMaterial.opacity(0.94))
-        .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
-        .padding(.horizontal, 12)
-        .padding(.bottom, 12)
+        .clipShape(
+            RoundedRectangle(
+                cornerRadius: max(CGFloat(16), 22 * layoutScale),
+                style: .continuous
+            )
+        )
     }
 
     @ViewBuilder
     private func detectionControls(compact: Bool) -> some View {
-        let spacing: CGFloat = compact ? 10 : 12
+        let spacingBase = CGFloat(compact ? 10 : 12)
+        let spacing: CGFloat = max(CGFloat(8), spacingBase * layoutScale)
 
         HStack(spacing: spacing) {
             if cameraManager.useLiDARDetection {
@@ -440,12 +561,13 @@ struct CameraView: View {
                     cameraManager.lidarDetector.debugARSessionStatus()
                 }
             } else {
+                let isSampling = cameraManager.roiDetector.isBackgroundSampling
                 iconControl(
-                    systemImage: cameraManager.roiDetector.isBackgroundSampling ? "waveform" : "brain.head.profile",
-                    title: cameraManager.roiDetector.isBackgroundSampling ? "Learning" : "Learn Background",
-                    isActive: cameraManager.roiDetector.isBackgroundSampling,
+                    systemImage: isSampling ? "waveform" : "brain.head.profile",
+                    title: isSampling ? "Learning" : "Learn Background",
+                    isActive: isSampling,
                     tint: .orange,
-                    isDisabled: cameraManager.roiDetector.isBackgroundSampling
+                    isDisabled: isSampling
                 ) {
                     cameraManager.roiDetector.startBackgroundSampling()
                 }
@@ -459,10 +581,15 @@ struct CameraView: View {
             print("CameraView: Manual capture triggered")
             cameraManager.capturePhoto(triggerType: .manual)
         } label: {
-            VStack(spacing: compact ? 6 : 8) {
-                let outer: CGFloat = compact ? 72 : 86
-                let middle: CGFloat = compact ? 60 : 72
-                let inner: CGFloat = compact ? 52 : 64
+            let labelSpacing = CGFloat(compact ? 6 : 8)
+            VStack(spacing: labelSpacing) {
+                let scale = layoutScale
+                let outerBase = CGFloat(compact ? 72 : 86)
+                let middleBase = CGFloat(compact ? 60 : 72)
+                let innerBase = CGFloat(compact ? 52 : 64)
+                let outer: CGFloat = max(CGFloat(60), outerBase * scale)
+                let middle: CGFloat = max(CGFloat(48), middleBase * scale)
+                let inner: CGFloat = max(CGFloat(42), innerBase * scale)
 
                 ZStack {
                     Circle()
@@ -486,7 +613,8 @@ struct CameraView: View {
 
     @ViewBuilder
     private func sessionControls(compact: Bool) -> some View {
-        VStack(spacing: compact ? 10 : 12) {
+        let stackBase = CGFloat(compact ? 10 : 12)
+        VStack(spacing: max(CGFloat(9), stackBase * layoutScale)) {
             iconControl(
                 systemImage: sessionManager.isSessionActive ? "stop.circle.fill" : "play.circle.fill",
                 title: sessionManager.isSessionActive ? "End Session" : "Start Session",
@@ -523,6 +651,55 @@ struct CameraView: View {
         .frame(maxWidth: compact ? nil : .infinity, alignment: compact ? .leading : .trailing)
     }
 
+    @ViewBuilder
+    private func autoStickerControl() -> some View {
+        iconControl(
+            systemImage: cameraManager.backgroundRemovalEnabled ? "sparkles.rectangle.stack.fill" : "sparkles.rectangle.stack",
+            title: "Auto Sticker",
+            isActive: cameraManager.backgroundRemovalEnabled,
+            tint: .green
+        ) {
+            cameraManager.backgroundRemovalEnabled.toggle()
+        }
+    }
+
+    @ViewBuilder
+    private func adjustFrameControl() -> some View {
+        iconControl(
+            systemImage: isAdjustingROI ? "rectangle.dashed.badge.record" : "rectangle.dashed",
+            title: isAdjustingROI ? "Lock Frame" : "Adjust Frame",
+            isActive: isAdjustingROI,
+            tint: .cyan
+        ) {
+            withAnimation(.spring(response: 0.28, dampingFraction: 0.8)) {
+                isAdjustingROI.toggle()
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func performanceControl() -> some View {
+        iconControl(
+            systemImage: "chart.line.uptrend.xyaxis",
+            title: "Performance",
+            isActive: showPerformanceOverlay,
+            tint: .orange
+        ) {
+            showPerformanceOverlay.toggle()
+        }
+    }
+
+    @ViewBuilder
+    private func setupControl() -> some View {
+        iconControl(
+            systemImage: "gearshape.fill",
+            title: "Setup",
+            tint: .blue
+        ) {
+            showSetupWizard = true
+        }
+    }
+
     private func iconControl(
         systemImage: String,
         title: String,
@@ -532,7 +709,8 @@ struct CameraView: View {
         action: @escaping () -> Void
     ) -> some View {
         Button(action: action) {
-            VStack(spacing: isCompactHeight ? 4 : 6) {
+            let spacingBase: CGFloat = isCompactHeight ? 4 : 6
+            VStack(spacing: max(CGFloat(3), spacingBase * layoutScale)) {
                 Image(systemName: systemImage)
                     .font(controlIconFont)
                     .foregroundColor(.white)
@@ -544,7 +722,12 @@ struct CameraView: View {
             }
             .frame(width: controlButtonDimension, height: controlButtonDimension)
             .background((isActive ? tint : Color.black.opacity(0.55)))
-            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+            .clipShape(
+                RoundedRectangle(
+                    cornerRadius: max(CGFloat(14), 18 * layoutScale),
+                    style: .continuous
+                )
+            )
         }
         .buttonStyle(.plain)
         .disabled(isDisabled)
