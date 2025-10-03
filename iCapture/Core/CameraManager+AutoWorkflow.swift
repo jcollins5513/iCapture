@@ -53,6 +53,11 @@ extension CameraManager {
 
         print("CameraManager: Beginning automatic capture workflow")
 
+        backgroundRemovalEnabled = true
+        if lidarDetector.isLiDARAvailable {
+            useLiDARDetection = true
+        }
+
         shouldAutoStartTriggers = true
         triggerEngine.stopSession()
         triggerEngine.resetSession()
@@ -108,6 +113,7 @@ extension CameraManager {
     @objc func handleSessionDidStart(_ notification: Notification) {
         Task { @MainActor in
             if self.sessionManager?.isSessionActive == true {
+                self.backgroundRemovalEnabled = true
                 self.beginAutomaticCaptureWorkflow()
             }
         }

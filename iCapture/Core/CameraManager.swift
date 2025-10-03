@@ -204,6 +204,19 @@ class CameraManager: NSObject, ObservableObject {
                 } else {
                     print("CameraManager: Depth data delivery not supported")
                 }
+
+                self.photoOutput.isHighResolutionCaptureEnabled = true
+                if #available(iOS 15.0, *) {
+                    self.photoOutput.maxPhotoQualityPrioritization = .quality
+                }
+
+                if self.photoOutput.isLivePhotoCaptureSupported {
+                    self.photoOutput.isLivePhotoCaptureEnabled = false
+                }
+
+                if self.photoOutput.isDualCameraDualPhotoDeliverySupported {
+                    self.photoOutput.isDualCameraDualPhotoDeliveryEnabled = false
+                }
                 print("CameraManager: Photo output added successfully")
             } else {
                 print("CameraManager: WARNING - Cannot add photo output")
@@ -324,30 +337,39 @@ class CameraManager: NSObject, ObservableObject {
                 photoSettings = AVCapturePhotoSettings()
             }
 
-            // Enable high resolution capture if supported
-        if #available(iOS 16.0, *) {
-            if let device = self.captureDevice,
-               let maxDimensions = device.activeFormat.supportedMaxPhotoDimensions.max(by: { $0.width * $0.height < $1.width * $1.height }),
-               maxDimensions.width >= 8000 {
-                if self.photoOutput.isDepthDataDeliveryEnabled {
-                    print("CameraManager: Depth data enabled - using standard resolution for compatibility")
-                } else if self.photoOutput.maxPhotoDimensions.width >= maxDimensions.width {
-                    photoSettings.maxPhotoDimensions = maxDimensions
-                    print("CameraManager: Capturing 48MP high-resolution photo")
-                } else {
-                    print("CameraManager: Photo output doesn't support 48MP, using standard resolution")
-                }
-            } else {
-                print("CameraManager: Capturing standard resolution photo")
+            photoSettings.isHighResolutionPhotoEnabled = true
+            if #available(iOS 15.0, *) {
+                photoSettings.photoQualityPrioritization = .quality
             }
-        }
+
+            photoSettings.isAutoStillImageStabilizationEnabled = true
+            photoSettings.isAutoDualCameraFusionEnabled = true
+
+            // Enable high resolution capture if supported
+            if #available(iOS 16.0, *) {
+                if let device = self.captureDevice,
+                   let maxDimensions = device.activeFormat.supportedMaxPhotoDimensions.max(by: { $0.width * $0.height < $1.width * $1.height }),
+                   maxDimensions.width >= 8000 {
+                    if self.photoOutput.isDepthDataDeliveryEnabled && !(self.useLiDARDetection && self.lidarDetector.isSessionRunning) {
+                        print("CameraManager: Depth data enabled - using standard resolution for compatibility")
+                    } else if self.photoOutput.maxPhotoDimensions.width >= maxDimensions.width {
+                        photoSettings.maxPhotoDimensions = maxDimensions
+                        print("CameraManager: Capturing 48MP high-resolution photo")
+                    } else {
+                        print("CameraManager: Photo output doesn't support 48MP, using standard resolution")
+                    }
+                } else {
+                    print("CameraManager: Capturing standard resolution photo")
+                }
+            }
 
             // Note: Custom metadata keys are not allowed by AVFoundation
             // We'll store trigger info in session data instead
 
             if self.photoOutput.isDepthDataDeliveryEnabled {
-                photoSettings.isDepthDataDeliveryEnabled = true
-                if #available(iOS 16.0, *) {
+                let shouldCaptureDepth = !(self.useLiDARDetection && self.lidarDetector.isSessionRunning)
+                photoSettings.isDepthDataDeliveryEnabled = shouldCaptureDepth
+                if shouldCaptureDepth, #available(iOS 16.0, *) {
                     photoSettings.isDepthDataFiltered = true
                 }
             }
