@@ -266,10 +266,19 @@ extension CameraManager {
                 guard !dimensions.isEmpty else { continue }
 
                 for dimension in dimensions {
-                    let area = Int(dimension.width) * Int(dimension.height)
-                    let isTwelveMPOrGreater = dimension.width >= 4_000 && dimension.height >= 3_000
+                    let width = Int(dimension.width)
+                    let height = Int(dimension.height)
+                    let longSide = max(width, height)
+                    let shortSide = min(width, height)
+                    let area = width * height
+                    let isTwelveMPOrGreater = longSide >= 4_000 && shortSide >= 3_000
+                    let isUltraHigh = longSide >= 8_000 && shortSide >= 6_000
 
-                    if isTwelveMPOrGreater && area > selectedArea {
+                    if isUltraHigh && area > selectedArea {
+                        selectedFormat = format
+                        selectedDimensions = dimension
+                        selectedArea = area
+                    } else if isTwelveMPOrGreater && !isUltraHigh && area > selectedArea {
                         selectedFormat = format
                         selectedDimensions = dimension
                         selectedArea = area
@@ -320,19 +329,68 @@ extension CameraManager {
         print("CameraManager: Preferred photo dimensions set to \(description) (~\(String(format: "%.1f", megapixels))MP)")
     }
 
+    private func logSupportedFormats(for device: AVCaptureDevice) {
+        print("CameraManager: Enumerating supported formats for \(device.localizedName)")
+        for format in device.formats {
+            let formatDesc = format.formatDescription
+            let dimensions = CMVideoFormatDescriptionGetDimensions(formatDesc)
+            var photoDimensionsDescription = "n/a"
+            if #available(iOS 16.0, *) {
+                let supported = format.supportedMaxPhotoDimensions
+                if supported.isEmpty {
+                    photoDimensionsDescription = "[]"
+                } else {
+                    let entries = supported.map { "\($0.width)x\($0.height)" }
+                    photoDimensionsDescription = "[\(entries.joined(separator: ", "))]"
+                }
+            } else {
+                let photoDims = format.highResolutionStillImageDimensions
+                photoDimensionsDescription = "\(photoDims.width)x\(photoDims.height)"
+            }
+
+            print(
+                "CameraManager: - Format: \(format) | video=\(dimensions.width)x\(dimensions.height) | photoOptions=\(photoDimensionsDescription)"
+            )
+        }
+    }
+
     private func addVideoInput() -> Bool {
-        guard let videoDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back),
-              let videoInput = try? AVCaptureDeviceInput(device: videoDevice),
-              captureSession.canAddInput(videoInput) else {
-            print("CameraManager: ERROR - Failed to create video input")
+        let deviceTypes: [AVCaptureDevice.DeviceType] = [
+            .builtInTripleCamera,
+            .builtInDualWideCamera,
+            .builtInWideAngleCamera
+        ]
+
+        let discoverySession = AVCaptureDevice.DiscoverySession(
+            deviceTypes: deviceTypes,
+            mediaType: .video,
+            position: .back
+        )
+
+        guard let videoDevice = discoverySession.devices.first else {
+            print("CameraManager: ERROR - No compatible back camera found")
             return false
         }
 
-        captureSession.addInput(videoInput)
-        captureDevice = videoDevice
-        configureBestPhotoFormat(for: videoDevice)
-        print("CameraManager: Video input added successfully")
-        return true
+        do {
+            let videoInput = try AVCaptureDeviceInput(device: videoDevice)
+            guard captureSession.canAddInput(videoInput) else {
+                print("CameraManager: ERROR - Cannot add video input to session")
+                return false
+            }
+            captureSession.addInput(videoInput)
+            captureDevice = videoDevice
+
+            print("CameraManager: Selected camera device = \(videoDevice.localizedName)")
+            self.logSupportedFormats(for: videoDevice)
+
+            configureBestPhotoFormat(for: videoDevice)
+            print("CameraManager: Video input added successfully")
+            return true
+        } catch {
+            print("CameraManager: ERROR - Failed to create video input: \(error)")
+            return false
+        }
     }
 
     private func addVideoOutput() {
@@ -489,15 +547,18 @@ extension CameraManager {
             if #available(iOS 16.0, *) {
                 if let device = self.captureDevice {
                     let supported = device.activeFormat.supportedMaxPhotoDimensions
-                    let descriptions = supported.map { "\($0.width)x\($0.height)" }.joined(separator: ", ")
-                    print("CameraManager: supportedMaxPhotoDimensions = [\(descriptions)]")
-
-                    if let preferred = supported.first(where: { $0.width >= 4_000 && $0.height >= 3_000 }) {
-                        preferredPhotoDimensions = preferred
-                    } else if let first = supported.first {
-                        preferredPhotoDimensions = first
-                    } else {
+                    if supported.isEmpty {
+                        print("CameraManager: supportedMaxPhotoDimensions is empty on current format")
                         preferredPhotoDimensions = nil
+                    } else {
+                        let descriptions = supported.map { "\($0.width)x\($0.height)" }.joined(separator: ", ")
+                        print("CameraManager: supportedMaxPhotoDimensions = [\(descriptions)]")
+
+                        preferredPhotoDimensions = supported.max(by: { lhs, rhs in
+                            let lhsArea = Int(lhs.width) * Int(lhs.height)
+                            let rhsArea = Int(rhs.width) * Int(rhs.height)
+                            return lhsArea < rhsArea
+                        })
                     }
                 }
 

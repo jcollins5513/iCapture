@@ -41,36 +41,7 @@ extension CameraManager {
 
     @MainActor
     func beginAutomaticCaptureWorkflow() {
-        guard autoCaptureState == .idle else {
-            print("CameraManager: Automatic capture workflow already in progress")
-            return
-        }
-
-        guard sessionManager?.isSessionActive == true else {
-            print("CameraManager: Cannot begin automatic workflow without active session")
-            return
-        }
-
-        print("CameraManager: Beginning automatic capture workflow")
-
-        backgroundRemovalEnabled = true
-        if lidarDetector.isLiDARAvailable {
-            useLiDARDetection = true
-        }
-
-        shouldAutoStartTriggers = true
-        backgroundSamplingAttempt = 0
-        triggerEngine.stopSession()
-        triggerEngine.resetSession()
-        roiDetector.resetBackgroundLearning()
-
-        if lidarDetector.isLiDARAvailable {
-            autoCaptureState = .waitingForLiDAR
-            startLiDARDetection()
-        } else {
-            autoCaptureState = .waitingForBackground
-            scheduleAutomaticBackgroundSampling(delay: 0.2)
-        }
+        print("CameraManager: Automatic workflow temporarily disabled; manual capture only")
     }
 
     @MainActor
