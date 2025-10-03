@@ -75,6 +75,10 @@ class CameraManager: NSObject, ObservableObject {
     var shouldAutoStartTriggers = false
     var backgroundSamplingWorkItem: DispatchWorkItem?
     var backgroundSamplingTimeoutWorkItem: DispatchWorkItem?
+    let backgroundSamplingTimeout: TimeInterval = 3.5
+    let backgroundSamplingMonitorInterval: TimeInterval = 0.5
+    let maxBackgroundSamplingAttempts = 3
+    var backgroundSamplingAttempt = 0
     private var pendingTriggerType: TriggerType = .manual
 
     fileprivate final class PixelBufferBox: @unchecked Sendable {
@@ -175,16 +179,12 @@ extension CameraManager {
             print("CameraManager: Setting up capture session...")
             self.captureSession.beginConfiguration()
 
-            configureSessionPreset()
+            self.configureSessionPreset()
 
-            guard addVideoInput() else {
+            guard self.addVideoInput() else {
                 self.captureSession.commitConfiguration()
                 return
             }
-
-            self.captureSession.addInput(videoInput)
-            self.captureDevice = videoDevice
-            print("CameraManager: Video input added successfully")
 
             // Add video output for preview
             if self.captureSession.canAddOutput(self.videoOutput) {

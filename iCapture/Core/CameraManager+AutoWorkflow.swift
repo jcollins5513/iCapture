@@ -59,6 +59,7 @@ extension CameraManager {
         }
 
         shouldAutoStartTriggers = true
+        backgroundSamplingAttempt = 0
         triggerEngine.stopSession()
         triggerEngine.resetSession()
         roiDetector.resetBackgroundLearning()
@@ -79,6 +80,7 @@ extension CameraManager {
         backgroundSamplingWorkItem?.cancel()
         backgroundSamplingTimeoutWorkItem?.cancel()
         backgroundSamplingTimeoutWorkItem = nil
+        backgroundSamplingAttempt = 0
         roiDetector.resetBackgroundLearning()
         print("CameraManager: Automatic capture workflow cancelled")
     }
@@ -88,26 +90,23 @@ extension CameraManager {
         backgroundSamplingWorkItem?.cancel()
         backgroundSamplingTimeoutWorkItem?.cancel()
         backgroundSamplingTimeoutWorkItem = nil
+        guard shouldAutoStartTriggers else { return }
+
+        let nextAttempt = backgroundSamplingAttempt + 1
+        backgroundSamplingAttempt = nextAttempt
+
         let workItem = DispatchWorkItem { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
             Task { @MainActor in
+                guard self.shouldAutoStartTriggers else { return }
                 self.roiDetector.resetBackgroundLearning()
                 self.roiDetector.startBackgroundSampling()
-                print("CameraManager: Automatic background sampling started")
+                print("CameraManager: Automatic background sampling started (attempt \(nextAttempt))")
+                self.monitorBackgroundSampling(startedAt: Date(), attempt: nextAttempt)
             }
         }
         backgroundSamplingWorkItem = workItem
         DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: workItem)
-
-        let timeoutItem = DispatchWorkItem { [weak self] in
-            Task { @MainActor in
-                guard let self = self, self.shouldAutoStartTriggers else { return }
-                print("CameraManager: Automatic background sampling timed out - proceeding with capture workflow")
-                self.finalizeAutomaticCaptureWorkflow(reason: "background sampling timeout")
-            }
-        }
-        backgroundSamplingTimeoutWorkItem = timeoutItem
-        DispatchQueue.main.asyncAfter(deadline: .now() + delay + 2.0, execute: timeoutItem)
     }
 
     @objc func handleSessionDidStart(_ notification: Notification) {
@@ -125,6 +124,7 @@ extension CameraManager {
 
         autoCaptureState = .idle
         shouldAutoStartTriggers = false
+        backgroundSamplingAttempt = 0
         backgroundSamplingWorkItem?.cancel()
         backgroundSamplingTimeoutWorkItem?.cancel()
         backgroundSamplingTimeoutWorkItem = nil
@@ -136,5 +136,42 @@ extension CameraManager {
         } else {
             print("CameraManager: Background sampling finished but session inactive")
         }
+    }
+
+    @MainActor
+    private func monitorBackgroundSampling(startedAt: Date, attempt: Int) {
+        backgroundSamplingTimeoutWorkItem?.cancel()
+
+        let monitorItem = DispatchWorkItem { [weak self] in
+            Task { @MainActor in
+                guard let self = self, self.shouldAutoStartTriggers else { return }
+
+                if self.roiDetector.isBackgroundLearned {
+                    self.finalizeAutomaticCaptureWorkflow(reason: "background sampling completed")
+                    return
+                }
+
+                let elapsed = Date().timeIntervalSince(startedAt)
+
+                if elapsed >= self.backgroundSamplingTimeout {
+                    if attempt >= self.maxBackgroundSamplingAttempts {
+                        print("CameraManager: Background sampling timed out after \(attempt) attempts; finalizing")
+                        self.finalizeAutomaticCaptureWorkflow(reason: "background sampling timeout")
+                    } else {
+                        print("CameraManager: Background sampling attempt \(attempt) timed out; retrying")
+                        self.scheduleAutomaticBackgroundSampling(delay: 0.5)
+                    }
+                    return
+                }
+
+                self.monitorBackgroundSampling(startedAt: startedAt, attempt: attempt)
+            }
+        }
+
+        backgroundSamplingTimeoutWorkItem = monitorItem
+        DispatchQueue.main.asyncAfter(
+            deadline: .now() + backgroundSamplingMonitorInterval,
+            execute: monitorItem
+        )
     }
 }
