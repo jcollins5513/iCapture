@@ -18,6 +18,7 @@ extension CameraManager {
         }
 
         useLiDARDetection = true
+        lidarBoostState = .ready
         lastLiDARProcessingState = nil
         print("CameraManager: LiDAR depth data cached for background removal")
 

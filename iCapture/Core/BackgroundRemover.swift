@@ -279,17 +279,17 @@ extension BackgroundRemover {
 
         let dilate = CIFilter.morphologyMaximum()
         dilate.inputImage = refined
-        dilate.radius = 2.0
+        dilate.radius = 2.5
         if let dilated = dilate.outputImage { refined = dilated }
 
         let erode = CIFilter.morphologyMinimum()
         erode.inputImage = refined
-        erode.radius = 1.5
+        erode.radius = 2.0
         if let eroded = erode.outputImage { refined = eroded }
 
         let blur = CIFilter.gaussianBlur()
         blur.inputImage = refined
-        blur.radius = 0.8
+        blur.radius = 1.2
         if let blurred = blur.outputImage { refined = blurred }
 
         return refined.cropped(to: targetExtent)
