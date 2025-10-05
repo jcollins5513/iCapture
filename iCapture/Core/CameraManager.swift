@@ -43,7 +43,7 @@ class CameraManager: NSObject, ObservableObject {
     @Published var lidarDetector = LiDARDetector()
     @Published var lidarBackgroundRemover = LiDARBackgroundRemover()
     @Published var useLiDARDetection = false
-    @Published var saveToPhotoLibraryAutomatically = false
+    @Published var saveToPhotoLibraryAutomatically = true
 
     // Background removal settings
     @Published var backgroundRemovalEnabled = true
