@@ -14,9 +14,22 @@
 		CD03F02E2E884D9F00831FD4 /* iCapture.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iCapture.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		CD0C3FB32E9292440087A394 /* Exceptions for "iCapture" folder in "iCapture" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = CD03F02D2E884D9F00831FD4 /* iCapture */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		CD03F0302E884D9F00831FD4 /* iCapture */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				CD0C3FB32E9292440087A394 /* Exceptions for "iCapture" folder in "iCapture" target */,
+			);
 			path = iCapture;
 			sourceTree = "<group>";
 		};
@@ -265,6 +278,7 @@
 				DEVELOPMENT_TEAM = YN6FK3U2YV;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = iCapture/Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "iCapture needs camera access to capture vehicle photos during rotation sessions.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "iCapture may record audio during video capture sessions.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "";
@@ -300,6 +314,7 @@
 				DEVELOPMENT_TEAM = YN6FK3U2YV;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = iCapture/Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "iCapture needs camera access to capture vehicle photos during rotation sessions.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "iCapture may record audio during video capture sessions.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "";
