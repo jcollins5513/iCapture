@@ -649,8 +649,7 @@ extension CameraManager {
         if photoOutput.availablePhotoCodecTypes.contains(.hevc) {
             // Use HEVC/HEIF format for better compression
             photoSettings = AVCapturePhotoSettings(format: [
-                AVVideoCodecKey: AVVideoCodecType.hevc,
-                AVVideoQualityKey: 1.0
+                AVVideoCodecKey: AVVideoCodecType.hevc
             ])
         } else {
             // Fallback to standard format
