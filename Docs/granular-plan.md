@@ -143,6 +143,13 @@ Based on master-plan.md. Update by checking off completed tasks.
 - [ ] **9.7** Document issues and fixes
 - [ ] **9.8** Final performance validation
 
+## Milestone 10: Subject Lift & Depth Boost Polish
+- [ ] **10.1** Guarantee session asset persistence before export
+- [ ] **10.2** Build in-app gallery for sessions (photos, stickers, cutouts)
+- [ ] **10.3** Measure LiDAR depth boost benefit vs. energy cost
+- [ ] **10.4** Experiment with ProRAW/HEIF Max capture to validate >12 MP path
+- [ ] **10.5** Refine Vision mask edges to match iOS sticker quality
+
 ## Technical Implementation Details
 
 ### Core Components to Create
