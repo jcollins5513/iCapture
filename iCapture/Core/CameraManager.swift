@@ -648,11 +648,18 @@ extension CameraManager {
 
         if photoOutput.availablePhotoCodecTypes.contains(.hevc) {
             // Use HEVC/HEIF format for better compression
-            photoSettings = AVCapturePhotoSettings(format: [AVVideoCodecKey: AVVideoCodecType.hevc])
+            photoSettings = AVCapturePhotoSettings(format: [
+                AVVideoCodecKey: AVVideoCodecType.hevc,
+                AVVideoQualityKey: 1.0
+            ])
         } else {
             // Fallback to standard format
             photoSettings = AVCapturePhotoSettings()
         }
+
+        photoSettings.isHighResolutionPhotoEnabled = true
+        photoSettings.isAutoStillImageStabilizationEnabled = true
+        photoSettings.isAutoDualCameraFusionEnabled = true
 
         // Check if 48MP is available but don't set maxPhotoDimensions here
         // We'll set it per capture to avoid conflicts
@@ -666,6 +673,30 @@ extension CameraManager {
                 print("CameraManager: 48MP high-resolution capture supported")
             } else {
                 print("CameraManager: 48MP capture not available, using standard resolution")
+            }
+        }
+
+        if #available(iOS 16.0, *), let preferred = preferredPhotoDimensions {
+            let isUltraHighResolution = preferred.width >= 5_700 || preferred.height >= 4_200
+
+            photoSettings.maxPhotoDimensions = preferred
+
+            if isUltraHighResolution {
+                photoSettings.isAutoStillImageStabilizationEnabled = false
+                photoSettings.isAutoDualCameraFusionEnabled = false
+                print("CameraManager: Prepared photo settings tuned for ultra-high resolution capture")
+            }
+
+            if captureDevice?.activeFormat == nil {
+                print("CameraManager: capture device not ready; deferring photoOutput.maxPhotoDimensions update")
+            } else {
+                sessionQueue.async { [weak self] in
+                    guard let self = self else { return }
+                    self.photoOutput.maxPhotoDimensions = preferred
+                    print(
+                        "CameraManager: Set global photoOutput.maxPhotoDimensions to \(preferred.width)x\(preferred.height)"
+                    )
+                }
             }
         }
 
