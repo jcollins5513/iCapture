@@ -440,22 +440,37 @@ struct CameraView: View {
             }
         }
 
-        if cameraManager.useLiDARDetection {
-            let lidarColor: Color = cameraManager.lidarDetector.isSessionRunning ? .purple : .gray
-            let text = cameraManager.lidarDetector.isSessionRunning ? "LiDAR Active" : "LiDAR Ready"
-            chips.append(
-                StatusChip(
-                    icon: "sensor.tag.radiowaves.forward",
-                    text: text,
-                    color: lidarColor
-                )
-            )
-        } else {
+        switch cameraManager.lidarBoostState {
+        case .unavailable:
             chips.append(
                 StatusChip(
                     icon: "brain.head.profile",
                     text: "Vision Detect",
                     color: .blue
+                )
+            )
+        case .idle:
+            chips.append(
+                StatusChip(
+                    icon: "brain.head.profile",
+                    text: "Vision Detect",
+                    color: .blue
+                )
+            )
+        case .scanning:
+            chips.append(
+                StatusChip(
+                    icon: "sensor.tag.radiowaves.forward",
+                    text: "Depth Scanning",
+                    color: .purple
+                )
+            )
+        case .ready:
+            chips.append(
+                StatusChip(
+                    icon: "sensor.tag.radiowaves.forward.fill",
+                    text: "Depth Ready",
+                    color: .purple
                 )
             )
         }
@@ -526,31 +541,55 @@ struct CameraView: View {
         let spacing: CGFloat = max(CGFloat(8), spacingBase * layoutScale)
 
         HStack(spacing: spacing) {
-            if cameraManager.useLiDARDetection {
-                iconControl(
-                    systemImage: "sensor.tag.radiowaves.forward",
-                    title: cameraManager.lidarDetector.isSessionRunning ? "Stop LiDAR" : "Start LiDAR",
-                    isActive: cameraManager.lidarDetector.isSessionRunning,
-                    tint: .purple
-                ) {
-                    if cameraManager.lidarDetector.isSessionRunning {
-                        cameraManager.stopLiDARDetection()
-                    } else {
+            let isSampling = cameraManager.roiDetector.isBackgroundSampling
+            iconControl(
+                systemImage: isSampling ? "waveform" : "brain.head.profile",
+                title: isSampling ? "Learning" : "Learn Background",
+                isActive: isSampling,
+                tint: .orange,
+                isDisabled: isSampling
+            ) {
+                cameraManager.roiDetector.startBackgroundSampling()
+            }
+
+            if cameraManager.lidarBoostState != .unavailable {
+                switch cameraManager.lidarBoostState {
+                case .idle:
+                    iconControl(
+                        systemImage: "sensor.tag.radiowaves.forward",
+                        title: "Depth Boost",
+                        tint: .purple
+                    ) {
                         cameraManager.startLiDARDetection()
                     }
-                }
-
-                iconControl(
-                    systemImage: "sensor.tag.radiowaves.forward.fill",
-                    title: cameraManager.useLiDARDetection ? "LiDAR On" : "LiDAR Off",
-                    isActive: cameraManager.useLiDARDetection,
-                    tint: .purple
-                ) {
-                    if cameraManager.useLiDARDetection {
-                        cameraManager.disableLiDARDetection()
-                    } else {
-                        cameraManager.enableLiDARDetection()
+                case .scanning:
+                    iconControl(
+                        systemImage: "sensor.tag.radiowaves.forward",
+                        title: "Cancel Scan",
+                        isActive: true,
+                        tint: .purple
+                    ) {
+                        cameraManager.stopLiDARDetection()
                     }
+                case .ready:
+                    iconControl(
+                        systemImage: "sensor.tag.radiowaves.forward.fill",
+                        title: "Depth Ready",
+                        isActive: true,
+                        tint: .purple
+                    ) {
+                        cameraManager.startLiDARDetection()
+                    }
+
+                    iconControl(
+                        systemImage: "xmark.circle",
+                        title: "Clear Depth",
+                        tint: .purple
+                    ) {
+                        cameraManager.disableLiDARDetection()
+                    }
+                case .unavailable:
+                    EmptyView()
                 }
 
                 iconControl(
@@ -559,17 +598,6 @@ struct CameraView: View {
                     tint: .orange
                 ) {
                     cameraManager.lidarDetector.debugARSessionStatus()
-                }
-            } else {
-                let isSampling = cameraManager.roiDetector.isBackgroundSampling
-                iconControl(
-                    systemImage: isSampling ? "waveform" : "brain.head.profile",
-                    title: isSampling ? "Learning" : "Learn Background",
-                    isActive: isSampling,
-                    tint: .orange,
-                    isDisabled: isSampling
-                ) {
-                    cameraManager.roiDetector.startBackgroundSampling()
                 }
             }
         }
