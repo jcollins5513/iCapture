@@ -1,75 +1,45 @@
-# iCapture - Next Session Prompt
+# iCapture – Next Session Prompt
 
 ## Project Status
-Continue development on **iCapture** - a hands-free, statically mounted iPhone app for vehicle photo capture during rotation.
+Hands-free iPhone capture app focused on subject lifting quality for dealership-ready exports.
 
-**Current Milestone**: Milestone 8 (QA Pass on iPhone 15 Pro and 15 Pro Max) - **75% Complete**
+**Current Focus**: Subject-lift polish and depth boost UX — Milestone 8 follow-up work in progress (~80% complete).
 
 ## Recent Accomplishments ✅
-- **Camera Orientation Issues RESOLVED**: Fixed camera image rotating with device instead of staying upright
-- **Landscape View Sizing RESOLVED**: Fixed half-screen display in landscape mode
-- **Photo Capture Crash RESOLVED**: Fixed invalid metadata keys causing crashes
-- **Preview Layer Frame Issues RESOLVED**: Implemented proper frame sizing and layout handling
-- **48MP HEIF Capture**: Verified working with proper file size optimization
-- **Thermal Monitoring**: Enhanced with comprehensive thermal state tracking
-- **Storage Management**: Implemented automatic cleanup and usage monitoring
-- **Performance Monitoring**: Real-time metrics collection and QA testing framework
+- Defaulted to Vision-only background removal after each capture; LiDAR now an optional "Depth Boost" with clear status chips.
+- Added refined mask processing (morphological close + blur) to tighten subject edges compared to iOS sticker baseline.
+- Prevented automatic Photo Library saves to keep all assets in `/Documents/Captures/<session>` for in-app access.
+- Simplified detection controls and status HUD to highlight background learning + depth readiness states.
+
+## Active Issues / Observations ⚠️
+- Session export still logs `Code=260` copy failures because assets may not exist when export runs (needs retry/await).
+- Captures remain 12 MP due to Apple's pipeline limits; ProRAW/HEIF Max experiment still pending.
+- No built-in gallery yet—need an in-app browser to review cutouts/stickers without jumping to Photos.
 
 ## Next Priority Tasks
+1. **Session Assets Reliability**
+   - Wait-for-write or retry loop before export copies (`SessionManager`).
+   - Add logging when asset write finishes vs. export start.
+2. **Mask Quality Validation**
+   - Compare new Vision-only edges vs. iOS sticker output on a small test set.
+   - Tune feather/blur radii and consider bilateral refinement pass.
+3. **In-App Gallery / Media Browser**
+   - Surface session photos/cutouts/stickers locally (no Photos dependency).
+   - Optional share/export actions and delete safeguards.
+4. **Depth Boost UX Polish**
+   - Persist most recent depth map timestamp; auto-expire after N minutes.
+   - Evaluate energy impact and consider throttle/cooldown telemetry.
+5. **High-Resolution Capture Follow-up (Deferred)**
+   - Prototype single ProRAW capture to confirm 48 MP path before reintroducing.
 
-### **Task 8.8: Battery Usage Optimization** (Next Focus)
-- [ ] **8.8.1** Test battery consumption during active sessions
-- [ ] **8.8.2** Monitor power usage patterns  
-- [ ] **8.8.3** Test low power mode compatibility
-- [ ] **8.8.4** Verify battery level monitoring
-- [ ] **8.8.5** Test power optimization features
+## Key Files Updated This Session
+- `iCapture/Core/CameraManager.swift`, `CameraManager+BackgroundRemoval.swift`
+- `iCapture/Core/BackgroundRemover.swift`
+- `iCapture/UI/CameraView.swift`
 
-### **Task 8.9: Complete QA Testing Framework** (Final Task)
-- [x] **8.9.1** Create PerformanceMonitor class ✅
-- [x] **8.9.2** Implement QA testing mode ✅
-- [x] **8.9.3** Add performance overlay UI ✅
-- [ ] **8.9.4** Test QA tools on physical devices
-- [ ] **8.9.5** Verify metrics accuracy and reliability
-- [ ] **8.9.6** Complete QA documentation
+## Build / Lint
+- ✅ `xcodebuild -scheme iCapture -configuration Debug -destination 'platform=iOS Simulator,name=iPhone 17 Pro' build`
+- ⚠️ `swiftlint` still reports legacy length violations (no new ones introduced).
 
-## Key Files & Components
-- **Core**: `CameraManager.swift`, `PerformanceMonitor.swift`, `SessionManager.swift`
-- **UI**: `CameraView.swift`, `QATestingView.swift`, `CameraPreviewView.swift`
-- **Testing**: `CameraDebugger.swift`, `CameraDebugView.swift`
-- **Documentation**: `Docs/granular-plan.md`, `Docs/qa-testing-guide.md`
-
-## Critical Fixes Applied This Session
-1. **Landscape Orientation Mapping**: Fixed reversed `UIDeviceOrientation` to `AVCaptureVideoOrientation` mapping
-2. **Preview Layer Layout**: Implemented custom `CameraPreviewContainerView` with `layoutSubviews()` override
-3. **Orientation Debouncing**: Added 0.1s debounce to prevent rapid orientation changes
-4. **Device vs Interface Orientation**: Switched to using `UIDevice.current.orientation` for more reliable detection
-
-## Development Rules
-- **Target**: iOS 26.0, iPhone 15 Pro and newer only
-- **No Cloud Dependencies**: Everything remains on-device
-- **Maintain**: File structure per `file-structure.txt`
-- **Do Not Edit**: `Docs/master-plan.md` or `Docs/granular-plan.md` except to check off completed tasks
-- **All Changes**: Must pass `Scripts/lint.sh` and `Scripts/build.sh`
-
-## Demo Credentials (Firebase Auth)
-- **Email**: demo@icapture.app
-- **Password**: DemoPass123!
-
-## Current Build Status
-- ✅ **Build**: Successful (warnings only, no errors)
-- ✅ **Lint**: Passing
-- ✅ **Camera Preview**: Working correctly in both orientations
-- ✅ **Photo Capture**: 48MP HEIF working with proper metadata
-- ✅ **Performance Monitoring**: Real-time metrics collection active
-
-## Next Session Goal
-**Focus on Task 8.8: Battery Usage Optimization**
-
-Implement comprehensive battery monitoring and optimization features:
-1. Add battery level tracking to `PerformanceMonitor`
-2. Implement power usage pattern analysis
-3. Test low power mode compatibility
-4. Add battery consumption estimation for sessions
-5. Create battery optimization recommendations
-
-**Ready to proceed with battery optimization implementation!** 🚀
+## Next Session Kickoff
+Focus on stabilising session asset persistence and delivering an in-app gallery while validating the new Vision-only mask quality. Depth boost experiments and any ProRAW checks can follow once export reliability is solved.
