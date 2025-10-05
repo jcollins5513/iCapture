@@ -11,6 +11,7 @@ import SwiftUI
 import AudioToolbox
 import Photos
 import ImageIO
+import ARKit
 
 class CameraManager: NSObject, ObservableObject {
     @Published var isAuthorized = false
@@ -42,9 +43,10 @@ class CameraManager: NSObject, ObservableObject {
     @Published var lidarDetector = LiDARDetector()
     @Published var lidarBackgroundRemover = LiDARBackgroundRemover()
     @Published var useLiDARDetection = false
+    @Published var saveToPhotoLibraryAutomatically = false
 
     // Background removal settings
-    @Published var backgroundRemovalEnabled = false
+    @Published var backgroundRemovalEnabled = true
 
     // Session Manager reference (will be set by CameraView)
     weak var sessionManager: SessionManager?
@@ -81,6 +83,15 @@ class CameraManager: NSObject, ObservableObject {
     var backgroundSamplingAttempt = 0
     private var pendingTriggerType: TriggerType = .manual
     private var preferredPhotoDimensions: CMVideoDimensions?
+
+    enum LiDARBoostState {
+        case unavailable
+        case idle
+        case scanning
+        case ready
+    }
+
+    @Published var lidarBoostState: LiDARBoostState = .unavailable
 
     fileprivate final class PixelBufferBox: @unchecked Sendable {
         let buffer: CVPixelBuffer
@@ -493,7 +504,7 @@ extension CameraManager {
                 self.isSessionRunning = self.captureSession.isRunning
 
                 // Stop LiDAR detection
-                if self.useLiDARDetection {
+                if self.lidarDetector.isSessionRunning {
                     self.lidarDetector.stopLiDARDetection()
                 }
 
@@ -934,8 +945,9 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
                     sessionFileURL: fileURL
                 )
             } else {
-                // Also save to photo library if user has granted permission
-                self.saveToPhotoLibrary(imageData: params.imageData)
+                if self.saveToPhotoLibraryAutomatically {
+                    self.saveToPhotoLibrary(imageData: params.imageData)
+                }
             }
 
             DispatchQueue.main.async {
@@ -1188,13 +1200,13 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
 
         // Check if LiDAR is available but don't start it automatically
         if lidarDetector.isLiDARAvailable {
-            useLiDARDetection = true
-            print("CameraManager: LiDAR detection available (will start on demand)")
-            print("CameraManager: - useLiDARDetection set to: \(useLiDARDetection)")
+            useLiDARDetection = false
+            lidarBoostState = .idle
+            print("CameraManager: LiDAR detection available; depth boost can be requested manually")
         } else {
             useLiDARDetection = false
+            lidarBoostState = .unavailable
             print("CameraManager: LiDAR not available, using traditional detection")
-            print("CameraManager: - useLiDARDetection set to: \(useLiDARDetection)")
         }
     }
 
@@ -1211,6 +1223,9 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
             return
         }
 
+        lidarBoostState = .scanning
+        useLiDARDetection = false
+
         // Stop the camera session temporarily to avoid conflicts
         print("CameraManager: Temporarily stopping camera session for LiDAR...")
         sessionQueue.async { [weak self] in
@@ -1224,8 +1239,6 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
             // Start LiDAR detection
             DispatchQueue.main.async {
                 self.lidarDetector.startLiDARDetection()
-                self.useLiDARDetection = true
-                self.lastLiDARProcessingState = nil
                 print("CameraManager: LiDAR detection started manually")
             }
         }
@@ -1239,6 +1252,12 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
 
         lidarDetector.stopLiDARDetection()
         lastLiDARProcessingState = nil
+        useLiDARDetection = false
+        if lidarDetector.latestDepthData?.depthMap != nil {
+            lidarBoostState = .ready
+        } else {
+            lidarBoostState = .idle
+        }
         print("CameraManager: LiDAR detection stopped")
 
         restartCaptureSessionIfNeeded()
@@ -1248,11 +1267,14 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
         if lidarDetector.isSessionRunning {
             stopLiDARDetection()
         }
-        if useLiDARDetection {
-            useLiDARDetection = false
-            lastLiDARProcessingState = nil
-            print("CameraManager: LiDAR detection disabled - switching to traditional detection")
+        useLiDARDetection = false
+        lastLiDARProcessingState = nil
+        if lidarDetector.isLiDARAvailable {
+            lidarBoostState = .idle
+        } else {
+            lidarBoostState = .unavailable
         }
+        print("CameraManager: LiDAR detection disabled - switching to traditional detection")
     }
 
     func enableLiDARDetection() {
@@ -1260,13 +1282,7 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
             print("CameraManager: Cannot enable LiDAR - not available on this device")
             return
         }
-        if lidarDetector.isSessionRunning {
-            useLiDARDetection = true
-            lastLiDARProcessingState = nil
-            print("CameraManager: LiDAR detection enabled")
-        } else {
-            startLiDARDetection()
-        }
+        startLiDARDetection()
     }
 
     // MARK: - Automatic Capture Workflow

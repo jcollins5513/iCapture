@@ -75,7 +75,7 @@ extension CameraManager {
         filename: String,
         sessionFileURL: URL?
     ) {
-        if useLiDARDetection,
+        if lidarBoostState == .ready,
            lidarDetector.isLiDARAvailable,
            let latestDepth = lidarDetector.latestDepthData {
             print("CameraManager: Using cached LiDAR depth data for background removal")
@@ -133,11 +133,18 @@ extension CameraManager {
         DispatchQueue.main.async {
             guard let processedData = processedData else {
                 print("CameraManager: Background removal failed for \(filename)")
-                self.saveToPhotoLibrary(imageData: originalData)
+                if self.saveToPhotoLibraryAutomatically {
+                    self.saveToPhotoLibrary(imageData: originalData)
+                }
                 return
             }
 
             print("CameraManager: Background removal completed for \(filename) using \(sourceDescription)")
+
+            if sourceDescription.contains("LiDAR") {
+                self.useLiDARDetection = false
+                self.lidarBoostState = self.lidarDetector.isLiDARAvailable ? .idle : .unavailable
+            }
 
             if let processedImage = UIImage(data: processedData) {
                 let normalizedImage = processedImage
@@ -154,12 +161,14 @@ extension CameraManager {
                     originalFilename: filename,
                     sessionFileURL: sessionFileURL
                 )
-
-                UIImageWriteToSavedPhotosAlbum(normalizedImage, nil, nil, nil)
-                print("CameraManager: Background-removed photo saved to photo library")
+                if self.saveToPhotoLibraryAutomatically {
+                    self.saveToPhotoLibrary(imageData: processedData)
+                }
             } else {
                 print("CameraManager: Unable to decode processed image data; saving original instead")
-                self.saveToPhotoLibrary(imageData: originalData)
+                if self.saveToPhotoLibraryAutomatically {
+                    self.saveToPhotoLibrary(imageData: originalData)
+                }
             }
         }
     }
