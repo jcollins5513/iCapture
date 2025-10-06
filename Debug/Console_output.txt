@@ -1,42 +1,75 @@
- 1280x 720, { 1- 30 fps}, photo dims:{1280x720,4224x2376}, fov:106.201, supports vis (modes: standard, cinematic, extended, enhanced, preview) (max strength:Ultra), max zoom:123.75 (upscales @3.00), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000015-1.000000, system exposure bias range:-2.0-2.0, supports wide color, supports multicam> | video=1280x720 | photoOptions=[1280x720, 4224x2376]
-CameraManager: - Format: <AVCaptureDeviceFormat: 0x105405700 'vide'/'420v' 1280x 720, { 1- 60 fps}, photo dims:{1280x720,4224x2376}, fov:106.201, supports vis (modes: standard, cinematic, extended, enhanced, preview) (max strength:Medium), max zoom:123.75 (upscales @3.00), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000023-1.000000, system exposure bias range:-2.0-2.0, supports HDR, supports multicam, supports high photo quality, supports CS RoI> | video=1280x720 | photoOptions=[1280x720, 4224x2376]
-CameraManager: - Format: <AVCaptureDeviceFormat: 0x105405720 'vide'/'420f' 1280x 720, { 1- 60 fps}, photo dims:{1280x720,4224x2376}, fov:106.201, supports vis (modes: standard, cinematic, extended, enhanced, preview) (max strength:Medium), max zoom:123.75 (upscales @3.00), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000023-1.000000, system exposure bias range:-2.0-2.0, supports HDR, supports wide color, supports multicam, supports high photo quality, supports CS RoI> | video=1280x720 | photoOptions=[1280x720, 4224x2376]
-CameraManager: - Format: <AVCaptureDeviceFormat: 0x105405740 'vide'/'x420' 1280x 720, { 1- 60 fps}, photo dims:{1280x720,4224x2376}, fov:106.201, supports vis (modes: standard, cinematic, extended, enhanced, preview) (max strength:Medium), max zoom:123.75 (upscales @3.00), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000023-1.000000, system exposure bias range:-2.0-2.0, supports wide color, supports multicam> | video=1280x720 | photoOptions=[1280x720, 4224x2376]
-CameraManager: - Format: <AVCaptureDeviceFormat: 0x105405760 'vide'/'420v' 1280x 720, { 1- 60 fps}, photo dims:{1280x720,2112x1188}, fov:106.201, binned, supports vis (modes: standard, cinematic, extended, preview) (max strength:Low), max zoom:61.88 (upscales @1.50), system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000025-1.000000, system exposure bias range:-2.0-2.0, supports multicam> | video=1280x720 | photoOptions=[1280x720, 2112x1188]
-CameraManager: - Format: <AVCaptureDeviceFormat: 0x105405780 'vide'/'420f' 1280x 720, { 1- 60 fps}, photo dims:{1280x720,2112x1188}, fov:106.201, binned, supports vis (modes: standard, cinematic, extended, preview) (max strength:Low), max zoom:61.88 (upscales @1.50), system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000025-1.000000, system exposure bias range:-2.0-2.0, supports wide color, supports multicam> | video=1280x720 | photoOptions=[1280x720, 2112x1188]
-CameraManager: - Format: <AVCaptureDeviceFormat: 0x1054057a0 'vide'/'420v' 1440x1080, { 1- 60 fps}, photo dims:{1440x1080,2016x1512}, fov:101.022, gdc fov:103.625, binned, max zoom:94.50 (upscales @1.40), system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000025-1.000000, system exposure bias range:-2.0-2.0, supports multicam, supports Smudge Detection> | video=1440x1080 | photoOptions=[1440x1080, 2016x1512]
-CameraManager: - Format: <AVCaptureDeviceFormat: 0x1054057c0 'vide'/'420f' 1440x1080, { 1- 60 fps}, photo dims:{1440x1080,2016x1512}, fov:101.022, gdc fov:103.625, binned, max zoom:94.50 (upscales @1.40), system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000025-1.000000, system exposure bias range:-2.0-2.0, supports wide color, supports multicam, supports Smudge Detection> | video=1440x1080 | photoOptions=[1440x1080, 2016x1512]
-CameraManager: - Format: <AVCaptureDeviceFormat: 0x1054057e0 'vide'/'420v' 1920x1080, { 1- 30 fps}, photo dims:{1920x1080,4224x2376}, fov:106.201, supports vis (modes: standard, cinematic, extended, enhanced, preview) (max strength:Ultra), max zoom:123.75 (upscales @2.00), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000015-1.000000, system exposure bias range:-2.0-2.0, supports HDR, supports multicam, supports spatial video capture, supports high photo quality, supports CS RoI, supports Smudge Detection> | video=1920x1080 | photoOptions=[1920x1080, 4224x2376]
-CameraManager: - Format: <AVCaptureDeviceFormat: 0x105405800 'vide'/'420f' 1920x1080, { 1- 30 fps}, photo dims:{1920x1080,4224x2376}, fov:106.201, supports vis (modes: standard, cinematic, extended, enhanced, preview) (max strength:Ultra), max zoom:123.75 (upscales @2.00), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000015-1.000000, system exposure bias range:-2.0-2.0, supports HDR, supports wide color, supports multicam, supports spatial video capture, supports high photo quality, supports CS RoI, supports Smudge Detection> | video=1920x1080 | photoOptions=[1920x1080, 4224x2376]
-CameraManager: - Format: <AVCaptureDeviceFormat: 0x105405820 'vide'/'x420' 1920x1080, { 1- 30 fps}, photo dims:{1920x1080,4224x2376}, fov:106.201, supports vis (modes: standard, cinematic, extended, enhanced, preview) (max strength:Ultra), max zoom:123.75 (upscales @2.00), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000015-1.000000, system exposure bias range:-2.0-2.0, supports wide color, supports multicam, supports spatial video capture> | video=1920x1080 | photoOptions=[1920x1080, 4224x2376]
-CameraManager: - Format: <AVCaptureDeviceFormat: 0x105405840 'vide'/'x422' 1920x1080, { 1- 30 fps}, photo dims:{1920x1080,4224x2376}, fov:106.201, supports vis (modes: standard, cinematic, extended, enhanced, preview) (max strength:Ultra), max zoom:123.75 (upscales @2.00), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000015-1.000000, system exposure bias range:-2.0-2.0, supports HDR, supports wide color, supports multicam> | video=1920x1080 | photoOptions=[1920x1080, 4224x2376]
-CameraManager: - Format: <AVCaptureDeviceFormat: 0x105405860 'vide'/'420v' 1920x1080, { 1- 60 fps}, photo dims:{1920x1080,4224x2376}, fov:106.201, supports vis (modes: standard, cinematic, extended, enhanced, preview) (max strength:Medium), max zoom:123.75 (upscales @2.00), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000023-1.000000, system exposure bias range:-2.0-2.0, supports HDR, supports multicam, supports high photo quality, supports CS RoI, supports Smudge Detection> | video=1920x1080 | photoOptions=[1920x1080, 4224x2376]
-CameraManager: - Format: <AVCaptureDeviceFormat: 0x105405880 'vide'/'420f' 1920x1080, { 1- 60 fps}, photo dims:{1920x1080,4224x2376}, fov:106.201, supports vis (modes: standard, cinematic, extended, enhanced, preview) (max strength:Medium), max zoom:123.75 (upscales @2.00), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000023-1.000000, system exposure bias range:-2.0-2.0, supports HDR, supports wide color, supports multicam, supports high photo quality, supports CS RoI, supports Smudge Detection> | video=1920x1080 | photoOptions=[1920x1080, 4224x2376]
-CameraManager: - Format: <AVCaptureDeviceFormat: 0x1054058a0 'vide'/'x420' 1920x1080, { 1- 60 fps}, photo dims:{1920x1080,4224x2376}, fov:106.201, supports vis (modes: standard, cinematic, extended, enhanced, preview) (max strength:Medium), max zoom:123.75 (upscales @2.00), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000023-1.000000, system exposure bias range:-2.0-2.0, supports wide color, supports multicam> | video=1920x1080 | photoOptions=[1920x1080, 4224x2376]
-CameraManager: - Format: <AVCaptureDeviceFormat: 0x1054058c0 'vide'/'x422' 1920x1080, { 1- 60 fps}, photo dims:{1920x1080,4224x2376}, fov:106.201, supports vis (modes: standard, cinematic, extended, enhanced, preview) (max strength:Medium), max zoom:123.75 (upscales @2.00), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000023-1.000000, system exposure bias range:-2.0-2.0, supports HDR, supports wide color, supports multicam> | video=1920x1080 | photoOptions=[1920x1080, 4224x2376]
-CameraManager: - Format: <AVCaptureDeviceFormat: 0x1054058e0 'vide'/'420v' 1920x1080, { 1- 60 fps}, photo dims:{1920x1080,2112x1188}, fov:106.201, gdc fov:106.016, binned, supports vis (modes: standard, cinematic, extended, preview) (max strength:Low), max zoom:61.88 (upscales @1.00), system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000025-1.000000, system exposure bias range:-2.0-2.0, supports multicam, supports Smudge Detection> | video=1920x1080 | photoOptions=[1920x1080, 2112x1188]
-CameraManager: - Format: <AVCaptureDeviceFormat: 0x105405900 'vide'/'420f' 1920x1080, { 1- 60 fps}, photo dims:{1920x1080,2112x1188}, fov:106.201, gdc fov:106.016, binned, supports vis (modes: standard, cinematic, extended, preview) (max strength:Low), max zoom:61.88 (upscales @1.00), system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000025-1.000000, system exposure bias range:-2.0-2.0, supports wide color, supports multicam, supports Smudge Detection> | video=1920x1080 | photoOptions=[1920x1080, 2112x1188]
-CameraManager: - Format: <AVCaptureDeviceFormat: 0x105405920 'vide'/'x422' 1920x1440, { 1- 30 fps}, photo dims:{1920x1440,4032x3024}, fov:103.625, gdc fov:106.201, supports vis (modes: standard, cinematic, extended, preview) (max strength:Low), max zoom:157.50 (upscales @1.91), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000023-1.000000, system exposure bias range:-2.0-2.0, supports HDR, supports wide color, supports multicam> | video=1920x1440 | photoOptions=[1920x1440, 4032x3024]
-CameraManager: - Format: <AVCaptureDeviceFormat: 0x105405940 'vide'/'420v' 1920x1440, { 1- 60 fps}, photo dims:{1920x1440,4032x3024}, fov:103.625, gdc fov:106.201, supports vis (modes: standard, cinematic, extended, preview) (max strength:Low), max zoom:157.50 (upscales @1.91), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000023-1.000000, system exposure bias range:-2.0-2.0, supports HDR, supports multicam, supports high photo quality, supports CS RoI, supports Smudge Detection> | video=1920x1440 | photoOptions=[1920x1440, 4032x3024]
-CameraManager: - Format: <AVCaptureDeviceFormat: 0x105405960 'vide'/'420f' 1920x1440, { 1- 60 fps}, photo dims:{1920x1440,4032x3024}, fov:103.625, gdc fov:106.201, supports vis (modes: standard, cinematic, extended, preview) (max strength:Low), max zoom:157.50 (upscales @1.91), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000023-1.000000, system exposure bias range:-2.0-2.0, supports HDR, supports wide color, supports multicam, supports high photo quality, supports CS RoI, supports Smudge Detection> | video=1920x1440 | photoOptions=[1920x1440, 4032x3024]
-CameraManager: - Format: <AVCaptureDeviceFormat: 0x105405980 'vide'/'x420' 1920x1440, { 1- 60 fps}, photo dims:{1920x1440,4032x3024}, fov:103.625, gdc fov:106.201, supports vis (modes: standard, cinematic, extended, preview) (max strength:Low), max zoom:157.50 (upscales @1.91), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000023-1.000000, system exposure bias range:-2.0-2.0, supports wide color, supports multicam> | video=1920x1440 | photoOptions=[1920x1440, 4032x3024]
-CameraManager: - Format: <AVCaptureDeviceFormat: 0x1054059a0 'vide'/'x422' 1920x1440, { 1- 60 fps}, photo dims:{1920x1440,4032x3024}, fov:103.625, gdc fov:106.201, supports vis (modes: standard, cinematic, extended, preview) (max strength:Low), max zoom:157.50 (upscales @1.91), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000023-1.000000, system exposure bias range:-2.0-2.0, supports HDR, supports wide color, supports multicam> | video=1920x1440 | photoOptions=[1920x1440, 4032x3024]
-CameraManager: - Format: <AVCaptureDeviceFormat: 0x1054059c0 'vide'/'420v' 1920x1440, { 1- 60 fps}, photo dims:{1920x1440,2016x1512}, fov:103.625, gdc fov:106.201, binned, max zoom:94.50 (upscales @1.05), system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000025-1.000000, system exposure bias range:-2.0-2.0, supports multicam, supports Smudge Detection> | video=1920x1440 | photoOptions=[1920x1440, 2016x1512]
-CameraManager: - Format: <AVCaptureDeviceFormat: 0x1054059e0 'vide'/'420f' 1920x1440, { 1- 60 fps}, photo dims:{1920x1440,2016x1512}, fov:103.625, gdc fov:106.201, binned, max zoom:94.50 (upscales @1.05), system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000025-1.000000, system exposure bias range:-2.0-2.0, supports wide color, supports multicam, supports Smudge Detection> | video=1920x1440 | photoOptions=[1920x1440, 2016x1512]
-CameraManager: - Format: <AVCaptureDeviceFormat: 0x105405a00 'vide'/'420v' 2592x1944, { 1- 30 fps}, photo dims:{2592x1944,4032x3024}, fov:103.625, gdc fov:106.201, max zoom:189.00 (upscales @1.56), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000015-1.000000, system exposure bias range:-2.0-2.0, supports HDR, supports Smudge Detection> | video=2592x1944 | photoOptions=[2592x1944, 4032x3024]
-CameraManager: - Format: <AVCaptureDeviceFormat: 0x105405a20 'vide'/'420f' 2592x1944, { 1- 30 fps}, photo dims:{2592x1944,4032x3024}, fov:103.625, gdc fov:106.201, max zoom:189.00 (upscales @1.56), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000015-1.000000, system exposure bias range:-2.0-2.0, supports HDR, supports wide color, supports Smudge Detection> | video=2592x1944 | photoOptions=[2592x1944, 4032x3024]
-CameraManager: - Format: <AVCaptureDeviceFormat: 0x105405a40 'vide'/'420v' 3264x2448, { 1- 30 fps}, photo dims:{3264x2448,4032x3024}, fov:103.625, gdc fov:106.201, max zoom:189.00 (upscales @1.24), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000015-1.000000, system exposure bias range:-2.0-2.0, supports HDR, supports Smudge Detection> | video=3264x2448 | photoOptions=[3264x2448, 4032x3024]
-CameraManager: - Format: <AVCaptureDeviceFormat: 0x105405a60 'vide'/'420f' 3264x2448, { 1- 30 fps}, photo dims:{3264x2448,4032x3024}, fov:103.625, gdc fov:106.201, max zoom:189.00 (upscales @1.24), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000015-1.000000, system exposure bias range:-2.0-2.0, supports HDR, supports wide color, supports Smudge Detection> | video=3264x2448 | photoOptions=[3264x2448, 4032x3024]
-CameraManager: - Format: <AVCaptureDeviceFormat: 0x105405a80 'vide'/'420v' 3840x2160, { 1- 30 fps}, photo dims:{3840x2160,4224x2376}, fov:106.201, supports vis (modes: standard, cinematic, extended, enhanced, preview) (max strength:Ultra), max zoom:129.12 (upscales @1.00), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000023-1.000000, system exposure bias range:-2.0-2.0, supports HDR, supports multicam, supports high photo quality, supports Smudge Detection> | video=3840x2160 | photoOptions=[3840x2160, 4224x2376]
-CameraManager: - Format: <AVCaptureDeviceFormat: 0x105405aa0 'vide'/'420f' 3840x2160, { 1- 30 fps}, photo dims:{3840x2160,4224x2376}, fov:106.201, supports vis (modes: standard, cinematic, extended, enhanced, preview) (max strength:Ultra), max zoom:129.12 (upscales @1.00), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000023-1.000000, system exposure bias range:-2.0-2.0, supports HDR, supports wide color, supports multicam, supports high photo quality, supports Smudge Detection> | video=3840x2160 | photoOptions=[3840x2160, 4224x2376]
-CameraManager: - Format: <AVCaptureDeviceFormat: 0x105405ac0 'vide'/'x420' 3840x2160, { 1- 30 fps}, photo dims:{3840x2160,4224x2376}, fov:106.201, supports vis (modes: standard, cinematic, extended, enhanced, preview) (max strength:Ultra), max zoom:129.12 (upscales @1.00), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000023-1.000000, system exposure bias range:-2.0-2.0, supports wide color, supports multicam> | video=3840x2160 | photoOptions=[3840x2160, 4224x2376]
-CameraManager: - Format: <AVCaptureDeviceFormat: 0x105405ae0 'vide'/'x422' 3840x2160, { 1- 30 fps}, photo dims:{3840x2160,4224x2376}, fov:106.201, supports vis (modes: standard, cinematic, extended, enhanced, preview) (max strength:Ultra), max zoom:129.12 (upscales @1.00), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000023-1.000000, system exposure bias range:-2.0-2.0, supports HDR, supports wide color, supports multicam> | video=3840x2160 | photoOptions=[3840x2160, 4224x2376]
-CameraManager: - Format: <AVCaptureDeviceFormat: 0x105405b00 'vide'/'420v' 3840x2160, { 1- 60 fps}, photo dims:{3840x2160}, fov:106.201, supports vis (modes: standard, cinematic, extended, enhanced, preview) (max strength:Medium), max zoom:129.12 (upscales @1.00), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000023-1.000000, system exposure bias range:-2.0-2.0, supports HDR, supports Smudge Detection> | video=3840x2160 | photoOptions=[3840x2160]
-CameraManager: - Format: <AVCaptureDeviceFormat: 0x105405b30 'vide'/'420f' 3840x2160, { 1- 60 fps}, photo dims:{3840x2160}, fov:106.201, supports vis (modes: standard, cinematic, extended, enhanced, preview) (max strength:Medium), max zoom:129.12 (upscales @1.00), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000023-1.000000, system exposure bias range:-2.0-2.0, supports HDR, supports wide color, supports Smudge Detection> | video=3840x2160 | photoOptions=[3840x2160]
-CameraManager: - Format: <AVCaptureDeviceFormat: 0x105405b60 'vide'/'x420' 3840x2160, { 1- 60 fps}, photo dims:{3840x2160}, fov:106.201, supports vis (modes: standard, cinematic, extended, enhanced, preview) (max strength:Medium), max zoom:129.12 (upscales @1.00), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000023-1.000000, system exposure bias range:-2.0-2.0, supports wide color> | video=3840x2160 | photoOptions=[3840x2160]
-CameraManager: - Format: <AVCaptureDeviceFormat: 0x105405b90 'vide'/'x422' 3840x2160, { 1- 60 fps}, photo dims:{3840x2160}, fov:106.201, supports vis (modes: standard, cinematic, extended, enhanced, preview) (max strength:Medium), max zoom:129.12 (upscales @1.00), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000023-1.000000, system exposure bias range:-2.0-2.0, supports HDR, supports wide color> | video=3840x2160 | photoOptions=[3840x2160]
-CameraManager: - Format: <AVCaptureDeviceFormat: 0x105405bc0 'vide'/'420v' 4032x3024, { 1- 30 fps}, photo dims:{4032x3024,5712x4284}, fov:103.625, gdc fov:106.201, max zoom:189.00 (upscales @1.00), secondary:4.00, system zoom range:1.0-50.0, AF System:2, ISO:55.0-12320.0, SS:0.000015-1.000000, system exposure bias range:-2.0-2.0, supports HDR, supports depth, supports responsive capture, supports zero shutter lag (with depth), supports highest photo quality, supports Smudge Detection> | video=4032x3024 | photoOptions=[4032x3024, 5712x4284]
-CameraManager: - Format: <AVCaptureDeviceFormat: 0x105405bd0 'vide'/'420f' 4032x3024, { 1- 30 fps}, photo dims:{4032x3024,5712x4284}, fov:103.625, gdc fov:106.201, max zoom:189.00 (upscales @1.00), secondary:4.00, system zoom range:1.0-50.0, AF System:2, ISO:55.0-12320.0, SS:0.000015-1.000000, system exposure bias range:-2.0-2.0, supports HDR, supports wide color, supports depth, supports responsive capture, supports zero shutter lag (with depth), supports highest photo quality, supports Smudge Detection> | video=4032x3024 | photoOptions=[4032x3024, 5712x4284]
+(Fig) signalled err=-12710 at <>:601
+(Fig) signalled err=-12710 at <>:601
+(Fig) signalled err=-12710 at <>:601
+LiDARDetector: Scene depth is available on this device
+LiDARDetector: Smoothed scene depth available: true
+LiDARDetector: Setting up ARSession...
+LiDARDetector: ARSession created with delegate
+LiDARDetector: ARSession delegate set: true
+LiDARDetector: ARSession created but not started yet
+CameraManager: Setting up capture session...
+CameraManager: Session preset set to photo
+TriggerEngine: Vehicle lost - disabling capture triggers
+CameraManager: Initializing LiDAR detection...
+CameraManager: - LiDAR available: true
+CameraManager: LiDAR detection available; depth boost can be requested manually
+CameraManager: Selected camera device = Back Triple Camera
+CameraManager: Enumerating supported formats for Back Triple Camera
+CameraManager: - Format: <AVCaptureDeviceFormat: 0x1064ad640 'vide'/'420v'  192x 144, { 1- 60 fps}, photo dims:{192x144,4032x3024}, fov:101.022, gdc fov:103.625, max zoom:189.00 (upscales @21.00), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000023-1.000000, system exposure bias range:-2.0-2.0, supports HDR> | video=192x144 | photoOptions=[192x144, 4032x3024]
+CameraManager: - Format: <AVCaptureDeviceFormat: 0x1064ad660 'vide'/'420f'  192x 144, { 1- 60 fps}, photo dims:{192x144,4032x3024}, fov:101.022, gdc fov:103.625, max zoom:189.00 (upscales @21.00), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000023-1.000000, system exposure bias range:-2.0-2.0, supports HDR, supports wide color> | video=192x144 | photoOptions=[192x144, 4032x3024]
+CameraManager: - Format: <AVCaptureDeviceFormat: 0x1064ad680 'vide'/'420v'  352x 288, { 1- 60 fps}, photo dims:{352x288,3696x3024}, fov:96.093, gdc fov:103.625, max zoom:189.00 (upscales @10.50), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000023-1.000000, system exposure bias range:-2.0-2.0, supports HDR> | video=352x288 | photoOptions=[352x288, 3696x3024]
+CameraManager: - Format: <AVCaptureDeviceFormat: 0x1064ad6a0 'vide'/'420f'  352x 288, { 1- 60 fps}, photo dims:{352x288,3696x3024}, fov:96.093, gdc fov:103.625, max zoom:189.00 (upscales @10.50), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000023-1.000000, system exposure bias range:-2.0-2.0, supports HDR, supports wide color> | video=352x288 | photoOptions=[352x288, 3696x3024]
+CameraManager: - Format: <AVCaptureDeviceFormat: 0x1064ad6c0 'vide'/'420v'  480x 360, { 1- 60 fps}, photo dims:{480x360,4032x3024}, fov:101.022, gdc fov:103.625, max zoom:189.00 (upscales @8.40), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000023-1.000000, system exposure bias range:-2.0-2.0, supports HDR> | video=480x360 | photoOptions=[480x360, 4032x3024]
+CameraManager: - Format: <AVCaptureDeviceFormat: 0x1064ad6e0 'vide'/'420f'  480x 360, { 1- 60 fps}, photo dims:{480x360,4032x3024}, fov:101.022, gdc fov:103.625, max zoom:189.00 (upscales @8.40), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000023-1.000000, system exposure bias range:-2.0-2.0, supports HDR, supports wide color> | video=480x360 | photoOptions=[480x360, 4032x3024]
+CameraManager: - Format: <AVCaptureDeviceFormat: 0x1064ad700 'vide'/'420v'  640x 480, { 1- 60 fps}, photo dims:{640x480,4032x3024}, fov:101.022, gdc fov:103.625, max zoom:189.00 (upscales @6.30), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000023-1.000000, system exposure bias range:-2.0-2.0, supports HDR, supports multicam, supports CS RoI> | video=640x480 | photoOptions=[640x480, 4032x3024]
+CameraManager: - Format: <AVCaptureDeviceFormat: 0x1064ad720 'vide'/'420f'  640x 480, { 1- 60 fps}, photo dims:{640x480,4032x3024}, fov:101.022, gdc fov:103.625, max zoom:189.00 (upscales @6.30), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000023-1.000000, system exposure bias range:-2.0-2.0, supports HDR, supports wide color, supports multicam, supports CS RoI> | video=640x480 | photoOptions=[640x480, 4032x3024]
+CameraManager: - Format: <AVCaptureDeviceFormat: 0x1064ad740 'vide'/'420v'  640x 480, { 1- 60 fps}, photo dims:{640x480,2016x1512}, fov:101.022, gdc fov:103.625, binned, max zoom:94.50 (upscales @3.15), system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000025-1.000000, system exposure bias range:-2.0-2.0, supports multicam> | video=640x480 | photoOptions=[640x480, 2016x1512]
+CameraManager: - Format: <AVCaptureDeviceFormat: 0x1064ad760 'vide'/'420f'  640x 480, { 1- 60 fps}, photo dims:{640x480,2016x1512}, fov:101.022, gdc fov:103.625, binned, max zoom:94.50 (upscales @3.15), system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000025-1.000000, system exposure bias range:-2.0-2.0, supports wide color, supports multicam> | video=640x480 | photoOptions=[640x480, 2016x1512]
+CameraManager: - Format: <AVCaptureDeviceFormat: 0x1064ad780 'vide'/'420v'  960x 540, { 1- 60 fps}, photo dims:{960x540,4224x2376}, fov:106.201, supports vis (modes: standard, cinematic, extended, enhanced, preview) (max strength:Medium), max zoom:123.75 (upscales @4.00), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000023-1.000000, system exposure bias range:-2.0-2.0, supports HDR> | video=960x540 | photoOptions=[960x540, 4224x2376]
+CameraManager: - Format: <AVCaptureDeviceFormat: 0x1064ad7a0 'vide'/'420f'  960x 540, { 1- 60 fps}, photo dims:{960x540,4224x2376}, fov:106.201, supports vis (modes: standard, cinematic, extended, enhanced, preview) (max strength:Medium), max zoom:123.75 (upscales @4.00), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000023-1.000000, system exposure bias range:-2.0-2.0, supports HDR, supports wide color> | video=960x540 | photoOptions=[960x540, 4224x2376]
+CameraManager: - Format: <AVCaptureDeviceFormat: 0x1064ad7c0 'vide'/'420v' 1024x 768, { 1- 60 fps}, photo dims:{1024x768,4032x3024}, fov:101.022, gdc fov:103.625, supports vis (modes: standard, preview) (max strength:Low), max zoom:171.88 (upscales @3.58), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000023-1.000000, system exposure bias range:-2.0-2.0, supports HDR> | video=1024x768 | photoOptions=[1024x768, 4032x3024]
+CameraManager: - Format: <AVCaptureDeviceFormat: 0x1064ad7e0 'vide'/'420f' 1024x 768, { 1- 60 fps}, photo dims:{1024x768,4032x3024}, fov:101.022, gdc fov:103.625, supports vis (modes: standard, preview) (max strength:Low), max zoom:171.88 (upscales @3.58), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000023-1.000000, system exposure bias range:-2.0-2.0, supports HDR, supports wide color> | video=1024x768 | photoOptions=[1024x768, 4032x3024]
+CameraManager: - Format: <AVCaptureDeviceFormat: 0x1064ad800 'vide'/'420v' 1280x 720, { 1- 30 fps}, photo dims:{1280x720,4224x2376}, fov:106.201, supports vis (modes: standard, cinematic, extended, enhanced, preview) (max strength:Ultra), max zoom:123.75 (upscales @3.00), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000015-1.000000, system exposure bias range:-2.0-2.0, supports HDR, supports multicam, supports high photo quality, supports CS RoI> | video=1280x720 | photoOptions=[1280x720, 4224x2376]
+CameraManager: - Format: <AVCaptureDeviceFormat: 0x1064ad820 'vide'/'420f' 1280x 720, { 1- 30 fps}, photo dims:{1280x720,4224x2376}, fov:106.201, supports vis (modes: standard, cinematic, extended, enhanced, preview) (max strength:Ultra), max zoom:123.75 (upscales @3.00), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000015-1.000000, system exposure bias range:-2.0-2.0, supports HDR, supports wide color, supports multicam, supports high photo quality, supports CS RoI> | video=1280x720 | photoOptions=[1280x720, 4224x2376]
+CameraManager: - Format: <AVCaptureDeviceFormat: 0x1064ad840 'vide'/'x420' 1280x 720, { 1- 30 fps}, photo dims:{1280x720,4224x2376}, fov:106.201, supports vis (modes: standard, cinematic, extended, enhanced, preview) (max strength:Ultra), max zoom:123.75 (upscales @3.00), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000015-1.000000, system exposure bias range:-2.0-2.0, supports wide color, supports multicam> | video=1280x720 | photoOptions=[1280x720, 4224x2376]
+CameraManager: - Format: <AVCaptureDeviceFormat: 0x1064ad860 'vide'/'420v' 1280x 720, { 1- 60 fps}, photo dims:{1280x720,4224x2376}, fov:106.201, supports vis (modes: standard, cinematic, extended, enhanced, preview) (max strength:Medium), max zoom:123.75 (upscales @3.00), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000023-1.000000, system exposure bias range:-2.0-2.0, supports HDR, supports multicam, supports high photo quality, supports CS RoI> | video=1280x720 | photoOptions=[1280x720, 4224x2376]
+CameraManager: - Format: <AVCaptureDeviceFormat: 0x1064ad880 'vide'/'420f' 1280x 720, { 1- 60 fps}, photo dims:{1280x720,4224x2376}, fov:106.201, supports vis (modes: standard, cinematic, extended, enhanced, preview) (max strength:Medium), max zoom:123.75 (upscales @3.00), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000023-1.000000, system exposure bias range:-2.0-2.0, supports HDR, supports wide color, supports multicam, supports high photo quality, supports CS RoI> | video=1280x720 | photoOptions=[1280x720, 4224x2376]
+CameraManager: - Format: <AVCaptureDeviceFormat: 0x1064ad8a0 'vide'/'x420' 1280x 720, { 1- 60 fps}, photo dims:{1280x720,4224x2376}, fov:106.201, supports vis (modes: standard, cinematic, extended, enhanced, preview) (max strength:Medium), max zoom:123.75 (upscales @3.00), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000023-1.000000, system exposure bias range:-2.0-2.0, supports wide color, supports multicam> | video=1280x720 | photoOptions=[1280x720, 4224x2376]
+CameraManager: - Format: <AVCaptureDeviceFormat: 0x1064ad8c0 'vide'/'420v' 1280x 720, { 1- 60 fps}, photo dims:{1280x720,2112x1188}, fov:106.201, binned, supports vis (modes: standard, cinematic, extended, preview) (max strength:Low), max zoom:61.88 (upscales @1.50), system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000025-1.000000, system exposure bias range:-2.0-2.0, supports multicam> | video=1280x720 | photoOptions=[1280x720, 2112x1188]
+CameraManager: - Format: <AVCaptureDeviceFormat: 0x1064ad8e0 'vide'/'420f' 1280x 720, { 1- 60 fps}, photo dims:{1280x720,2112x1188}, fov:106.201, binned, supports vis (modes: standard, cinematic, extended, preview) (max strength:Low), max zoom:61.88 (upscales @1.50), system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000025-1.000000, system exposure bias range:-2.0-2.0, supports wide color, supports multicam> | video=1280x720 | photoOptions=[1280x720, 2112x1188]
+CameraManager: - Format: <AVCaptureDeviceFormat: 0x1064ad900 'vide'/'420v' 1440x1080, { 1- 60 fps}, photo dims:{1440x1080,2016x1512}, fov:101.022, gdc fov:103.625, binned, max zoom:94.50 (upscales @1.40), system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000025-1.000000, system exposure bias range:-2.0-2.0, supports multicam, supports Smudge Detection> | video=1440x1080 | photoOptions=[1440x1080, 2016x1512]
+CameraManager: - Format: <AVCaptureDeviceFormat: 0x1064ad920 'vide'/'420f' 1440x1080, { 1- 60 fps}, photo dims:{1440x1080,2016x1512}, fov:101.022, gdc fov:103.625, binned, max zoom:94.50 (upscales @1.40), system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000025-1.000000, system exposure bias range:-2.0-2.0, supports wide color, supports multicam, supports Smudge Detection> | video=1440x1080 | photoOptions=[1440x1080, 2016x1512]
+CameraManager: - Format: <AVCaptureDeviceFormat: 0x1064ad940 'vide'/'420v' 1920x1080, { 1- 30 fps}, photo dims:{1920x1080,4224x2376}, fov:106.201, supports vis (modes: standard, cinematic, extended, enhanced, preview) (max strength:Ultra), max zoom:123.75 (upscales @2.00), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000015-1.000000, system exposure bias range:-2.0-2.0, supports HDR, supports multicam, supports spatial video capture, supports high photo quality, supports CS RoI, supports Smudge Detection> | video=1920x1080 | photoOptions=[1920x1080, 4224x2376]
+CameraManager: - Format: <AVCaptureDeviceFormat: 0x1064ad960 'vide'/'420f' 1920x1080, { 1- 30 fps}, photo dims:{1920x1080,4224x2376}, fov:106.201, supports vis (modes: standard, cinematic, extended, enhanced, preview) (max strength:Ultra), max zoom:123.75 (upscales @2.00), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000015-1.000000, system exposure bias range:-2.0-2.0, supports HDR, supports wide color, supports multicam, supports spatial video capture, supports high photo quality, supports CS RoI, supports Smudge Detection> | video=1920x1080 | photoOptions=[1920x1080, 4224x2376]
+CameraManager: - Format: <AVCaptureDeviceFormat: 0x1064ad980 'vide'/'x420' 1920x1080, { 1- 30 fps}, photo dims:{1920x1080,4224x2376}, fov:106.201, supports vis (modes: standard, cinematic, extended, enhanced, preview) (max strength:Ultra), max zoom:123.75 (upscales @2.00), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000015-1.000000, system exposure bias range:-2.0-2.0, supports wide color, supports multicam, supports spatial video capture> | video=1920x1080 | photoOptions=[1920x1080, 4224x2376]
+CameraManager: - Format: <AVCaptureDeviceFormat: 0x1064ad9a0 'vide'/'x422' 1920x1080, { 1- 30 fps}, photo dims:{1920x1080,4224x2376}, fov:106.201, supports vis (modes: standard, cinematic, extended, enhanced, preview) (max strength:Ultra), max zoom:123.75 (upscales @2.00), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000015-1.000000, system exposure bias range:-2.0-2.0, supports HDR, supports wide color, supports multicam> | video=1920x1080 | photoOptions=[1920x1080, 4224x2376]
+CameraManager: - Format: <AVCaptureDeviceFormat: 0x1064ad9c0 'vide'/'420v' 1920x1080, { 1- 60 fps}, photo dims:{1920x1080,4224x2376}, fov:106.201, supports vis (modes: standard, cinematic, extended, enhanced, preview) (max strength:Medium), max zoom:123.75 (upscales @2.00), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000023-1.000000, system exposure bias range:-2.0-2.0, supports HDR, supports multicam, supports high photo quality, supports CS RoI, supports Smudge Detection> | video=1920x1080 | photoOptions=[1920x1080, 4224x2376]
+CameraManager: - Format: <AVCaptureDeviceFormat: 0x1064ad9e0 'vide'/'420f' 1920x1080, { 1- 60 fps}, photo dims:{1920x1080,4224x2376}, fov:106.201, supports vis (modes: standard, cinematic, extended, enhanced, preview) (max strength:Medium), max zoom:123.75 (upscales @2.00), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000023-1.000000, system exposure bias range:-2.0-2.0, supports HDR, supports wide color, supports multicam, supports high photo quality, supports CS RoI, supports Smudge Detection> | video=1920x1080 | photoOptions=[1920x1080, 4224x2376]
+CameraManager: - Format: <AVCaptureDeviceFormat: 0x1064ada00 'vide'/'x420' 1920x1080, { 1- 60 fps}, photo dims:{1920x1080,4224x2376}, fov:106.201, supports vis (modes: standard, cinematic, extended, enhanced, preview) (max strength:Medium), max zoom:123.75 (upscales @2.00), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000023-1.000000, system exposure bias range:-2.0-2.0, supports wide color, supports multicam> | video=1920x1080 | photoOptions=[1920x1080, 4224x2376]
+CameraManager: - Format: <AVCaptureDeviceFormat: 0x1064ada20 'vide'/'x422' 1920x1080, { 1- 60 fps}, photo dims:{1920x1080,4224x2376}, fov:106.201, supports vis (modes: standard, cinematic, extended, enhanced, preview) (max strength:Medium), max zoom:123.75 (upscales @2.00), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000023-1.000000, system exposure bias range:-2.0-2.0, supports HDR, supports wide color, supports multicam> | video=1920x1080 | photoOptions=[1920x1080, 4224x2376]
+CameraManager: - Format: <AVCaptureDeviceFormat: 0x1064ada40 'vide'/'420v' 1920x1080, { 1- 60 fps}, photo dims:{1920x1080,2112x1188}, fov:106.201, gdc fov:106.016, binned, supports vis (modes: standard, cinematic, extended, preview) (max strength:Low), max zoom:61.88 (upscales @1.00), system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000025-1.000000, system exposure bias range:-2.0-2.0, supports multicam, supports Smudge Detection> | video=1920x1080 | photoOptions=[1920x1080, 2112x1188]
+CameraManager: - Format: <AVCaptureDeviceFormat: 0x1064ada60 'vide'/'420f' 1920x1080, { 1- 60 fps}, photo dims:{1920x1080,2112x1188}, fov:106.201, gdc fov:106.016, binned, supports vis (modes: standard, cinematic, extended, preview) (max strength:Low), max zoom:61.88 (upscales @1.00), system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000025-1.000000, system exposure bias range:-2.0-2.0, supports wide color, supports multicam, supports Smudge Detection> | video=1920x1080 | photoOptions=[1920x1080, 2112x1188]
+CameraManager: - Format: <AVCaptureDeviceFormat: 0x1064ada80 'vide'/'x422' 1920x1440, { 1- 30 fps}, photo dims:{1920x1440,4032x3024}, fov:103.625, gdc fov:106.201, supports vis (modes: standard, cinematic, extended, preview) (max strength:Low), max zoom:157.50 (upscales @1.91), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000023-1.000000, system exposure bias range:-2.0-2.0, supports HDR, supports wide color, supports multicam> | video=1920x1440 | photoOptions=[1920x1440, 4032x3024]
+CameraManager: - Format: <AVCaptureDeviceFormat: 0x1064adaa0 'vide'/'420v' 1920x1440, { 1- 60 fps}, photo dims:{1920x1440,4032x3024}, fov:103.625, gdc fov:106.201, supports vis (modes: standard, cinematic, extended, preview) (max strength:Low), max zoom:157.50 (upscales @1.91), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000023-1.000000, system exposure bias range:-2.0-2.0, supports HDR, supports multicam, supports high photo quality, supports CS RoI, supports Smudge Detection> | video=1920x1440 | photoOptions=[1920x1440, 4032x3024]
+CameraManager: - Format: <AVCaptureDeviceFormat: 0x1064adac0 'vide'/'420f' 1920x1440, { 1- 60 fps}, photo dims:{1920x1440,4032x3024}, fov:103.625, gdc fov:106.201, supports vis (modes: standard, cinematic, extended, preview) (max strength:Low), max zoom:157.50 (upscales @1.91), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000023-1.000000, system exposure bias range:-2.0-2.0, supports HDR, supports wide color, supports multicam, supports high photo quality, supports CS RoI, supports Smudge Detection> | video=1920x1440 | photoOptions=[1920x1440, 4032x3024]
+CameraManager: - Format: <AVCaptureDeviceFormat: 0x1064adae0 'vide'/'x420' 1920x1440, { 1- 60 fps}, photo dims:{1920x1440,4032x3024}, fov:103.625, gdc fov:106.201, supports vis (modes: standard, cinematic, extended, preview) (max strength:Low), max zoom:157.50 (upscales @1.91), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000023-1.000000, system exposure bias range:-2.0-2.0, supports wide color, supports multicam> | video=1920x1440 | photoOptions=[1920x1440, 4032x3024]
+CameraManager: - Format: <AVCaptureDeviceFormat: 0x1064adb00 'vide'/'x422' 1920x1440, { 1- 60 fps}, photo dims:{1920x1440,4032x3024}, fov:103.625, gdc fov:106.201, supports vis (modes: standard, cinematic, extended, preview) (max strength:Low), max zoom:157.50 (upscales @1.91), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000023-1.000000, system exposure bias range:-2.0-2.0, supports HDR, supports wide color, supports multicam> | video=1920x1440 | photoOptions=[1920x1440, 4032x3024]
+CameraManager: - Format: <AVCaptureDeviceFormat: 0x1064adb20 'vide'/'420v' 1920x1440, { 1- 60 fps}, photo dims:{1920x1440,2016x1512}, fov:103.625, gdc fov:106.201, binned, max zoom:94.50 (upscales @1.05), system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000025-1.000000, system exposure bias range:-2.0-2.0, supports multicam, supports Smudge Detection> | video=1920x1440 | photoOptions=[1920x1440, 2016x1512]
+CameraManager: - Format: <AVCaptureDeviceFormat: 0x1064adb40 'vide'/'420f' 1920x1440, { 1- 60 fps}, photo dims:{1920x1440,2016x1512}, fov:103.625, gdc fov:106.201, binned, max zoom:94.50 (upscales @1.05), system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000025-1.000000, system exposure bias range:-2.0-2.0, supports wide color, supports multicam, supports Smudge Detection> | video=1920x1440 | photoOptions=[1920x1440, 2016x1512]
+CameraManager: - Format: <AVCaptureDeviceFormat: 0x1064adb60 'vide'/'420v' 2592x1944, { 1- 30 fps}, photo dims:{2592x1944,4032x3024}, fov:103.625, gdc fov:106.201, max zoom:189.00 (upscales @1.56), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000015-1.000000, system exposure bias range:-2.0-2.0, supports HDR, supports Smudge Detection> | video=2592x1944 | photoOptions=[2592x1944, 4032x3024]
+CameraManager: - Format: <AVCaptureDeviceFormat: 0x1064adb80 'vide'/'420f' 2592x1944, { 1- 30 fps}, photo dims:{2592x1944,4032x3024}, fov:103.625, gdc fov:106.201, max zoom:189.00 (upscales @1.56), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000015-1.000000, system exposure bias range:-2.0-2.0, supports HDR, supports wide color, supports Smudge Detection> | video=2592x1944 | photoOptions=[2592x1944, 4032x3024]
+CameraManager: - Format: <AVCaptureDeviceFormat: 0x1064adba0 'vide'/'420v' 3264x2448, { 1- 30 fps}, photo dims:{3264x2448,4032x3024}, fov:103.625, gdc fov:106.201, max zoom:189.00 (upscales @1.24), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000015-1.000000, system exposure bias range:-2.0-2.0, supports HDR, supports Smudge Detection> | video=3264x2448 | photoOptions=[3264x2448, 4032x3024]
+CameraManager: - Format: <AVCaptureDeviceFormat: 0x1064adbc0 'vide'/'420f' 3264x2448, { 1- 30 fps}, photo dims:{3264x2448,4032x3024}, fov:103.625, gdc fov:106.201, max zoom:189.00 (upscales @1.24), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000015-1.000000, system exposure bias range:-2.0-2.0, supports HDR, supports wide color, supports Smudge Detection> | video=3264x2448 | photoOptions=[3264x2448, 4032x3024]
+CameraManager: - Format: <AVCaptureDeviceFormat: 0x1064adbe0 'vide'/'420v' 3840x2160, { 1- 30 fps}, photo dims:{3840x2160,4224x2376}, fov:106.201, supports vis (modes: standard, cinematic, extended, enhanced, preview) (max strength:Ultra), max zoom:129.12 (upscales @1.00), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000023-1.000000, system exposure bias range:-2.0-2.0, supports HDR, supports multicam, supports high photo quality, supports Smudge Detection> | video=3840x2160 | photoOptions=[3840x2160, 4224x2376]
+CameraManager: - Format: <AVCaptureDeviceFormat: 0x1064adc00 'vide'/'420f' 3840x2160, { 1- 30 fps}, photo dims:{3840x2160,4224x2376}, fov:106.201, supports vis (modes: standard, cinematic, extended, enhanced, preview) (max strength:Ultra), max zoom:129.12 (upscales @1.00), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000023-1.000000, system exposure bias range:-2.0-2.0, supports HDR, supports wide color, supports multicam, supports high photo quality, supports Smudge Detection> | video=3840x2160 | photoOptions=[3840x2160, 4224x2376]
+CameraManager: - Format: <AVCaptureDeviceFormat: 0x1064adc20 'vide'/'x420' 3840x2160, { 1- 30 fps}, photo dims:{3840x2160,4224x2376}, fov:106.201, supports vis (modes: standard, cinematic, extended, enhanced, preview) (max strength:Ultra), max zoom:129.12 (upscales @1.00), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000023-1.000000, system exposure bias range:-2.0-2.0, supports wide color, supports multicam> | video=3840x2160 | photoOptions=[3840x2160, 4224x2376]
+CameraManager: - Format: <AVCaptureDeviceFormat: 0x1064adc40 'vide'/'x422' 3840x2160, { 1- 30 fps}, photo dims:{3840x2160,4224x2376}, fov:106.201, supports vis (modes: standard, cinematic, extended, enhanced, preview) (max strength:Ultra), max zoom:129.12 (upscales @1.00), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000023-1.000000, system exposure bias range:-2.0-2.0, supports HDR, supports wide color, supports multicam> | video=3840x2160 | photoOptions=[3840x2160, 4224x2376]
+CameraManager: - Format: <AVCaptureDeviceFormat: 0x1064adc60 'vide'/'420v' 3840x2160, { 1- 60 fps}, photo dims:{3840x2160}, fov:106.201, supports vis (modes: standard, cinematic, extended, enhanced, preview) (max strength:Medium), max zoom:129.12 (upscales @1.00), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000023-1.000000, system exposure bias range:-2.0-2.0, supports HDR, supports Smudge Detection> | video=3840x2160 | photoOptions=[3840x2160]
+CameraManager: - Format: <AVCaptureDeviceFormat: 0x1064adc90 'vide'/'420f' 3840x2160, { 1- 60 fps}, photo dims:{3840x2160}, fov:106.201, supports vis (modes: standard, cinematic, extended, enhanced, preview) (max strength:Medium), max zoom:129.12 (upscales @1.00), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000023-1.000000, system exposure bias range:-2.0-2.0, supports HDR, supports wide color, supports Smudge Detection> | video=3840x2160 | photoOptions=[3840x2160]
+CameraManager: - Format: <AVCaptureDeviceFormat: 0x1064adcc0 'vide'/'x420' 3840x2160, { 1- 60 fps}, photo dims:{3840x2160}, fov:106.201, supports vis (modes: standard, cinematic, extended, enhanced, preview) (max strength:Medium), max zoom:129.12 (upscales @1.00), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000023-1.000000, system exposure bias range:-2.0-2.0, supports wide color> | video=3840x2160 | photoOptions=[3840x2160]
+CameraManager: - Format: <AVCaptureDeviceFormat: 0x1064adcf0 'vide'/'x422' 3840x2160, { 1- 60 fps}, photo dims:{3840x2160}, fov:106.201, supports vis (modes: standard, cinematic, extended, enhanced, preview) (max strength:Medium), max zoom:129.12 (upscales @1.00), secondary:4.00, system zoom range:1.0-30.0, AF System:2, ISO:55.0-5280.0, SS:0.000023-1.000000, system exposure bias range:-2.0-2.0, supports HDR, supports wide color> | video=3840x2160 | photoOptions=[3840x2160]
+CameraManager: - Format: <AVCaptureDeviceFormat: 0x1064add20 'vide'/'420v' 4032x3024, { 1- 30 fps}, photo dims:{4032x3024,5712x4284}, fov:103.625, gdc fov:106.201, max zoom:189.00 (upscales @1.00), secondary:4.00, system zoom range:1.0-50.0, AF System:2, ISO:55.0-12320.0, SS:0.000015-1.000000, system exposure bias range:-2.0-2.0, supports HDR, supports depth, supports responsive capture, supports zero shutter lag (with depth), supports highest photo quality, supports Smudge Detection> | video=4032x3024 | photoOptions=[4032x3024, 5712x4284]
+CameraManager: - Format: <AVCaptureDeviceFormat: 0x1064add30 'vide'/'420f' 4032x3024, { 1- 30 fps}, photo dims:{4032x3024,5712x4284}, fov:103.625, gdc fov:106.201, max zoom:189.00 (upscales @1.00), secondary:4.00, system zoom range:1.0-50.0, AF System:2, ISO:55.0-12320.0, SS:0.000015-1.000000, system exposure bias range:-2.0-2.0, supports HDR, supports wide color, supports depth, supports responsive capture, supports zero shutter lag (with depth), supports highest photo quality, supports Smudge Detection> | video=4032x3024 | photoOptions=[4032x3024, 5712x4284]
 CameraManager: Updated activeFormat for high-resolution capture
 CameraManager: Preferred photo dimensions set to 5712x4284 (~24.5MP)
 CameraManager: Video input added successfully
@@ -54,7 +87,7 @@ CameraManager: Session configuration committed
 CameraManager: Starting capture session
 CameraManager: Camera device: Back Triple Camera
 CameraManager: Camera position: 1
-CameraManager: Camera format: <AVCaptureDeviceFormat: 0x105405bc0 'vide'/'420v' 4032x3024, { 1- 30 fps}, photo dims:{4032x3024,5712x4284}, fov:103.625, gdc fov:106.201, max zoom:189.00 (upscales @1.00), secondary:4.00, system zoom range:1.0-50.0, AF System:2, ISO:55.0-12320.0, SS:0.000015-1.000000, system exposure bias range:-2.0-2.0, supports HDR, supports depth, supports responsive capture, supports zero shutter lag (with depth), supports highest photo quality, supports Smudge Detection>
+CameraManager: Camera format: <AVCaptureDeviceFormat: 0x1064add20 'vide'/'420v' 4032x3024, { 1- 30 fps}, photo dims:{4032x3024,5712x4284}, fov:103.625, gdc fov:106.201, max zoom:189.00 (upscales @1.00), secondary:4.00, system zoom range:1.0-50.0, AF System:2, ISO:55.0-12320.0, SS:0.000015-1.000000, system exposure bias range:-2.0-2.0, supports HDR, supports depth, supports responsive capture, supports zero shutter lag (with depth), supports highest photo quality, supports Smudge Detection>
 CameraManager: 48MP capture not available, using standard resolution
 CameraManager: Prepared photo settings tuned for ultra-high resolution capture
 CameraManager: Photo output configured for high-resolution capture
@@ -84,52 +117,51 @@ CameraView: Preview layer frame: (0.0, 0.0, 430.0, 932.0)
 CameraManager: Preview layer frame update requested - delegating to CameraPreviewView
 CameraManager: Set global photoOutput.maxPhotoDimensions to 5712x4284
 CameraManager: Using traditional frame processing
-CameraManager: Video rotation angle unchanged: 90.0
 CameraManager: Camera health check - Available: true
 CameraManager: Preview layer frame update requested - delegating to CameraPreviewView
-CameraView: Manual capture triggered
-CameraManager: supportedMaxPhotoDimensions = [4032x3024, 5712x4284]
-CameraManager: Requested photo dimensions: 5712x4284 (~24.5MP)
-PerformanceMonitor: Capture latency: 0.783810019493103s
-CameraManager: Captured photo - Resolution: 4032x3024, Size: 0.62MB
-CameraManager: Photo size within target limits
-Test shot saved: file:///var/mobile/Containers/Data/Application/672A5127-45E0-43B0-A8C6-70E50D9F13CF/Documents/TestShots/photo_1759663245_12MP.heic
-2025-10-05 06:20:55.593 iCapture[14025:2691442] Successfully load keyboard extensions
-SessionManager: Cleaned up old session: SSS
-SessionManager: Started session for stock HHH
+CameraManager: Video rotation angle unchanged: 90.0
+CameraManager: Video rotation angle unchanged: 90.0
+Requesting visual style in an implementation that has disabled it, returning nil. Behavior of caller is undefined.
+Requesting visual style in an implementation that has disabled it, returning nil. Behavior of caller is undefined.
+Requesting visual style in an implementation that has disabled it, returning nil. Behavior of caller is undefined.
+Requesting visual style in an implementation that has disabled it, returning nil. Behavior of caller is undefined.
+Requesting visual style in an implementation that has disabled it, returning nil. Behavior of caller is undefined.
+UIKeyboardLayoutStar implements focusItemsInRect: - caching for linear focus movement is limited as long as this view is on screen.
+Reporter disconnected. { function=sendMessage, reporterID=80839874445313 }
+Reporter disconnected. { function=sendMessage, reporterID=80839874445313 }
+Reporter disconnected. { function=sendMessage, reporterID=80839874445313 }
+Reporter disconnected. { function=sendMessage, reporterID=80839874445313 }
+Reporter disconnected. { function=sendMessage, reporterID=80839874445313 }
+Reporter disconnected. { function=sendMessage, reporterID=80839874445313 }
+Reporter disconnected. { function=sendMessage, reporterID=80839874445313 }
+Reporter disconnected. { function=sendMessage, reporterID=80839874445313 }
+Reporter disconnected. { function=sendMessage, reporterID=80839874445313 }
+CameraManager: Video rotation angle unchanged: 90.0
+SessionManager: Cleaned up old session: KIH
+SessionManager: Started session for stock EGGHH
 CameraManager: Automatic workflow temporarily disabled; manual capture only
 CameraManager: Automatic workflow temporarily disabled; manual capture only
+Reporter disconnected or already stopped. { func=stop, reporterID=80839874445313 }
+CameraManager: Video rotation angle unchanged: 90.0
+CameraManager: Video rotation angle unchanged: 90.0
 CameraView: Manual capture triggered
 CameraManager: supportedMaxPhotoDimensions = [4032x3024, 5712x4284]
 CameraManager: Requested photo dimensions: 5712x4284 (~24.5MP)
-PerformanceMonitor: Capture latency: 0.7101989984512329s
-CameraManager: Captured photo - Resolution: 4032x3024, Size: 0.66MB
+PerformanceMonitor: Capture latency: 0.785749077796936s
+CameraManager: Captured photo - Resolution: 4032x3024, Size: 1.44MB
 CameraManager: Photo size within target limits
-SessionManager: Added photo asset: photo_1759663264_12MP.heic
-Photo saved to session: photo_1759663264_12MP.heic
-CameraManager: Starting background removal for photo_1759663264_12MP.heic
+SessionManager: Added photo asset: photo_1759709903_12MP.heic
+Photo saved to session: photo_1759709903_12MP.heic
+CameraManager: Starting background removal for photo_1759709903_12MP.heic
 CameraManager: Falling back to Vision-based background removal
 BackgroundRemover: Applying foreground + (optional) depth mask
-CameraManager: Background removal completed for photo_1759663264_12MP.heic using Vision fallback
-CameraManager: Saved sticker to photo_1759663264_12MP_sticker.png
-CameraManager: Saved transparent cutout to photo_1759663264_12MP_cutout.png
-CameraManager: Original capture preserved at photo_1759663264_12MP.heic
-CameraView: Manual capture triggered
-CameraManager: supportedMaxPhotoDimensions = [4032x3024, 5712x4284]
-CameraManager: Requested photo dimensions: 5712x4284 (~24.5MP)
-PerformanceMonitor: Capture latency: 0.7891069650650024s
-CameraManager: Captured photo - Resolution: 4032x3024, Size: 0.66MB
-CameraManager: Photo size within target limits
-SessionManager: Added photo asset: photo_1759663276_12MP.heic
-Photo saved to session: photo_1759663276_12MP.heic
-CameraManager: Starting background removal for photo_1759663276_12MP.heic
-CameraManager: Falling back to Vision-based background removal
-BackgroundRemover: Applying foreground + (optional) depth mask
-CameraManager: Background removal completed for photo_1759663276_12MP.heic using Vision fallback
-CameraManager: Saved sticker to photo_1759663276_12MP_sticker.png
-CameraManager: Saved transparent cutout to photo_1759663276_12MP_cutout.png
-CameraManager: Original capture preserved at photo_1759663276_12MP.heic
+PerformanceMonitor: Thermal throttling started - State: Fair
+CameraManager: Background removal completed for photo_1759709903_12MP.heic using Vision fallback
+CameraManager: Saved transparent cutout to photo_1759709903_12MP_cutout.png
+CameraManager: Original capture preserved at photo_1759709903_12MP.heic
 CameraManager: Temporarily stopping camera session for LiDAR...
+<<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
 CameraManager: Camera session stopped for LiDAR
 LiDARDetector: Using smoothed scene depth for better quality
 LiDARDetector: Starting ARSession with depth sensing...
@@ -138,251 +170,103 @@ LiDARDetector: Scene depth supported: true
 LiDARDetector: ARSession started successfully
 LiDARDetector: Started depth data timeout timer (10.0s)
 CameraManager: LiDAR detection started manually
+CameraManager: Photo saved to photo library using PhotoKit
+{"msg":"file does not exist... clearing", "file":"\/\/private\/var\/Managed Preferences\/mobile\/com.apple.CoreMotion.plist", "error":"Error Domain=NSCocoaErrorDomain Code=260 \"The file “com.apple.CoreMotion.plist” couldn’t be opened because there is no such file.\" UserInfo={NSFilePath=\/\/private\/var\/Managed Preferences\/mobile\/com.apple.CoreMotion.plist, NSURL=file:\/\/\/\/private\/var\/Managed%20Preferences\/mobile\/com.apple.CoreMotion.plist, NSUnderlyingError=0x119b23360 {Error Domain=NSPOSIXErrorDomain Code=2 \"No such file or directory\"}}"}
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:276) - (err=-12784)
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:513) - (err=-12784)
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:276) - (err=-12784)
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:513) - (err=-12784)
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:276) - (err=-12784)
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:513) - (err=-12784)
+(Fig) signalled err=-12710 at <>:601
+(Fig) signalled err=-12710 at <>:601
 LiDARDetector: Camera tracking state changed: limited((extension in ARKit):__C.ARCamera.TrackingState.Reason.initializing)
 LiDARDetector: Camera tracking state: limited((extension in ARKit):__C.ARCamera.TrackingState.Reason.initializing)
-LiDARDetector: ARSession didUpdate frame - Timestamp: 154425.614656416
-LiDARDetector: Frame has scene depth: false
-LiDARDetector: Frame has scene depth confidence: false
-LiDARDetector: Frame camera tracking state: limited(initializing)
-LiDARDetector: Camera tracking state is not normal: limited(initializing)
-LiDARDetector: No scene depth data in frame
-LiDARDetector: This could be due to:
-LiDARDetector: - Device doesn't support scene depth
-LiDARDetector: - Poor lighting conditions
-LiDARDetector: - ARSession not properly configured
-LiDARDetector: - Tracking issues
-LiDARDetector: ARSession didUpdate frame - Timestamp: 154425.631324208
-LiDARDetector: Frame has scene depth: false
-LiDARDetector: Frame has scene depth confidence: false
-LiDARDetector: Frame camera tracking state: limited(initializing)
-LiDARDetector: Camera tracking state is not normal: limited(initializing)
-LiDARDetector: No scene depth data in frame
-LiDARDetector: This could be due to:
-LiDARDetector: - Device doesn't support scene depth
-LiDARDetector: - Poor lighting conditions
-LiDARDetector: - ARSession not properly configured
-LiDARDetector: - Tracking issues
-LiDARDetector: ARSession didUpdate frame - Timestamp: 154425.647991875
-LiDARDetector: Frame has scene depth: false
-LiDARDetector: Frame has scene depth confidence: false
-LiDARDetector: Frame camera tracking state: limited(initializing)
-LiDARDetector: Camera tracking state is not normal: limited(initializing)
-LiDARDetector: No scene depth data in frame
-LiDARDetector: This could be due to:
-LiDARDetector: - Device doesn't support scene depth
-LiDARDetector: - Poor lighting conditions
-LiDARDetector: - ARSession not properly configured
-LiDARDetector: - Tracking issues
-LiDARDetector: ARSession didUpdate frame - Timestamp: 154425.664659541
-LiDARDetector: Frame has scene depth: false
-LiDARDetector: Frame has scene depth confidence: false
-LiDARDetector: Frame camera tracking state: limited(initializing)
-LiDARDetector: Camera tracking state is not normal: limited(initializing)
-LiDARDetector: No scene depth data in frame
-LiDARDetector: This could be due to:
-LiDARDetector: - Device doesn't support scene depth
-LiDARDetector: - Poor lighting conditions
-LiDARDetector: - ARSession not properly configured
-LiDARDetector: - Tracking issues
-LiDARDetector: ARSession didUpdate frame - Timestamp: 154425.68132725
-LiDARDetector: Frame has scene depth: false
-LiDARDetector: Frame has scene depth confidence: false
-LiDARDetector: Frame camera tracking state: limited(initializing)
-LiDARDetector: Camera tracking state is not normal: limited(initializing)
-LiDARDetector: No scene depth data in frame
-LiDARDetector: This could be due to:
-LiDARDetector: - Device doesn't support scene depth
-LiDARDetector: - Poor lighting conditions
-LiDARDetector: - ARSession not properly configured
-LiDARDetector: - Tracking issues
-LiDARDetector: ARSession didUpdate frame - Timestamp: 154425.697995083
-LiDARDetector: Frame has scene depth: false
-LiDARDetector: Frame has scene depth confidence: false
-LiDARDetector: Frame camera tracking state: limited(initializing)
-LiDARDetector: Camera tracking state is not normal: limited(initializing)
-LiDARDetector: No scene depth data in frame
-LiDARDetector: This could be due to:
-LiDARDetector: - Device doesn't support scene depth
-LiDARDetector: - Poor lighting conditions
-LiDARDetector: - ARSession not properly configured
-LiDARDetector: - Tracking issues
-LiDARDetector: ARSession didUpdate frame - Timestamp: 154425.714662833
-LiDARDetector: Frame has scene depth: false
-LiDARDetector: Frame has scene depth confidence: false
-LiDARDetector: Frame camera tracking state: limited(initializing)
-LiDARDetector: Camera tracking state is not normal: limited(initializing)
-LiDARDetector: No scene depth data in frame
-LiDARDetector: This could be due to:
-LiDARDetector: - Device doesn't support scene depth
-LiDARDetector: - Poor lighting conditions
-LiDARDetector: - ARSession not properly configured
-LiDARDetector: - Tracking issues
-LiDARDetector: ARSession didUpdate frame - Timestamp: 154425.731330541
-LiDARDetector: Frame has scene depth: false
-LiDARDetector: Frame has scene depth confidence: false
-LiDARDetector: Frame camera tracking state: limited(initializing)
-LiDARDetector: Camera tracking state is not normal: limited(initializing)
-LiDARDetector: No scene depth data in frame
-LiDARDetector: This could be due to:
-LiDARDetector: - Device doesn't support scene depth
-LiDARDetector: - Poor lighting conditions
-LiDARDetector: - ARSession not properly configured
-LiDARDetector: - Tracking issues
-LiDARDetector: ARSession didUpdate frame - Timestamp: 154425.747998333
-LiDARDetector: Frame has scene depth: false
-LiDARDetector: Frame has scene depth confidence: false
-LiDARDetector: Frame camera tracking state: limited(initializing)
-LiDARDetector: Camera tracking state is not normal: limited(initializing)
-LiDARDetector: No scene depth data in frame
-LiDARDetector: This could be due to:
-LiDARDetector: - Device doesn't support scene depth
-LiDARDetector: - Poor lighting conditions
-LiDARDetector: - ARSession not properly configured
-LiDARDetector: - Tracking issues
-LiDARDetector: ARSession didUpdate frame - Timestamp: 154425.764666041
-LiDARDetector: Frame has scene depth: false
-LiDARDetector: Frame has scene depth confidence: false
-LiDARDetector: Frame camera tracking state: limited(initializing)
-LiDARDetector: Camera tracking state is not normal: limited(initializing)
-LiDARDetector: No scene depth data in frame
-LiDARDetector: This could be due to:
-LiDARDetector: - Device doesn't support scene depth
-LiDARDetector: - Poor lighting conditions
-LiDARDetector: - ARSession not properly configured
-LiDARDetector: - Tracking issues
-LiDARDetector: ARSession didUpdate frame - Timestamp: 154425.781333833
-LiDARDetector: Frame has scene depth: false
-LiDARDetector: Frame has scene depth confidence: false
-LiDARDetector: Frame camera tracking state: limited(initializing)
-LiDARDetector: Camera tracking state is not normal: limited(initializing)
-LiDARDetector: No scene depth data in frame
-LiDARDetector: This could be due to:
-LiDARDetector: - Device doesn't support scene depth
-LiDARDetector: - Poor lighting conditions
-LiDARDetector: - ARSession not properly configured
-LiDARDetector: - Tracking issues
-LiDARDetector: ARSession didUpdate frame - Timestamp: 154425.798001458
-LiDARDetector: Frame has scene depth: false
-LiDARDetector: Frame has scene depth confidence: false
-LiDARDetector: Frame camera tracking state: limited(initializing)
-LiDARDetector: Camera tracking state is not normal: limited(initializing)
-LiDARDetector: No scene depth data in frame
-LiDARDetector: This could be due to:
-LiDARDetector: - Device doesn't support scene depth
-LiDARDetector: - Poor lighting conditions
-LiDARDetector: - ARSession not properly configured
-LiDARDetector: - Tracking issues
-LiDARDetector: ARSession didUpdate frame - Timestamp: 154425.814669333
-LiDARDetector: Frame has scene depth: false
-LiDARDetector: Frame has scene depth confidence: false
-LiDARDetector: Frame camera tracking state: limited(initializing)
-LiDARDetector: Camera tracking state is not normal: limited(initializing)
-LiDARDetector: No scene depth data in frame
-LiDARDetector: This could be due to:
-LiDARDetector: - Device doesn't support scene depth
-LiDARDetector: - Poor lighting conditions
-LiDARDetector: - ARSession not properly configured
-LiDARDetector: - Tracking issues
-LiDARDetector: ARSession didUpdate frame - Timestamp: 154425.831337
-LiDARDetector: Frame has scene depth: false
-LiDARDetector: Frame has scene depth confidence: false
-LiDARDetector: Frame camera tracking state: limited(initializing)
-LiDARDetector: Camera tracking state is not normal: limited(initializing)
-LiDARDetector: No scene depth data in frame
-LiDARDetector: This could be due to:
-LiDARDetector: - Device doesn't support scene depth
-LiDARDetector: - Poor lighting conditions
-LiDARDetector: - ARSession not properly configured
-LiDARDetector: - Tracking issues
-LiDARDetector: ARSession didUpdate frame - Timestamp: 154425.848004708
-LiDARDetector: Frame has scene depth: false
-LiDARDetector: Frame has scene depth confidence: false
-LiDARDetector: Frame camera tracking state: limited(initializing)
-LiDARDetector: Camera tracking state is not normal: limited(initializing)
-LiDARDetector: No scene depth data in frame
-LiDARDetector: This could be due to:
-LiDARDetector: - Device doesn't support scene depth
-LiDARDetector: - Poor lighting conditions
-LiDARDetector: - ARSession not properly configured
-LiDARDetector: - Tracking issues
-LiDARDetector: ARSession didUpdate frame - Timestamp: 154425.864672458
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198546.706779958
 LiDARDetector: Frame has scene depth: true
 LiDARDetector: Frame has scene depth confidence: true
 LiDARDetector: Frame camera tracking state: limited(initializing)
 LiDARDetector: Camera tracking state is not normal: limited(initializing)
 LiDARDetector: Received depth data - Size: 256x192
 LiDARDetector: Depth data received - timeout reset
-LiDARDetector: ARSession didUpdate frame - Timestamp: 154425.881340208
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198546.740114916
 LiDARDetector: Frame has scene depth: true
 LiDARDetector: Frame has scene depth confidence: true
 LiDARDetector: Frame camera tracking state: limited(initializing)
 LiDARDetector: Camera tracking state is not normal: limited(initializing)
 LiDARDetector: Received depth data - Size: 256x192
 LiDARDetector: Depth data received - timeout reset
-LiDARDetector: ARSession didUpdate frame - Timestamp: 154425.898008
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198546.77344975
 LiDARDetector: Frame has scene depth: true
 LiDARDetector: Frame has scene depth confidence: true
 LiDARDetector: Frame camera tracking state: limited(initializing)
 LiDARDetector: Camera tracking state is not normal: limited(initializing)
 LiDARDetector: Received depth data - Size: 256x192
 LiDARDetector: Depth data received - timeout reset
-LiDARDetector: ARSession didUpdate frame - Timestamp: 154425.91467575
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198546.806784625
 LiDARDetector: Frame has scene depth: true
 LiDARDetector: Frame has scene depth confidence: true
 LiDARDetector: Frame camera tracking state: limited(initializing)
 LiDARDetector: Camera tracking state is not normal: limited(initializing)
 LiDARDetector: Received depth data - Size: 256x192
 LiDARDetector: Depth data received - timeout reset
-LiDARDetector: ARSession didUpdate frame - Timestamp: 154425.9313435
+LiDARDetector: ARSession status check:
+LiDARDetector: - Session exists: true
+LiDARDetector: - Session running: true
+LiDARDetector: - Depth data available: true
+LiDARDetector: - Background learned: false
+LiDARDetector: - Vehicle detected: false
+LiDARDetector: - Depth map size: 256x192
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198546.840119458
 LiDARDetector: Frame has scene depth: true
 LiDARDetector: Frame has scene depth confidence: true
 LiDARDetector: Frame camera tracking state: limited(initializing)
 LiDARDetector: Camera tracking state is not normal: limited(initializing)
 LiDARDetector: Received depth data - Size: 256x192
 LiDARDetector: Depth data received - timeout reset
-LiDARDetector: ARSession didUpdate frame - Timestamp: 154425.94801125
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198546.873454416
 LiDARDetector: Frame has scene depth: true
 LiDARDetector: Frame has scene depth confidence: true
 LiDARDetector: Frame camera tracking state: limited(initializing)
 LiDARDetector: Camera tracking state is not normal: limited(initializing)
 LiDARDetector: Received depth data - Size: 256x192
 LiDARDetector: Depth data received - timeout reset
-LiDARDetector: ARSession didUpdate frame - Timestamp: 154425.964678875
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198546.90678925
 LiDARDetector: Frame has scene depth: true
 LiDARDetector: Frame has scene depth confidence: true
 LiDARDetector: Frame camera tracking state: limited(initializing)
 LiDARDetector: Camera tracking state is not normal: limited(initializing)
 LiDARDetector: Received depth data - Size: 256x192
 LiDARDetector: Depth data received - timeout reset
-LiDARDetector: ARSession didUpdate frame - Timestamp: 154425.981346625
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198546.940124125
 LiDARDetector: Frame has scene depth: true
 LiDARDetector: Frame has scene depth confidence: true
 LiDARDetector: Frame camera tracking state: limited(initializing)
 LiDARDetector: Camera tracking state is not normal: limited(initializing)
 LiDARDetector: Received depth data - Size: 256x192
 LiDARDetector: Depth data received - timeout reset
-LiDARDetector: ARSession didUpdate frame - Timestamp: 154425.998014375
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198546.973458833
 LiDARDetector: Frame has scene depth: true
 LiDARDetector: Frame has scene depth confidence: true
 LiDARDetector: Frame camera tracking state: limited(initializing)
 LiDARDetector: Camera tracking state is not normal: limited(initializing)
 LiDARDetector: Received depth data - Size: 256x192
 LiDARDetector: Depth data received - timeout reset
-LiDARDetector: ARSession didUpdate frame - Timestamp: 154426.014682083
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198547.006793875
 LiDARDetector: Frame has scene depth: true
 LiDARDetector: Frame has scene depth confidence: true
 LiDARDetector: Frame camera tracking state: limited(initializing)
 LiDARDetector: Camera tracking state is not normal: limited(initializing)
 LiDARDetector: Received depth data - Size: 256x192
 LiDARDetector: Depth data received - timeout reset
-LiDARDetector: ARSession didUpdate frame - Timestamp: 154426.031349875
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198547.040128791
 LiDARDetector: Frame has scene depth: true
 LiDARDetector: Frame has scene depth confidence: true
 LiDARDetector: Frame camera tracking state: limited(initializing)
 LiDARDetector: Camera tracking state is not normal: limited(initializing)
 LiDARDetector: Received depth data - Size: 256x192
 LiDARDetector: Depth data received - timeout reset
-LiDARDetector: ARSession didUpdate frame - Timestamp: 154426.048017625
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198547.073463708
 LiDARDetector: Frame has scene depth: true
 LiDARDetector: Frame has scene depth confidence: true
 LiDARDetector: Frame camera tracking state: limited(initializing)
@@ -396,284 +280,1249 @@ CameraManager: LiDAR environment scan completed - resuming camera capture workfl
 LiDARDetector: Stopped LiDAR detection
 CameraManager: LiDAR detection stopped
 CameraManager: LiDAR depth data cached for background removal
-LiDARDetector: ARSession didUpdate frame - Timestamp: 154426.064685375
-LiDARDetector: Frame has scene depth: true
-LiDARDetector: Frame has scene depth confidence: true
-LiDARDetector: Frame camera tracking state: limited(initializing)
-LiDARDetector: Camera tracking state is not normal: limited(initializing)
-LiDARDetector: Received depth data - Size: 256x192
-LiDARDetector: Depth data received - timeout reset
+<<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
+<<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
+<<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
+<<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
 CameraManager: Using traditional frame processing
 CameraManager: - LiDAR session running: false
 CameraManager: - Depth data available: true
 CameraManager: Camera session restarted
-LiDARDetector: ARSession status check:
-LiDARDetector: - Session exists: true
-LiDARDetector: - Session running: false
-LiDARDetector: - Depth data available: true
-LiDARDetector: - Background learned: true
-LiDARDetector: - Vehicle detected: false
-LiDARDetector: - Depth map size: 256x192
 CameraView: Manual capture triggered
 CameraManager: supportedMaxPhotoDimensions = [4032x3024, 5712x4284]
 CameraManager: Requested photo dimensions: 5712x4284 (~24.5MP)
-PerformanceMonitor: Capture latency: 0.7075790166854858s
-CameraManager: Captured photo - Resolution: 4032x3024, Size: 0.65MB
+PerformanceMonitor: Capture latency: 0.9175978899002075s
+CameraManager: Captured photo - Resolution: 4032x3024, Size: 1.86MB
 CameraManager: Photo size within target limits
-SessionManager: Added photo asset: photo_1759663290_12MP.heic
-Photo saved to session: photo_1759663290_12MP.heic
-CameraManager: Starting background removal for photo_1759663290_12MP.heic
+SessionManager: Added photo asset: photo_1759709920_12MP.heic
+Photo saved to session: photo_1759709920_12MP.heic
+CameraManager: Starting background removal for photo_1759709920_12MP.heic
 CameraManager: Using cached LiDAR depth data for background removal
 BackgroundRemover: Applying foreground + (optional) depth mask
-CameraManager: Background removal completed for photo_1759663290_12MP.heic using Vision + LiDAR scan
-CameraManager: Saved sticker to photo_1759663290_12MP_sticker.png
-CameraManager: Saved transparent cutout to photo_1759663290_12MP_cutout.png
-CameraManager: Original capture preserved at photo_1759663290_12MP.heic
 CameraView: Manual capture triggered
 CameraManager: supportedMaxPhotoDimensions = [4032x3024, 5712x4284]
 CameraManager: Requested photo dimensions: 5712x4284 (~24.5MP)
-PerformanceMonitor: Capture latency: 0.769834041595459s
-CameraManager: Captured photo - Resolution: 4032x3024, Size: 0.64MB
+PerformanceMonitor: Capture latency: 0.7359179258346558s
+CameraManager: Captured photo - Resolution: 4032x3024, Size: 1.88MB
 CameraManager: Photo size within target limits
-SessionManager: Added photo asset: photo_1759663296_12MP.heic
-Photo saved to session: photo_1759663296_12MP.heic
-CameraManager: Starting background removal for photo_1759663296_12MP.heic
-CameraManager: Falling back to Vision-based background removal
-BackgroundRemover: Applying foreground + (optional) depth mask
-CameraManager: Background removal completed for photo_1759663296_12MP.heic using Vision fallback
-CameraManager: Saved sticker to photo_1759663296_12MP_sticker.png
-CameraManager: Saved transparent cutout to photo_1759663296_12MP_cutout.png
-CameraManager: Original capture preserved at photo_1759663296_12MP.heic
-ROIDetector: Starting background sampling...
-ROIDetector: Background sampling progress 0% (frames: 1) elapsed=0.00
-CameraManager: Temporarily stopping camera session for LiDAR...
-CameraManager: Camera session stopped for LiDAR
-LiDARDetector: Using smoothed scene depth for better quality
-LiDARDetector: Starting ARSession with depth sensing...
-LiDARDetector: Configuration frame semantics: ARFrameSemantics(rawValue: 24)
-LiDARDetector: Scene depth supported: true
-LiDARDetector: ARSession started successfully
-LiDARDetector: Started depth data timeout timer (10.0s)
-CameraManager: LiDAR detection started manually
-LiDARDetector: ARSession didUpdate frame - Timestamp: 154458.279306333
-LiDARDetector: Frame has scene depth: true
-LiDARDetector: Frame has scene depth confidence: true
-LiDARDetector: Frame camera tracking state: limited(initializing)
-LiDARDetector: Camera tracking state is not normal: limited(initializing)
-LiDARDetector: Received depth data - Size: 256x192
-LiDARDetector: Depth data received - timeout reset
-LiDARDetector: ARSession didUpdate frame - Timestamp: 154458.295974166
-LiDARDetector: Frame has scene depth: true
-LiDARDetector: Frame has scene depth confidence: true
-LiDARDetector: Frame camera tracking state: limited(initializing)
-LiDARDetector: Camera tracking state is not normal: limited(initializing)
-LiDARDetector: Received depth data - Size: 256x192
-LiDARDetector: Depth data received - timeout reset
-LiDARDetector: ARSession didUpdate frame - Timestamp: 154458.312641666
-LiDARDetector: Frame has scene depth: true
-LiDARDetector: Frame has scene depth confidence: true
-LiDARDetector: Frame camera tracking state: limited(initializing)
-LiDARDetector: Camera tracking state is not normal: limited(initializing)
-LiDARDetector: Received depth data - Size: 256x192
-LiDARDetector: Depth data received - timeout reset
-LiDARDetector: ARSession didUpdate frame - Timestamp: 154458.329309333
-LiDARDetector: Frame has scene depth: true
-LiDARDetector: Frame has scene depth confidence: true
-LiDARDetector: Frame camera tracking state: limited(initializing)
-LiDARDetector: Camera tracking state is not normal: limited(initializing)
-LiDARDetector: Received depth data - Size: 256x192
-LiDARDetector: Depth data received - timeout reset
-LiDARDetector: ARSession didUpdate frame - Timestamp: 154458.345976916
-LiDARDetector: Frame has scene depth: true
-LiDARDetector: Frame has scene depth confidence: true
-LiDARDetector: Frame camera tracking state: limited(initializing)
-LiDARDetector: Camera tracking state is not normal: limited(initializing)
-LiDARDetector: Received depth data - Size: 256x192
-LiDARDetector: Depth data received - timeout reset
-LiDARDetector: ARSession didUpdate frame - Timestamp: 154458.362640666
-LiDARDetector: Frame has scene depth: true
-LiDARDetector: Frame has scene depth confidence: true
-LiDARDetector: Frame camera tracking state: limited(initializing)
-LiDARDetector: Camera tracking state is not normal: limited(initializing)
-LiDARDetector: Received depth data - Size: 256x192
-LiDARDetector: Depth data received - timeout reset
-LiDARDetector: ARSession didUpdate frame - Timestamp: 154458.379312166
-LiDARDetector: Frame has scene depth: true
-LiDARDetector: Frame has scene depth confidence: true
-LiDARDetector: Frame camera tracking state: limited(initializing)
-LiDARDetector: Camera tracking state is not normal: limited(initializing)
-LiDARDetector: Received depth data - Size: 256x192
-LiDARDetector: Depth data received - timeout reset
-LiDARDetector: ARSession didUpdate frame - Timestamp: 154458.395979833
-LiDARDetector: Frame has scene depth: true
-LiDARDetector: Frame has scene depth confidence: true
-LiDARDetector: Frame camera tracking state: limited(initializing)
-LiDARDetector: Camera tracking state is not normal: limited(initializing)
-LiDARDetector: Received depth data - Size: 256x192
-LiDARDetector: Depth data received - timeout reset
-LiDARDetector: ARSession didUpdate frame - Timestamp: 154458.412647541
-LiDARDetector: Frame has scene depth: true
-LiDARDetector: Frame has scene depth confidence: true
-LiDARDetector: Frame camera tracking state: limited(initializing)
-LiDARDetector: Camera tracking state is not normal: limited(initializing)
-LiDARDetector: Received depth data - Size: 256x192
-LiDARDetector: Depth data received - timeout reset
-LiDARDetector: ARSession didUpdate frame - Timestamp: 154458.429315166
-LiDARDetector: Frame has scene depth: true
-LiDARDetector: Frame has scene depth confidence: true
-LiDARDetector: Frame camera tracking state: limited(initializing)
-LiDARDetector: Camera tracking state is not normal: limited(initializing)
-LiDARDetector: Received depth data - Size: 256x192
-LiDARDetector: Depth data received - timeout reset
-LiDARDetector: ARSession didUpdate frame - Timestamp: 154458.445982708
-LiDARDetector: Frame has scene depth: true
-LiDARDetector: Frame has scene depth confidence: true
-LiDARDetector: Frame camera tracking state: limited(initializing)
-LiDARDetector: Camera tracking state is not normal: limited(initializing)
-LiDARDetector: Received depth data - Size: 256x192
-LiDARDetector: Depth data received - timeout reset
-LiDARDetector: ARSession didUpdate frame - Timestamp: 154458.462650375
-LiDARDetector: Frame has scene depth: true
-LiDARDetector: Frame has scene depth confidence: true
-LiDARDetector: Frame camera tracking state: limited(initializing)
-LiDARDetector: Camera tracking state is not normal: limited(initializing)
-LiDARDetector: Received depth data - Size: 256x192
-LiDARDetector: Depth data received - timeout reset
-LiDARDetector: Initial environment scan completed after 12 depth frames
-LiDARDetector: Background learned using LiDAR depth data
-LiDARDetector: Depth map size: 256x192
-CameraManager: LiDAR environment scan completed - resuming camera capture workflow
-LiDARDetector: Stopped LiDAR detection
-CameraManager: LiDAR detection stopped
-CameraManager: LiDAR depth data cached for background removal
-LiDARDetector: ARSession didUpdate frame - Timestamp: 154458.479318
-LiDARDetector: Frame has scene depth: true
-LiDARDetector: Frame has scene depth confidence: true
-LiDARDetector: Frame camera tracking state: limited(initializing)
-LiDARDetector: Camera tracking state is not normal: limited(initializing)
-LiDARDetector: Received depth data - Size: 256x192
-LiDARDetector: Depth data received - timeout reset
-CameraManager: Using traditional frame processing
-CameraManager: - LiDAR session running: false
-CameraManager: - Depth data available: true
-ROIDetector: Background sampling progress 100% (frames: 7) elapsed=8.50
-ROIDetector: Background mask created successfully
-ROIDetector: Background sampling complete (frames: 7). Threshold: 0.15
-ROIDetector: Background sampling progress 100% (frames: 8) elapsed=8.56
-CameraManager: Camera session restarted
-ROIDetector: Background mask created successfully
-ROIDetector: Background sampling complete (frames: 8). Threshold: 0.15
-ROIDetector: Occupancy: 1.6%, Threshold: 15.0%, Occupied: false
-ROIDetector: Occupancy: 2.3%, Threshold: 15.0%, Occupied: false
-ROIDetector: Occupancy: 2.2%, Threshold: 15.0%, Occupied: false
-ROIDetector: Occupancy: 2.1%, Threshold: 15.0%, Occupied: false
-ROIDetector: Occupancy: 2.2%, Threshold: 15.0%, Occupied: false
-ROIDetector: Occupancy: 2.0%, Threshold: 15.0%, Occupied: false
-ROIDetector: Occupancy: 1.7%, Threshold: 15.0%, Occupied: false
-ROIDetector: Occupancy: 1.4%, Threshold: 15.0%, Occupied: false
-ROIDetector: Occupancy: 1.4%, Threshold: 15.0%, Occupied: false
-ROIDetector: Occupancy: 1.4%, Threshold: 15.0%, Occupied: false
-ROIDetector: Occupancy: 1.6%, Threshold: 15.0%, Occupied: false
-ROIDetector: Occupancy: 1.6%, Threshold: 15.0%, Occupied: false
-LiDARDetector: ARSession status check:
-LiDARDetector: - Session exists: true
-LiDARDetector: - Session running: false
-LiDARDetector: - Depth data available: true
-LiDARDetector: - Background learned: true
-LiDARDetector: - Vehicle detected: false
-LiDARDetector: - Depth map size: 256x192
-ROIDetector: Occupancy: 1.7%, Threshold: 15.0%, Occupied: false
-ROIDetector: Occupancy: 1.6%, Threshold: 15.0%, Occupied: false
-ROIDetector: Occupancy: 1.5%, Threshold: 15.0%, Occupied: false
-ROIDetector: Occupancy: 1.7%, Threshold: 15.0%, Occupied: false
-CameraView: Manual capture triggered
-CameraManager: supportedMaxPhotoDimensions = [4032x3024, 5712x4284]
-CameraManager: Requested photo dimensions: 5712x4284 (~24.5MP)
-ROIDetector: Occupancy: 1.7%, Threshold: 15.0%, Occupied: false
-ROIDetector: Occupancy: 1.3%, Threshold: 15.0%, Occupied: false
-ROIDetector: Occupancy: 1.2%, Threshold: 15.0%, Occupied: false
-ROIDetector: Occupancy: 1.2%, Threshold: 15.0%, Occupied: false
-ROIDetector: Occupancy: 1.8%, Threshold: 15.0%, Occupied: false
-ROIDetector: Occupancy: 1.9%, Threshold: 15.0%, Occupied: false
-ROIDetector: Occupancy: 2.0%, Threshold: 15.0%, Occupied: false
-ROIDetector: Occupancy: 2.1%, Threshold: 15.0%, Occupied: false
-ROIDetector: Occupancy: 2.2%, Threshold: 15.0%, Occupied: false
-ROIDetector: Occupancy: 2.1%, Threshold: 15.0%, Occupied: false
-ROIDetector: Occupancy: 2.0%, Threshold: 15.0%, Occupied: false
-PerformanceMonitor: Capture latency: 0.7286059856414795s
-CameraManager: Captured photo - Resolution: 4032x3024, Size: 0.65MB
-CameraManager: Photo size within target limits
-SessionManager: Added photo asset: photo_1759663317_12MP.heic
-Photo saved to session: photo_1759663317_12MP.heic
-CameraManager: Starting background removal for photo_1759663317_12MP.heic
-CameraManager: Using cached LiDAR depth data for background removal
-ROIDetector: Occupancy: 2.2%, Threshold: 15.0%, Occupied: false
-ROIDetector: Occupancy: 2.4%, Threshold: 15.0%, Occupied: false
-ROIDetector: Occupancy: 2.3%, Threshold: 15.0%, Occupied: false
-ROIDetector: Occupancy: 2.4%, Threshold: 15.0%, Occupied: false
-BackgroundRemover: Applying foreground + (optional) depth mask
-ROIDetector: Occupancy: 2.5%, Threshold: 15.0%, Occupied: false
-ROIDetector: Occupancy: 2.6%, Threshold: 15.0%, Occupied: false
-ROIDetector: Occupancy: 2.5%, Threshold: 15.0%, Occupied: false
-ROIDetector: Occupancy: 2.3%, Threshold: 15.0%, Occupied: false
-ROIDetector: Occupancy: 2.5%, Threshold: 15.0%, Occupied: false
-CameraView: Manual capture triggered
-CameraManager: supportedMaxPhotoDimensions = [4032x3024, 5712x4284]
-CameraManager: Requested photo dimensions: 5712x4284 (~24.5MP)
-ROIDetector: Occupancy: 2.4%, Threshold: 15.0%, Occupied: false
-ROIDetector: Occupancy: 2.0%, Threshold: 15.0%, Occupied: false
-ROIDetector: Occupancy: 2.3%, Threshold: 15.0%, Occupied: false
-ROIDetector: Occupancy: 2.8%, Threshold: 15.0%, Occupied: false
-ROIDetector: Occupancy: 3.7%, Threshold: 15.0%, Occupied: false
-ROIDetector: Occupancy: 4.3%, Threshold: 15.0%, Occupied: false
-ROIDetector: Occupancy: 4.4%, Threshold: 15.0%, Occupied: false
-ROIDetector: Occupancy: 4.6%, Threshold: 15.0%, Occupied: false
-ROIDetector: Occupancy: 5.0%, Threshold: 15.0%, Occupied: false
-ROIDetector: Occupancy: 4.8%, Threshold: 15.0%, Occupied: false
-ROIDetector: Occupancy: 4.8%, Threshold: 15.0%, Occupied: false
-ROIDetector: Occupancy: 4.7%, Threshold: 15.0%, Occupied: false
-PerformanceMonitor: Capture latency: 0.7669090032577515s
-CameraManager: Captured photo - Resolution: 4032x3024, Size: 0.62MB
-CameraManager: Photo size within target limits
-SessionManager: Added photo asset: photo_1759663318_12MP.heic
-Photo saved to session: photo_1759663318_12MP.heic
-CameraManager: Starting background removal for photo_1759663318_12MP.heic
+SessionManager: Added photo asset: photo_1759709922_12MP.heic
+Photo saved to session: photo_1759709922_12MP.heic
+CameraManager: Starting background removal for photo_1759709922_12MP.heic
 CameraManager: Using cached LiDAR depth data for background removal
 BackgroundRemover: Already processing, skipping request
 CameraManager: Cached LiDAR depth fusion failed, using LiDAR-only mask
-CameraManager: Background removal completed for photo_1759663318_12MP.heic using LiDAR scan fallback
-CameraManager: Saved sticker to photo_1759663318_12MP_sticker.png
-CameraManager: Saved transparent cutout to photo_1759663318_12MP_cutout.png
-CameraManager: Original capture preserved at photo_1759663318_12MP.heic
-CameraManager: LiDAR detection disabled - switching to traditional detection
-ROIDetector: Occupancy: 4.6%, Threshold: 15.0%, Occupied: false
-ROIDetector: Occupancy: 4.4%, Threshold: 15.0%, Occupied: false
-ROIDetector: Occupancy: 4.4%, Threshold: 15.0%, Occupied: false
+CameraView: Manual capture triggered
+CameraManager: supportedMaxPhotoDimensions = [4032x3024, 5712x4284]
+CameraManager: Requested photo dimensions: 5712x4284 (~24.5MP)
+CameraManager: Background removal completed for photo_1759709922_12MP.heic using LiDAR scan fallback
+CameraManager: Saved sticker to photo_1759709922_12MP_sticker.png
+CameraManager: Saved transparent cutout to photo_1759709922_12MP_cutout.png
+CameraManager: Original capture preserved at photo_1759709922_12MP.heic
+CameraManager: Photo saved to photo library using PhotoKit
+PerformanceMonitor: Capture latency: 9.436576008796692s
+CameraManager: Captured photo - Resolution: 4032x3024, Size: 1.90MB
+CameraManager: Photo size within target limits
+CameraManager: Background removal completed for photo_1759709920_12MP.heic using Vision + LiDAR scan
+CameraManager: Saved transparent cutout to photo_1759709920_12MP_cutout.png
+CameraManager: Original capture preserved at photo_1759709920_12MP.heic
+SessionManager: Added photo asset: photo_1759709932_12MP.heic
+Photo saved to session: photo_1759709932_12MP.heic
+CameraManager: Starting background removal for photo_1759709932_12MP.heic
+CameraManager: Falling back to Vision-based background removal
+BackgroundRemover: Applying foreground + (optional) depth mask
+CameraManager: Video rotation angle unchanged: 90.0
+CameraManager: Photo saved to photo library using PhotoKit
+CameraManager: Video rotation angle unchanged: 90.0
+CameraManager: Background removal completed for photo_1759709932_12MP.heic using Vision fallback
+CameraManager: Saved sticker to photo_1759709932_12MP_sticker.png
+CameraManager: Saved transparent cutout to photo_1759709932_12MP_cutout.png
+CameraManager: Original capture preserved at photo_1759709932_12MP.heic
+CameraManager: Photo saved to photo library using PhotoKit
+CameraView: Manual capture triggered
+CameraManager: supportedMaxPhotoDimensions = [4032x3024, 5712x4284]
+CameraManager: Requested photo dimensions: 5712x4284 (~24.5MP)
+PerformanceMonitor: Capture latency: 0.6622710227966309s
+CameraManager: Captured photo - Resolution: 4032x3024, Size: 1.80MB
+CameraManager: Photo size within target limits
+SessionManager: Added photo asset: photo_1759709959_12MP.heic
+Photo saved to session: photo_1759709959_12MP.heic
+CameraManager: Starting background removal for photo_1759709959_12MP.heic
+CameraManager: Falling back to Vision-based background removal
+BackgroundRemover: No segmentation results
+CameraView: Manual capture triggered
+CameraManager: supportedMaxPhotoDimensions = [4032x3024, 5712x4284]
+CameraManager: Requested photo dimensions: 5712x4284 (~24.5MP)
+PerformanceMonitor: Capture latency: 0.8405659198760986s
+CameraManager: Captured photo - Resolution: 4032x3024, Size: 1.90MB
+CameraManager: Photo size within target limits
+SessionManager: Added photo asset: photo_1759709962_12MP.heic
+Photo saved to session: photo_1759709962_12MP.heic
+CameraManager: Starting background removal for photo_1759709962_12MP.heic
+CameraManager: Falling back to Vision-based background removal
+BackgroundRemover: Already processing, skipping request
+CameraManager: Background removal failed for photo_1759709962_12MP.heic
+CameraManager: Temporarily stopping camera session for LiDAR...
+<<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
+CameraManager: Camera session stopped for LiDAR
+LiDARDetector: Using smoothed scene depth for better quality
+LiDARDetector: Starting ARSession with depth sensing...
+LiDARDetector: Configuration frame semantics: ARFrameSemantics(rawValue: 24)
+LiDARDetector: Scene depth supported: true
+LiDARDetector: ARSession started successfully
+LiDARDetector: Started depth data timeout timer (10.0s)
+CameraManager: LiDAR detection started manually
+<<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
+<<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
+<<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
+<<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
+(Fig) signalled err=-12710 at <>:601
+(Fig) signalled err=-12710 at <>:601
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198592.884017333
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+CameraManager: Photo saved to photo library using PhotoKit
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198592.917352166
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198592.950686833
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198592.9840215
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198593.017356125
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198593.050690958
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198593.084025666
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198593.117360458
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198593.150695083
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198593.184029791
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198593.217364583
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198593.250699333
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: Initial environment scan completed after 12 depth frames
+LiDARDetector: Background learned using LiDAR depth data
+LiDARDetector: Depth map size: 256x192
+CameraManager: LiDAR environment scan completed - resuming camera capture workflow
+LiDARDetector: Stopped LiDAR detection
+CameraManager: LiDAR detection stopped
+CameraManager: LiDAR depth data cached for background removal
+<<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
+<<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
+<<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
+<<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
+CameraManager: Camera session restarted
 CameraManager: Using traditional frame processing
-ROIDetector: Occupancy: 4.2%, Threshold: 15.0%, Occupied: false
-CameraManager: Background removal completed for photo_1759663317_12MP.heic using Vision + LiDAR scan
-CameraManager: Saved sticker to photo_1759663317_12MP_sticker.png
-CameraManager: Saved transparent cutout to photo_1759663317_12MP_cutout.png
-CameraManager: Original capture preserved at photo_1759663317_12MP.heic
-SessionManager: Failed to copy asset photo_1759663264_12MP.heic: Error Domain=NSCocoaErrorDomain Code=260 "The file “photo_1759663264_12MP.heic” couldn’t be opened because there is no such file." UserInfo={NSFilePath=/var/mobile/Containers/Data/Application/672A5127-45E0-43B0-A8C6-70E50D9F13CF/Documents/Captures/DE4DC665-AF5A-4E2D-9F62-D5A63799F697/photos/photo_1759663264_12MP.heic, NSURL=file:///var/mobile/Containers/Data/Application/672A5127-45E0-43B0-A8C6-70E50D9F13CF/Documents/Captures/DE4DC665-AF5A-4E2D-9F62-D5A63799F697/photos/photo_1759663264_12MP.heic, NSUnderlyingError=0x112f2eee0 {Error Domain=NSPOSIXErrorDomain Code=2 "No such file or directory"}}
-SessionManager: Failed to copy asset photo_1759663276_12MP.heic: Error Domain=NSCocoaErrorDomain Code=260 "The file “photo_1759663276_12MP.heic” couldn’t be opened because there is no such file." UserInfo={NSFilePath=/var/mobile/Containers/Data/Application/672A5127-45E0-43B0-A8C6-70E50D9F13CF/Documents/Captures/DE4DC665-AF5A-4E2D-9F62-D5A63799F697/photos/photo_1759663276_12MP.heic, NSURL=file:///var/mobile/Containers/Data/Application/672A5127-45E0-43B0-A8C6-70E50D9F13CF/Documents/Captures/DE4DC665-AF5A-4E2D-9F62-D5A63799F697/photos/photo_1759663276_12MP.heic, NSUnderlyingError=0x112f2cf60 {Error Domain=NSPOSIXErrorDomain Code=2 "No such file or directory"}}
-SessionManager: Failed to copy asset photo_1759663290_12MP.heic: Error Domain=NSCocoaErrorDomain Code=260 "The file “photo_1759663290_12MP.heic” couldn’t be opened because there is no such file." UserInfo={NSFilePath=/var/mobile/Containers/Data/Application/672A5127-45E0-43B0-A8C6-70E50D9F13CF/Documents/Captures/DE4DC665-AF5A-4E2D-9F62-D5A63799F697/photos/photo_1759663290_12MP.heic, NSURL=file:///var/mobile/Containers/Data/Application/672A5127-45E0-43B0-A8C6-70E50D9F13CF/Documents/Captures/DE4DC665-AF5A-4E2D-9F62-D5A63799F697/photos/photo_1759663290_12MP.heic, NSUnderlyingError=0x112f2fae0 {Error Domain=NSPOSIXErrorDomain Code=2 "No such file or directory"}}
-SessionManager: Failed to copy asset photo_1759663296_12MP.heic: Error Domain=NSCocoaErrorDomain Code=260 "The file “photo_1759663296_12MP.heic” couldn’t be opened because there is no such file." UserInfo={NSFilePath=/var/mobile/Containers/Data/Application/672A5127-45E0-43B0-A8C6-70E50D9F13CF/Documents/Captures/DE4DC665-AF5A-4E2D-9F62-D5A63799F697/photos/photo_1759663296_12MP.heic, NSURL=file:///var/mobile/Containers/Data/Application/672A5127-45E0-43B0-A8C6-70E50D9F13CF/Documents/Captures/DE4DC665-AF5A-4E2D-9F62-D5A63799F697/photos/photo_1759663296_12MP.heic, NSUnderlyingError=0x112f2e670 {Error Domain=NSPOSIXErrorDomain Code=2 "No such file or directory"}}
-SessionManager: Failed to copy asset photo_1759663317_12MP.heic: Error Domain=NSCocoaErrorDomain Code=260 "The file “photo_1759663317_12MP.heic” couldn’t be opened because there is no such file." UserInfo={NSFilePath=/var/mobile/Containers/Data/Application/672A5127-45E0-43B0-A8C6-70E50D9F13CF/Documents/Captures/DE4DC665-AF5A-4E2D-9F62-D5A63799F697/photos/photo_1759663317_12MP.heic, NSURL=file:///var/mobile/Containers/Data/Application/672A5127-45E0-43B0-A8C6-70E50D9F13CF/Documents/Captures/DE4DC665-AF5A-4E2D-9F62-D5A63799F697/photos/photo_1759663317_12MP.heic, NSUnderlyingError=0x112f2e790 {Error Domain=NSPOSIXErrorDomain Code=2 "No such file or directory"}}
-SessionManager: Failed to copy asset photo_1759663318_12MP.heic: Error Domain=NSCocoaErrorDomain Code=260 "The file “photo_1759663318_12MP.heic” couldn’t be opened because there is no such file." UserInfo={NSFilePath=/var/mobile/Containers/Data/Application/672A5127-45E0-43B0-A8C6-70E50D9F13CF/Documents/Captures/DE4DC665-AF5A-4E2D-9F62-D5A63799F697/photos/photo_1759663318_12MP.heic, NSURL=file:///var/mobile/Containers/Data/Application/672A5127-45E0-43B0-A8C6-70E50D9F13CF/Documents/Captures/DE4DC665-AF5A-4E2D-9F62-D5A63799F697/photos/photo_1759663318_12MP.heic, NSUnderlyingError=0x112f2d770 {Error Domain=NSPOSIXErrorDomain Code=2 "No such file or directory"}}
-SessionManager: Created export bundle at /var/mobile/Containers/Data/Application/672A5127-45E0-43B0-A8C6-70E50D9F13CF/Documents/Exports/HHH_DE4DC665-AF5A-4E2D-9F62-D5A63799F697
-SessionManager: Ended session for stock HHH. Total captures: 6
-CameraManager: Automatic capture workflow cancelled
-ROIDetector: Occupancy: 3.7%, Threshold: 15.0%, Occupied: false
-ROIDetector: Occupancy: 3.7%, Threshold: 15.0%, Occupied: false
-ROIDetector: Occupancy: 3.8%, Threshold: 15.0%, Occupied: false
-CameraManager: Video rotation angle unchanged: 90.0
-CameraManager: Video rotation angle unchanged: 90.0
-CameraManager: Video rotation angle unchanged: 90.0
-App terminated due to signal 9.
-
-🚫 Command returned non-zero exit code
-
-
- *  The terminal process terminated with exit code: 1. 
- *  Terminal will be reused by tasks, press any key to close it. 
+CameraManager: - LiDAR session running: false
+CameraManager: - Depth data available: true
+LiDARDetector: ARSession status check:
+LiDARDetector: - Session exists: true
+LiDARDetector: - Session running: false
+LiDARDetector: - Depth data available: true
+LiDARDetector: - Background learned: true
+LiDARDetector: - Vehicle detected: false
+LiDARDetector: - Depth map size: 256x192
+CameraView: Manual capture triggered
+CameraManager: supportedMaxPhotoDimensions = [4032x3024, 5712x4284]
+CameraManager: Requested photo dimensions: 5712x4284 (~24.5MP)
+PerformanceMonitor: Capture latency: 1.008194088935852s
+CameraManager: Captured photo - Resolution: 4032x3024, Size: 1.90MB
+CameraManager: Photo size within target limits
+SessionManager: Added photo asset: photo_1759709967_12MP.heic
+Photo saved to session: photo_1759709967_12MP.heic
+CameraManager: Starting background removal for photo_1759709967_12MP.heic
+CameraManager: Using cached LiDAR depth data for background removal
+BackgroundRemover: Already processing, skipping request
+CameraManager: Cached LiDAR depth fusion failed, using LiDAR-only mask
+CameraManager: Background removal completed for photo_1759709967_12MP.heic using LiDAR scan fallback
+CameraManager: Saved sticker to photo_1759709967_12MP_sticker.png
+CameraManager: Saved transparent cutout to photo_1759709967_12MP_cutout.png
+CameraManager: Original capture preserved at photo_1759709967_12MP.heic
+CameraView: Manual capture triggered
+CameraView: Manual capture triggered
+CameraView: Manual capture triggered
+CameraManager: supportedMaxPhotoDimensions = [4032x3024, 5712x4284]
+CameraManager: Requested photo dimensions: 5712x4284 (~24.5MP)
+CameraManager: supportedMaxPhotoDimensions = [4032x3024, 5712x4284]
+CameraManager: Requested photo dimensions: 5712x4284 (~24.5MP)
+CameraManager: supportedMaxPhotoDimensions = [4032x3024, 5712x4284]
+CameraManager: Requested photo dimensions: 5712x4284 (~24.5MP)
+CameraManager: Background removal completed for photo_1759709959_12MP.heic using Vision fallback
+CameraManager: Photo saved to photo library using PhotoKit
+CameraManager: Saved sticker to photo_1759709959_12MP_sticker.png
+CameraManager: Saved transparent cutout to photo_1759709959_12MP_cutout.png
+CameraManager: Original capture preserved at photo_1759709959_12MP.heic
+CameraView: Manual capture triggered
+CameraManager: supportedMaxPhotoDimensions = [4032x3024, 5712x4284]
+CameraManager: Requested photo dimensions: 5712x4284 (~24.5MP)
+CameraManager: Temporarily stopping camera session for LiDAR...
+ROIDetector: Starting background sampling...
+ROIDetector: Background sampling progress 0% (frames: 1) elapsed=0.01
+PerformanceMonitor: Capture latency: 0.0455549955368042s
+PerformanceMonitor: Capture latency: 0.045623064041137695s
+PerformanceMonitor: Capture latency: 0.04564201831817627s
+CameraManager: Captured photo - Resolution: 4032x3024, Size: 1.58MB
+CameraManager: Photo size within target limits
+SessionManager: Added photo asset: photo_1759709983_12MP.heic
+Photo saved to session: photo_1759709983_12MP.heic
+CameraManager: Starting background removal for photo_1759709983_12MP.heic
+CameraManager: Falling back to Vision-based background removal
+BackgroundRemover: No segmentation results
+CameraManager: Photo saved to photo library using PhotoKit
+CameraManager: Captured photo - Resolution: 4032x3024, Size: 1.55MB
+CameraManager: Photo size within target limits
+<<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
+CameraManager: Camera session stopped for LiDAR
+PerformanceMonitor: Capture latency: 0.8090380430221558s
+LiDARDetector: Using smoothed scene depth for better quality
+LiDARDetector: Starting ARSession with depth sensing...
+LiDARDetector: Configuration frame semantics: ARFrameSemantics(rawValue: 24)
+LiDARDetector: Scene depth supported: true
+LiDARDetector: ARSession started successfully
+LiDARDetector: Started depth data timeout timer (10.0s)
+CameraManager: LiDAR detection started manually
+SessionManager: Added photo asset: photo_1759709984_12MP.heic
+Photo saved to session: photo_1759709984_12MP.heic
+CameraManager: Starting background removal for photo_1759709984_12MP.heic
+CameraManager: Falling back to Vision-based background removal
+BackgroundRemover: Already processing, skipping request
+CameraManager: Captured photo - Resolution: 4032x3024, Size: 1.60MB
+CameraManager: Photo size within target limits
+CameraManager: Background removal failed for photo_1759709984_12MP.heic
+SessionManager: Added photo asset: photo_1759709984_12MP.heic
+Photo saved to session: photo_1759709984_12MP.heic
+CameraManager: Starting background removal for photo_1759709984_12MP.heic
+CameraManager: Falling back to Vision-based background removal
+BackgroundRemover: Already processing, skipping request
+CameraManager: Captured photo - Resolution: 4032x3024, Size: 1.59MB
+CameraManager: Photo size within target limits
+CameraManager: Background removal failed for photo_1759709984_12MP.heic
+SessionManager: Added photo asset: photo_1759709984_12MP.heic
+Photo saved to session: photo_1759709984_12MP.heic
+CameraManager: Starting background removal for photo_1759709984_12MP.heic
+CameraManager: Falling back to Vision-based background removal
+BackgroundRemover: Already processing, skipping request
+<<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
+<<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
+<<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
+CameraManager: Background removal failed for photo_1759709984_12MP.heic
+<<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
+(Fig) signalled err=-12710 at <>:601
+(Fig) signalled err=-12710 at <>:601
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198613.903859833
+LiDARDetector: Frame has scene depth: false
+LiDARDetector: Frame has scene depth confidence: false
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: No scene depth data in frame
+LiDARDetector: This could be due to:
+LiDARDetector: - Device doesn't support scene depth
+LiDARDetector: - Poor lighting conditions
+LiDARDetector: - ARSession not properly configured
+LiDARDetector: - Tracking issues
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198613.937194291
+LiDARDetector: Frame has scene depth: false
+LiDARDetector: Frame has scene depth confidence: false
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: No scene depth data in frame
+LiDARDetector: This could be due to:
+LiDARDetector: - Device doesn't support scene depth
+LiDARDetector: - Poor lighting conditions
+LiDARDetector: - ARSession not properly configured
+LiDARDetector: - Tracking issues
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198613.97052875
+LiDARDetector: Frame has scene depth: false
+LiDARDetector: Frame has scene depth confidence: false
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: No scene depth data in frame
+LiDARDetector: This could be due to:
+LiDARDetector: - Device doesn't support scene depth
+LiDARDetector: - Poor lighting conditions
+LiDARDetector: - ARSession not properly configured
+LiDARDetector: - Tracking issues
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198614.003863291
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198614.037198
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198614.070532333
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198614.103866958
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198614.137201416
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198614.170536125
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198614.203870541
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198614.237205125
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+CameraManager: Photo saved to photo library using PhotoKit
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198614.270539583
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198614.303874291
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198614.337208791
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198614.370543375
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: Initial environment scan completed after 12 depth frames
+LiDARDetector: Background learned using LiDAR depth data
+LiDARDetector: Depth map size: 256x192
+CameraManager: LiDAR environment scan completed - resuming camera capture workflow
+LiDARDetector: Stopped LiDAR detection
+CameraManager: LiDAR detection stopped
+CameraManager: LiDAR depth data cached for background removal
+<<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
+<<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
+<<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
+<<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
+CameraManager: Photo saved to photo library using PhotoKit
+CameraManager: Camera session restarted
+CameraManager: Using traditional frame processing
+CameraManager: - LiDAR session running: false
+CameraManager: - Depth data available: true
+ROIDetector: Background sampling progress 100% (frames: 7) elapsed=2.77
+ROIDetector: Background mask created successfully
+ROIDetector: Background sampling complete (frames: 7). Threshold: 0.15
+ROIDetector: Background sampling progress 100% (frames: 8) elapsed=2.81
+ROIDetector: Background mask created successfully
+ROIDetector: Background sampling complete (frames: 8). Threshold: 0.15
+LiDARDetector: ARSession status check:
+LiDARDetector: - Session exists: true
+LiDARDetector: - Session running: false
+LiDARDetector: - Depth data available: true
+LiDARDetector: - Background learned: true
+LiDARDetector: - Vehicle detected: false
+LiDARDetector: - Depth map size: 256x192
+CameraManager: Photo saved to photo library using PhotoKit
+ROIDetector: Occupancy: 72.5%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 10.8%, Threshold: 15.0%, Occupied: false
+ROIDetector: Occupancy: 10.2%, Threshold: 15.0%, Occupied: false
+ROIDetector: Occupancy: 10.4%, Threshold: 15.0%, Occupied: false
+ROIDetector: Occupancy: 8.7%, Threshold: 15.0%, Occupied: false
+ROIDetector: Occupancy: 8.6%, Threshold: 15.0%, Occupied: false
+ROIDetector: Occupancy: 8.6%, Threshold: 15.0%, Occupied: false
+ROIDetector: Occupancy: 9.5%, Threshold: 15.0%, Occupied: false
+ROIDetector: Occupancy: 9.1%, Threshold: 15.0%, Occupied: false
+ROIDetector: Occupancy: 8.9%, Threshold: 15.0%, Occupied: false
+ROIDetector: Occupancy: 9.2%, Threshold: 15.0%, Occupied: false
+CameraManager: Temporarily stopping camera session for LiDAR...
+ROIDetector: Occupancy: 8.9%, Threshold: 15.0%, Occupied: false
+ROIDetector: Occupancy: 9.4%, Threshold: 15.0%, Occupied: false
+<<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
+CameraManager: Camera session stopped for LiDAR
+LiDARDetector: Using smoothed scene depth for better quality
+LiDARDetector: Starting ARSession with depth sensing...
+LiDARDetector: Configuration frame semantics: ARFrameSemantics(rawValue: 24)
+LiDARDetector: Scene depth supported: true
+LiDARDetector: ARSession started successfully
+LiDARDetector: Started depth data timeout timer (10.0s)
+CameraManager: LiDAR detection started manually
+<<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
+<<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
+<<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
+<<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
+(Fig) signalled err=-12710 at <>:601
+(Fig) signalled err=-12710 at <>:601
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198617.053749333
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198617.087083833
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198617.120418541
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198617.153753083
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198617.187087541
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198617.22042225
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198617.253756875
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198617.287091375
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198617.320425958
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198617.353760625
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198617.387095166
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198617.420429666
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: Initial environment scan completed after 12 depth frames
+LiDARDetector: Background learned using LiDAR depth data
+LiDARDetector: Depth map size: 256x192
+CameraManager: LiDAR environment scan completed - resuming camera capture workflow
+LiDARDetector: Stopped LiDAR detection
+CameraManager: LiDAR detection stopped
+CameraManager: LiDAR depth data cached for background removal
+<<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
+<<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
+<<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
+<<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
+CameraManager: Camera session restarted
+CameraManager: Using traditional frame processing
+CameraManager: - LiDAR session running: false
+CameraManager: - Depth data available: true
+CameraManager: Background removal completed for photo_1759709983_12MP.heic using Vision fallback
+CameraManager: Saved sticker to photo_1759709983_12MP_sticker.png
+CameraManager: Saved transparent cutout to photo_1759709983_12MP_cutout.png
+CameraManager: Original capture preserved at photo_1759709983_12MP.heic
+CameraView: Manual capture triggered
+CameraManager: supportedMaxPhotoDimensions = [4032x3024, 5712x4284]
+CameraManager: Requested photo dimensions: 5712x4284 (~24.5MP)
+LiDARDetector: ARSession status check:
+LiDARDetector: - Session exists: true
+LiDARDetector: - Session running: false
+LiDARDetector: - Depth data available: true
+LiDARDetector: - Background learned: true
+LiDARDetector: - Vehicle detected: false
+LiDARDetector: - Depth map size: 256x192
+CameraManager: Photo saved to photo library using PhotoKit
+PerformanceMonitor: Capture latency: 0.686424970626831s
+CameraManager: Captured photo - Resolution: 4032x3024, Size: 1.60MB
+CameraManager: Photo size within target limits
+SessionManager: Added photo asset: photo_1759709993_12MP.heic
+Photo saved to session: photo_1759709993_12MP.heic
+CameraManager: Starting background removal for photo_1759709993_12MP.heic
+CameraManager: Using cached LiDAR depth data for background removal
+BackgroundRemover: No segmentation results
+CameraView: Manual capture triggered
+CameraManager: supportedMaxPhotoDimensions = [4032x3024, 5712x4284]
+CameraManager: Requested photo dimensions: 5712x4284 (~24.5MP)
+PerformanceMonitor: Capture latency: 1.0740079879760742s
+CameraManager: Captured photo - Resolution: 4032x3024, Size: 1.57MB
+CameraManager: Photo size within target limits
+SessionManager: Added photo asset: photo_1759709995_12MP.heic
+Photo saved to session: photo_1759709995_12MP.heic
+CameraManager: Starting background removal for photo_1759709995_12MP.heic
+CameraManager: Using cached LiDAR depth data for background removal
+BackgroundRemover: Already processing, skipping request
+CameraManager: Cached LiDAR depth fusion failed, using LiDAR-only mask
+CameraManager: Background removal completed for photo_1759709995_12MP.heic using LiDAR scan fallback
+CameraManager: Saved sticker to photo_1759709995_12MP_sticker.png
+CameraManager: Saved transparent cutout to photo_1759709995_12MP_cutout.png
+CameraManager: Original capture preserved at photo_1759709995_12MP.heic
+CameraManager: LiDAR detection disabled - switching to traditional detection
+CameraManager: Using traditional frame processing
+CameraManager: Background removal completed for photo_1759709993_12MP.heic using Vision + LiDAR scan
+CameraManager: Photo saved to photo library using PhotoKit
+CameraManager: Saved sticker to photo_1759709993_12MP_sticker.png
+CameraManager: Saved transparent cutout to photo_1759709993_12MP_cutout.png
+CameraManager: Original capture preserved at photo_1759709993_12MP.heic
+CameraManager: Photo saved to photo library using PhotoKit
+CameraView: Manual capture triggered
+CameraManager: supportedMaxPhotoDimensions = [4032x3024, 5712x4284]
+CameraManager: Requested photo dimensions: 5712x4284 (~24.5MP)
+CameraView: Manual capture triggered
+CameraManager: supportedMaxPhotoDimensions = [4032x3024, 5712x4284]
+CameraManager: Requested photo dimensions: 5712x4284 (~24.5MP)
+PerformanceMonitor: Capture latency: 0.305527925491333s
+CameraManager: Captured photo - Resolution: 4032x3024, Size: 1.51MB
+CameraManager: Photo size within target limits
+SessionManager: Added photo asset: photo_1759710009_12MP.heic
+Photo saved to session: photo_1759710009_12MP.heic
+CameraManager: Starting background removal for photo_1759710009_12MP.heic
+CameraManager: Falling back to Vision-based background removal
+BackgroundRemover: Applying foreground + (optional) depth mask
+PerformanceMonitor: Capture latency: 1.8136759996414185s
+CameraManager: Captured photo - Resolution: 4032x3024, Size: 1.46MB
+CameraManager: Photo size within target limits
+SessionManager: Added photo asset: photo_1759710011_12MP.heic
+Photo saved to session: photo_1759710011_12MP.heic
+CameraManager: Starting background removal for photo_1759710011_12MP.heic
+CameraManager: Falling back to Vision-based background removal
+BackgroundRemover: Already processing, skipping request
+CameraManager: Background removal failed for photo_1759710011_12MP.heic
+CameraManager: Temporarily stopping camera session for LiDAR...
+<<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
+CameraManager: Camera session stopped for LiDAR
+LiDARDetector: Using smoothed scene depth for better quality
+LiDARDetector: Starting ARSession with depth sensing...
+LiDARDetector: Configuration frame semantics: ARFrameSemantics(rawValue: 24)
+LiDARDetector: Scene depth supported: true
+LiDARDetector: ARSession started successfully
+LiDARDetector: Started depth data timeout timer (10.0s)
+CameraManager: LiDAR detection started manually
+<<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
+<<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
+<<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
+<<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
+(Fig) signalled err=-12710 at <>:601
+CameraView: Manual capture triggered
+(Fig) signalled err=-12710 at <>:601
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198642.541136833
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198642.574471375
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198642.607805833
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198642.641140291
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198642.674474916
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198642.707804958
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+CameraManager: Photo saved to photo library using PhotoKit
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198642.741143875
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198642.774478416
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198642.807812833
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198642.841147416
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198642.874481791
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198642.907816333
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: Initial environment scan completed after 12 depth frames
+LiDARDetector: Background learned using LiDAR depth data
+LiDARDetector: Depth map size: 256x192
+CameraManager: LiDAR environment scan completed - resuming camera capture workflow
+LiDARDetector: Stopped LiDAR detection
+CameraManager: LiDAR detection stopped
+CameraManager: LiDAR depth data cached for background removal
+<<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
+<<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
+<<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
+<<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
+CameraManager: Camera session restarted
+CameraManager: Using traditional frame processing
+CameraManager: - LiDAR session running: false
+CameraManager: - Depth data available: true
+LiDARDetector: ARSession status check:
+LiDARDetector: - Session exists: true
+LiDARDetector: - Session running: false
+LiDARDetector: - Depth data available: true
+LiDARDetector: - Background learned: true
+LiDARDetector: - Vehicle detected: false
+LiDARDetector: - Depth map size: 256x192
+CameraManager: Temporarily stopping camera session for LiDAR...
+<<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
+CameraManager: Camera session stopped for LiDAR
+LiDARDetector: Using smoothed scene depth for better quality
+LiDARDetector: Starting ARSession with depth sensing...
+LiDARDetector: Configuration frame semantics: ARFrameSemantics(rawValue: 24)
+LiDARDetector: Scene depth supported: true
+LiDARDetector: ARSession started successfully
+LiDARDetector: Started depth data timeout timer (10.0s)
+CameraManager: LiDAR detection started manually
+<<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
+<<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
+<<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
+<<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
+(Fig) signalled err=-12710 at <>:601
+(Fig) signalled err=-12710 at <>:601
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198647.014845375
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198647.048179875
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198647.081514416
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198647.114849
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198647.1481835
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198647.181517916
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198647.2148525
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198647.248187041
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198647.281521583
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198647.314856125
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198647.348190583
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198647.381525083
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: Initial environment scan completed after 12 depth frames
+LiDARDetector: Background learned using LiDAR depth data
+LiDARDetector: Depth map size: 256x192
+CameraManager: LiDAR environment scan completed - resuming camera capture workflow
+LiDARDetector: Stopped LiDAR detection
+CameraManager: LiDAR detection stopped
+CameraManager: LiDAR depth data cached for background removal
+<<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
+<<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
+<<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
+<<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
+CameraManager: Camera session restarted
+CameraManager: Using traditional frame processing
+CameraManager: - LiDAR session running: false
+CameraManager: - Depth data available: true
+LiDARDetector: ARSession status check:
+LiDARDetector: - Session exists: true
+LiDARDetector: - Session running: false
+LiDARDetector: - Depth data available: true
+LiDARDetector: - Background learned: true
+LiDARDetector: - Vehicle detected: false
+LiDARDetector: - Depth map size: 256x192
+CameraManager: LiDAR detection disabled - switching to traditional detection
+CameraManager: Using traditional frame processing
+ROIDetector: Starting background sampling...
+ROIDetector: Background sampling progress 0% (frames: 1) elapsed=0.00
+CameraManager: Background removal completed for photo_1759710009_12MP.heic using Vision fallback
+CameraManager: Saved transparent cutout to photo_1759710009_12MP_cutout.png
+CameraManager: Original capture preserved at photo_1759710009_12MP.heic
+CameraManager: Photo saved to photo library using PhotoKit
+CameraManager: Temporarily stopping camera session for LiDAR...
+<<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
+CameraManager: Camera session stopped for LiDAR
+LiDARDetector: Using smoothed scene depth for better quality
+LiDARDetector: Starting ARSession with depth sensing...
+LiDARDetector: Configuration frame semantics: ARFrameSemantics(rawValue: 24)
+LiDARDetector: Scene depth supported: true
+LiDARDetector: ARSession started successfully
+LiDARDetector: Started depth data timeout timer (10.0s)
+CameraManager: LiDAR detection started manually
+<<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
+<<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
+<<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
+<<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
+(Fig) signalled err=-12710 at <>:601
+(Fig) signalled err=-12710 at <>:601
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198658.450456666
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198658.483791208
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198658.517125833
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198658.550460416
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198658.583794958
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198658.617129375
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198658.650464041
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198658.683798583
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198658.717133208
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198658.75046775
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198658.783802291
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: ARSession didUpdate frame - Timestamp: 198658.817136791
+LiDARDetector: Frame has scene depth: true
+LiDARDetector: Frame has scene depth confidence: true
+LiDARDetector: Frame camera tracking state: limited(initializing)
+LiDARDetector: Camera tracking state is not normal: limited(initializing)
+LiDARDetector: Received depth data - Size: 256x192
+LiDARDetector: Depth data received - timeout reset
+LiDARDetector: Initial environment scan completed after 12 depth frames
+LiDARDetector: Background learned using LiDAR depth data
+LiDARDetector: Depth map size: 256x192
+CameraManager: LiDAR environment scan completed - resuming camera capture workflow
+LiDARDetector: Stopped LiDAR detection
+CameraManager: LiDAR detection stopped
+CameraManager: LiDAR depth data cached for background removal
+<<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
+<<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
+<<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
+<<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
+CameraManager: Using traditional frame processing
+CameraManager: - LiDAR session running: false
+CameraManager: - Depth data available: true
+ROIDetector: Background sampling progress 100% (frames: 7) elapsed=9.43
+ROIDetector: Background mask created successfully
+ROIDetector: Background sampling complete (frames: 7). Threshold: 0.15
+ROIDetector: Background sampling progress 100% (frames: 8) elapsed=9.49
+CameraManager: Camera session restarted
+ROIDetector: Background mask created successfully
+ROIDetector: Background sampling complete (frames: 8). Threshold: 0.15
+ROIDetector: Occupancy: 70.6%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 25.1%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 25.2%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 25.3%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 25.0%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 25.0%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 25.0%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 24.9%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 24.9%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 24.9%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 24.5%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 24.4%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 24.6%, Threshold: 15.0%, Occupied: true
+LiDARDetector: ARSession status check:
+LiDARDetector: - Session exists: true
+LiDARDetector: - Session running: false
+LiDARDetector: - Depth data available: true
+LiDARDetector: - Background learned: true
+LiDARDetector: - Vehicle detected: false
+LiDARDetector: - Depth map size: 256x192
+ROIDetector: Occupancy: 24.8%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 24.6%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 24.5%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 24.4%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 24.3%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 24.4%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 24.5%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 24.6%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 24.5%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 24.5%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 24.2%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 24.0%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 24.2%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 24.2%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 23.7%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 26.4%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 31.1%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 32.4%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 33.4%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 35.1%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 35.8%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 37.1%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 37.6%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 38.2%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 39.7%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 41.8%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 43.5%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 44.0%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 44.4%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 43.4%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 41.4%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 41.4%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 40.8%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 42.8%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 44.7%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 46.2%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 47.1%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 47.3%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 47.3%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 47.5%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 47.9%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 49.9%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 52.3%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 54.0%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 54.7%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 54.4%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 53.7%, Threshold: 15.0%, Occupied: true
+CameraView: Manual capture triggered
+CameraManager: supportedMaxPhotoDimensions = [4032x3024, 5712x4284]
+CameraManager: Requested photo dimensions: 5712x4284 (~24.5MP)
+ROIDetector: Occupancy: 53.4%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 52.6%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 54.0%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 54.0%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 52.6%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 50.3%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 50.3%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 50.3%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 49.9%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 49.9%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 49.5%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 49.7%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 49.9%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 50.0%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 50.6%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 50.7%, Threshold: 15.0%, Occupied: true
+PerformanceMonitor: Capture latency: 0.634998083114624s
+CameraManager: Captured photo - Resolution: 4032x3024, Size: 1.85MB
+CameraManager: Photo size within target limits
+SessionManager: Added photo asset: photo_1759710033_12MP.heic
+Photo saved to session: photo_1759710033_12MP.heic
+CameraManager: Starting background removal for photo_1759710033_12MP.heic
+CameraManager: Using cached LiDAR depth data for background removal
+ROIDetector: Occupancy: 50.7%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 50.5%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 50.2%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 49.8%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 48.4%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 46.4%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 45.9%, Threshold: 15.0%, Occupied: true
+BackgroundRemover: Applying foreground + (optional) depth mask
+ROIDetector: Occupancy: 45.0%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 45.0%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 44.4%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 44.0%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 43.6%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 42.6%, Threshold: 15.0%, Occupied: true
+CameraView: Manual capture triggered
+ROIDetector: Occupancy: 41.6%, Threshold: 15.0%, Occupied: true
+CameraManager: supportedMaxPhotoDimensions = [4032x3024, 5712x4284]
+CameraManager: Requested photo dimensions: 5712x4284 (~24.5MP)
+ROIDetector: Occupancy: 41.7%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 41.3%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 45.5%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 45.3%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 44.3%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 41.2%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 40.6%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 39.8%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 39.0%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 40.9%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 44.2%, Threshold: 15.0%, Occupied: true
+PerformanceMonitor: Capture latency: 0.8963930606842041s
+CameraManager: Captured photo - Resolution: 4032x3024, Size: 1.81MB
+CameraManager: Photo size within target limits
+ROIDetector: Occupancy: 45.4%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 47.0%, Threshold: 15.0%, Occupied: true
+CameraView: Manual capture triggered
+CameraManager: supportedMaxPhotoDimensions = [4032x3024, 5712x4284]
+CameraManager: Requested photo dimensions: 5712x4284 (~24.5MP)
+SessionManager: Added photo asset: photo_1759710034_12MP.heic
+Photo saved to session: photo_1759710034_12MP.heic
+CameraManager: Starting background removal for photo_1759710034_12MP.heic
+CameraManager: Using cached LiDAR depth data for background removal
+BackgroundRemover: Already processing, skipping request
+CameraManager: Cached LiDAR depth fusion failed, using LiDAR-only mask
+ROIDetector: Occupancy: 53.0%, Threshold: 15.0%, Occupied: true
+CameraManager: Background removal completed for photo_1759710034_12MP.heic using LiDAR scan fallback
+CameraManager: Saved sticker to photo_1759710034_12MP_sticker.png
+CameraManager: Saved transparent cutout to photo_1759710034_12MP_cutout.png
+CameraManager: Original capture preserved at photo_1759710034_12MP.heic
+ROIDetector: Occupancy: 55.6%, Threshold: 15.0%, Occupied: true
+<<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
+-[RTIInputSystemClient remoteTextInputSessionWithID:performInputOperation:]  perform input operation requires a valid sessionID. inputModality = Keyboard, inputOperation = dismissAutoFillPanel, customInfoType = UIUserInteractionRemoteInputOperations
+CameraView: Manual capture triggered
+ROIDetector: Occupancy: 56.2%, Threshold: 15.0%, Occupied: true
+ROIDetector: Occupancy: 55.3%, Threshold: 15.0%, Occupied: true
+CameraView: Manual capture triggered
+ROIDetector: Occupancy: 59.0%, Threshold: 15.0%, Occupied: true
+PerformanceMonitor: Capture latency: 0.07107698917388916s
+CameraManager: Captured photo - Resolution: 4032x3024, Size: 1.92MB
+CameraManager: Photo size within target limits
+Snapshotting a view (0x1198b1400, UIKeyboardImpl) that is not in a visible window requires afterScreenUpdates:YES.
+CameraManager: Photo saved to photo library using PhotoKit
+SessionManager: Added photo asset: photo_1759710045_12MP.heic
+Photo saved to session: photo_1759710045_12MP.heic
+CameraManager: Starting background removal for photo_1759710045_12MP.heic
+CameraManager: Falling back to Vision-based background removal
+BackgroundRemover: Already processing, skipping request
+CameraManager: Background removal failed for photo_1759710045_12MP.heic
+CameraManager: Photo saved to photo library using PhotoKit
+CameraManager: Background removal completed for photo_1759710033_12MP.heic using Vision + LiDAR scan
+CameraManager: Saved transparent cutout to photo_1759710033_12MP_cutout.png
+CameraManager: Original capture preserved at photo_1759710033_12MP.heic
+CameraManager: Photo saved to photo library using PhotoKit
+<<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
+<<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
+<<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
+<<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
+<<<< FigXPCUtilities >>>> signalled err=-17281 at <>:299
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
