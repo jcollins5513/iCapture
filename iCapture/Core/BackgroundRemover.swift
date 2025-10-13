@@ -23,6 +23,8 @@ class BackgroundRemover: ObservableObject {
     private let processingQueue = DispatchQueue(label: "background.removal.queue", qos: .userInitiated)
     private let ciContext = CIContext()
     private let depthForegroundThreshold: Float = 15.0 // retained for legacy paths
+    private let deepLabSegmenter = DeepLabSegmenter.shared
+    private let yoloSubjectDetector = YOLOSubjectDetector.shared
 
     // MARK: - Public Interface
 
@@ -152,18 +154,21 @@ extension BackgroundRemover {
                 guard let self = self else { return }
                 if let error = error {
                     print("BackgroundRemover: Foreground segmentation failed: \(error)")
-                    self.performSimpleBackgroundRemoval(image: originalImage, completion: completion)
+                    let fallback = self.subjectLiftFallback(image: originalImage, reason: "vision-request-error")
+                    completion(fallback)
                     return
                 }
                 guard let results = request.results, let result = results.first else {
                     print("BackgroundRemover: No segmentation results")
-                    self.performSimpleBackgroundRemoval(image: originalImage, completion: completion)
+                    let fallback = self.subjectLiftFallback(image: originalImage, reason: "vision-empty-results")
+                    completion(fallback)
                     return
                 }
 
                 let processedImage = self.applyForegroundMask(
                     result,
                     handler: handler,
+                    orientation: orientation,
                     to: originalImage,
                     cgImage: cgImage,
                     depthMap: depthMap
@@ -174,16 +179,19 @@ extension BackgroundRemover {
                 try handler.perform([request])
             } catch {
                 print("BackgroundRemover: Failed to perform foreground segmentation: \(error)")
-                performSimpleBackgroundRemoval(image: originalImage, completion: completion)
+                let fallback = subjectLiftFallback(image: originalImage, reason: "vision-handler-error")
+                completion(fallback)
             }
         } else {
-            performSimpleBackgroundRemoval(image: originalImage, completion: completion)
+            let fallback = subjectLiftFallback(image: originalImage, reason: "platform-legacy")
+            completion(fallback)
         }
     }
 
     private func applyForegroundMask(
         _ segmentationResult: Any,
         handler: VNImageRequestHandler,
+        orientation: CGImagePropertyOrientation,
         to image: UIImage,
         cgImage: CGImage,
         depthMap: CVPixelBuffer?
@@ -191,59 +199,91 @@ extension BackgroundRemover {
         print("BackgroundRemover: Applying foreground + (optional) depth mask")
 
         guard let observation = segmentationResult as? VNInstanceMaskObservation else {
-            return performSimpleBackgroundRemovalSync(image: image)
+            return subjectLiftFallback(image: image, reason: "vision-invalid-observation")
         }
 
         if #available(iOS 17.0, *) {
-            do {
-                // choose the best instance mask
-                guard let maskPixelBuffer = dominantMaskPixelBuffer(from: observation, using: handler) else {
-                    return performSimpleBackgroundRemovalSync(image: image)
-                }
-
-                let inputCIImage = CIImage(cgImage: cgImage)
-                let inputExtent = inputCIImage.extent
-
-                // refine the vision mask
-                var visionMask = CIImage(cvPixelBuffer: maskPixelBuffer)
-                visionMask = refinedMask(visionMask, targetExtent: inputExtent)
-
-                // intersect with depth if present
-                if let depthMap = depthMap,
-                   let depthMask = makeDepthMask(
-                        from: depthMap,
-                        guidedBy: maskPixelBuffer,
-                        targetExtent: inputExtent
-                   ) {
-                    let multiply = CIFilter.multiplyCompositing()
-                    multiply.inputImage = depthMask
-                    multiply.backgroundImage = visionMask
-                    if let combined = multiply.outputImage {
-                        visionMask = refinedMask(combined, targetExtent: inputExtent)
-                    }
-                }
-
-                guard let liftedCIImage = subjectLiftedImage(from: inputCIImage, mask: visionMask) else {
-                    return performSimpleBackgroundRemovalSync(image: image)
-                }
-
-                let colorSpace = cgImage.colorSpace ?? CGColorSpaceCreateDeviceRGB()
-                guard let outputCG = ciContext.createCGImage(
-                    liftedCIImage,
-                    from: liftedCIImage.extent,
-                    format: .RGBA16,
-                    colorSpace: colorSpace
-                ) else {
-                    return performSimpleBackgroundRemovalSync(image: image)
-                }
-
-                return UIImage(cgImage: outputCG, scale: image.scale, orientation: .up)
-            } catch {
-                print("BackgroundRemover: Failed to apply mask: \(error)")
-                return performSimpleBackgroundRemovalSync(image: image)
+            // choose the best instance mask
+            guard let maskPixelBuffer = dominantMaskPixelBuffer(from: observation, using: handler) else {
+                return subjectLiftFallback(image: image, reason: "vision-mask-missing")
             }
+
+            let inputCIImage = CIImage(cgImage: cgImage)
+            let inputExtent = inputCIImage.extent
+
+            // refine the vision mask
+            var visionMask = CIImage(cvPixelBuffer: maskPixelBuffer)
+            visionMask = refinedMask(visionMask, targetExtent: inputExtent)
+
+            var subjectMasks: [CIImage] = [visionMask]
+            var deepLabUsed = false
+            var depthApplied = false
+            var yoloApplied = false
+
+            if let deepLabMask = deepLabSegmenter.makeSubjectMask(
+                for: cgImage,
+                orientation: orientation,
+                targetExtent: inputExtent
+            ) {
+                let normalizedMask = refinedMask(deepLabMask, targetExtent: inputExtent)
+                subjectMasks.append(normalizedMask)
+                deepLabUsed = true
+            }
+
+            var combinedMask = combineMasksUsingMaximum(subjectMasks, targetExtent: inputExtent) ?? visionMask
+
+            // intersect with depth if present
+            if let depthMap = depthMap,
+               let depthMask = makeDepthMask(
+                    from: depthMap,
+                    guidedBy: maskPixelBuffer,
+                    targetExtent: inputExtent
+               ) {
+                let multiply = CIFilter.multiplyCompositing()
+                multiply.inputImage = depthMask
+                multiply.backgroundImage = combinedMask
+                if let combined = multiply.outputImage {
+                    visionMask = refinedMask(combined, targetExtent: inputExtent)
+                    combinedMask = visionMask
+                    depthApplied = true
+                }
+            }
+
+            if let yoloMask = yoloSubjectDetector.subjectBoundingMask(
+                for: cgImage,
+                orientation: orientation,
+                targetExtent: inputExtent
+            ) {
+                combinedMask = multiplyMask(
+                    combinedMask,
+                    gate: refinedMask(yoloMask, targetExtent: inputExtent),
+                    targetExtent: inputExtent
+                ) ?? combinedMask
+                yoloApplied = true
+            }
+
+            combinedMask = refinedMask(combinedMask, targetExtent: inputExtent)
+            print(
+                "BackgroundRemover: Mask fusion summary [Vision ✓, DeepLab \(deepLabUsed ? "✓" : "×"), Depth \(depthApplied ? "✓" : "×"), YOLO \(yoloApplied ? "✓" : "×")]"
+            )
+
+            guard let liftedCIImage = subjectLiftedImage(from: inputCIImage, mask: combinedMask) else {
+                return subjectLiftFallback(image: image, reason: "blend-failed")
+            }
+
+            let colorSpace = cgImage.colorSpace ?? CGColorSpaceCreateDeviceRGB()
+            guard let outputCG = ciContext.createCGImage(
+                liftedCIImage,
+                from: liftedCIImage.extent,
+                format: .RGBA16,
+                colorSpace: colorSpace
+            ) else {
+                return subjectLiftFallback(image: image, reason: "ciimage-create-failed")
+            }
+
+            return UIImage(cgImage: outputCG, scale: image.scale, orientation: .up)
         } else {
-            return performSimpleBackgroundRemovalSync(image: image)
+            return subjectLiftFallback(image: image, reason: "platform-legacy")
         }
     }
 
@@ -293,6 +333,37 @@ extension BackgroundRemover {
         if let blurred = blur.outputImage { refined = blurred }
 
         return refined.cropped(to: targetExtent)
+    }
+
+    @available(iOS 17.0, *)
+    private func combineMasksUsingMaximum(_ masks: [CIImage], targetExtent: CGRect) -> CIImage? {
+        guard !masks.isEmpty else { return nil }
+
+        var combined = masks[0].clampedToExtent()
+        combined = combined.cropped(to: targetExtent)
+
+        for mask in masks.dropFirst() {
+            let cropped = mask.clampedToExtent().cropped(to: targetExtent)
+            let maxFilter = CIFilter.maximumCompositing()
+            maxFilter.inputImage = cropped
+            maxFilter.backgroundImage = combined
+            if let output = maxFilter.outputImage {
+                combined = output
+            } else {
+                combined = cropped.composited(over: combined)
+            }
+        }
+
+        return combined.cropped(to: targetExtent)
+    }
+
+    @available(iOS 17.0, *)
+    private func multiplyMask(_ mask: CIImage, gate: CIImage, targetExtent: CGRect) -> CIImage? {
+        let multiply = CIFilter.multiplyCompositing()
+        multiply.inputImage = mask.clampedToExtent()
+        multiply.backgroundImage = gate.clampedToExtent()
+        guard let output = multiply.outputImage else { return nil }
+        return output.cropped(to: targetExtent)
     }
 
     @available(iOS 17.0, *)
@@ -431,8 +502,37 @@ extension BackgroundRemover {
 
     // MARK: - Simple fallback
 
+    private func subjectLiftFallback(image: UIImage, reason: String) -> UIImage? {
+        if let lifted = attemptAppleSubjectLift(image: image, reason: reason) {
+            return lifted
+        }
+        print("BackgroundRemover: Resorting to legacy fallback (\(reason))")
+        return performSimpleBackgroundRemovalSync(image: image)
+    }
+
+    private func attemptAppleSubjectLift(image: UIImage, reason: String) -> UIImage? {
+        #if canImport(VisionKit)
+        if #available(iOS 16.0, *) {
+            guard AppleSubjectLift.shared.isSupported else {
+                print("BackgroundRemover: Apple subject lift unsupported on this device (\(reason))")
+                return nil
+            }
+            if let result = AppleSubjectLift.shared.liftSubjectSync(from: image, reason: reason) {
+                let durationMS = Int(result.analysisDuration * 1000)
+                print(
+                    "BackgroundRemover: Apple subject lift succeeded (\(reason)) - subjects=\(result.subjectCount), \(durationMS)ms"
+                )
+                return result.image
+            } else {
+                print("BackgroundRemover: Apple subject lift yielded no result (\(reason))")
+            }
+        }
+        #endif
+        return nil
+    }
+
     private func performSimpleBackgroundRemoval(image: UIImage, completion: @escaping (UIImage?) -> Void) {
-        let processedImage = performSimpleBackgroundRemovalSync(image: image)
+        let processedImage = subjectLiftFallback(image: image, reason: "legacy-entry-point")
         completion(processedImage)
     }
 

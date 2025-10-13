@@ -26,9 +26,7 @@ final class DeepLabSegmenter {
             let configuration = MLModelConfiguration()
             configuration.computeUnits = .cpuAndGPU
             let deepLabModel = try DeepLabV3(configuration: configuration)
-            let vnModel = try VNCoreMLModel(for: deepLabModel.model)
-            vnModel.imageCropAndScaleOption = .scaleFit
-            model = vnModel
+            model = try VNCoreMLModel(for: deepLabModel.model)
         } catch {
             print("DeepLabSegmenter: Failed to load DeepLabV3 model: \(error)")
             model = nil
@@ -225,28 +223,30 @@ private struct MultiArrayValueReader {
     private static func float16ToFloat(_ pointer: UnsafeRawPointer) -> Float {
         let rawValue = pointer.load(as: UInt16.self)
         if #available(iOS 14.0, *) {
-            let value = Float16(bitPattern: rawValue)
-            return Float(value)
-        } else {
-            // Basic fallback conversion; precision is acceptable for mask logits.
-            let sign = (rawValue & 0x8000) >> 15
-            var exponent = Int((rawValue & 0x7C00) >> 10)
-            let mantissa = Int(rawValue & 0x03FF)
-
-            if exponent == 0 {
-                if mantissa == 0 { return sign == 0 ? 0 : -0 }
-                let exp = -14
-                let frac = Float(mantissa) / 1024.0
-                let value = ldexpf(frac, exp)
-                return sign == 0 ? value : -value
-            } else if exponent == 31 {
-                return mantissa == 0 ? (sign == 0 ? Float.infinity : -Float.infinity) : Float.nan
-            } else {
-                exponent -= 15
-                let frac = 1.0 + Float(mantissa) / 1024.0
-                let value = ldexpf(frac, exponent)
-                return sign == 0 ? value : -value
-            }
+            let float16Value = Float16(bitPattern: rawValue)
+            return Float(float16Value)
         }
+
+        // Basic fallback conversion; precision is acceptable for mask logits.
+        let sign = (rawValue & 0x8000) >> 15
+        var exponent = Int((rawValue & 0x7C00) >> 10)
+        let mantissa = Int(rawValue & 0x03FF)
+
+        if exponent == 0 {
+            if mantissa == 0 { return sign == 0 ? 0 : -0 }
+            let exp = -14
+            let frac = Float(mantissa) / 1024.0
+            let magnitude = ldexpf(frac, Int32(exp))
+            return sign == 0 ? magnitude : -magnitude
+        }
+
+        if exponent == 31 {
+            return mantissa == 0 ? (sign == 0 ? Float.infinity : -Float.infinity) : Float.nan
+        }
+
+        exponent -= 15
+        let frac = 1.0 + Float(mantissa) / 1024.0
+        let magnitude = ldexpf(frac, Int32(exponent))
+        return sign == 0 ? magnitude : -magnitude
     }
 }
