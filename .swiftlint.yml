@@ -1,0 +1,43 @@
+strict: true
+opt_in_rules:
+  - empty_count
+  - closure_end_indentation
+  - explicit_init
+  - fatal_error_message
+  - file_name_no_space
+  - first_where
+  - implicit_return
+  - number_separator
+  - redundant_nil_coalescing
+excluded:
+  - Carthage
+  - Pods
+  - DerivedData
+line_length:
+  ignores_comments: true
+  warning: 140
+  error: 160
+identifier_name:
+  min_length: 2
+  allowed_symbols: [_]
+  excluded:
+    - x
+    - y
+    - z
+    - r
+    - g
+    - b
+    - p
+    - v
+file_length:
+  warning: 1200
+  error: 1500
+type_body_length:
+  warning: 900
+  error: 1100
+function_body_length:
+  warning: 80
+  error: 110
+cyclomatic_complexity:
+  warning: 12
+  error: 20

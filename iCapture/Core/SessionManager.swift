@@ -499,4 +499,3 @@ extension Notification.Name {
     static let sessionDidStart = Notification.Name("SessionDidStart")
     static let sessionDidEnd = Notification.Name("SessionDidEnd")
 }
-

@@ -380,102 +380,107 @@ struct CameraView: View {
     private func buildStatusChips() -> [StatusChip] {
         var chips: [StatusChip] = []
 
-        if sessionManager.isSessionActive {
-            chips.append(
-                StatusChip(
-                    icon: "clock",
-                    text: sessionManager.getFormattedDuration(),
-                    color: .green
-                )
-            )
-            chips.append(
-                StatusChip(
-                    icon: "camera.on.rectangle",
-                    text: "Photos \(sessionManager.getPhotosCount())",
-                    color: .cyan
-                )
-            )
-        }
+        chips.append(contentsOf: buildSessionChips())
+        chips.append(contentsOf: buildBackgroundRemovalChips())
+        chips.append(contentsOf: buildTriggerEngineChips())
+        chips.append(contentsOf: buildLiDARChips())
 
-        if cameraManager.backgroundRemovalEnabled {
-            chips.append(
-                StatusChip(
-                    icon: "sparkles",
-                    text: "Stickers On",
-                    color: .green
-                )
-            )
-        }
+        return chips
+    }
 
-        if cameraManager.triggerEngine.isIntervalCaptureActive {
-            let occupancy = cameraManager.roiDetector.occupancyPercentage
-            let occupancyText = String(format: "ROI %.0f%%", occupancy)
-            let color: Color = cameraManager.roiDetector.isROIOccupied ? .green : .orange
-            chips.append(
-                StatusChip(
-                    icon: "rectangle.inset.filled",
-                    text: occupancyText,
-                    color: color
-                )
-            )
+    private func buildSessionChips() -> [StatusChip] {
+        guard sessionManager.isSessionActive else { return [] }
 
-            if cameraManager.motionDetector.isVehicleStopped {
-                chips.append(
-                    StatusChip(
-                        icon: "car.fill",
-                        text: "Vehicle Stopped",
-                        color: .red
-                    )
-                )
-            } else {
-                let motion = cameraManager.motionDetector.motionMagnitude
-                let motionText = String(format: "Motion %.3f", motion)
-                chips.append(
-                    StatusChip(
-                        icon: "speedometer",
-                        text: motionText,
-                        color: .yellow
-                    )
-                )
-            }
-        }
+        return [
+            StatusChip(
+                icon: "clock",
+                text: sessionManager.getFormattedDuration(),
+                color: .green
+            ),
+            StatusChip(
+                icon: "camera.on.rectangle",
+                text: "Photos \(sessionManager.getPhotosCount())",
+                color: .cyan
+            )
+        ]
+    }
 
-        switch cameraManager.lidarBoostState {
-        case .unavailable:
+    private func buildBackgroundRemovalChips() -> [StatusChip] {
+        guard cameraManager.backgroundRemovalEnabled else { return [] }
+
+        return [
+            StatusChip(
+                icon: "sparkles",
+                text: "Stickers On",
+                color: .green
+            )
+        ]
+    }
+
+    private func buildTriggerEngineChips() -> [StatusChip] {
+        guard cameraManager.triggerEngine.isIntervalCaptureActive else { return [] }
+
+        var chips: [StatusChip] = []
+
+        let occupancy = cameraManager.roiDetector.occupancyPercentage
+        let occupancyText = String(format: "ROI %.0f%%", occupancy)
+        let color: Color = cameraManager.roiDetector.isROIOccupied ? .green : .orange
+        chips.append(
+            StatusChip(
+                icon: "rectangle.inset.filled",
+                text: occupancyText,
+                color: color
+            )
+        )
+
+        if cameraManager.motionDetector.isVehicleStopped {
             chips.append(
                 StatusChip(
-                    icon: "brain.head.profile",
-                    text: "Vision Detect",
-                    color: .blue
+                    icon: "car.fill",
+                    text: "Vehicle Stopped",
+                    color: .red
                 )
             )
-        case .idle:
+        } else {
+            let motion = cameraManager.motionDetector.motionMagnitude
+            let motionText = String(format: "Motion %.3f", motion)
             chips.append(
                 StatusChip(
-                    icon: "brain.head.profile",
-                    text: "Vision Detect",
-                    color: .blue
-                )
-            )
-        case .scanning:
-            chips.append(
-                StatusChip(
-                    icon: "sensor.tag.radiowaves.forward",
-                    text: "Depth Scanning",
-                    color: .purple
-                )
-            )
-        case .ready:
-            chips.append(
-                StatusChip(
-                    icon: "sensor.tag.radiowaves.forward.fill",
-                    text: "Depth Ready",
-                    color: .purple
+                    icon: "speedometer",
+                    text: motionText,
+                    color: .yellow
                 )
             )
         }
 
         return chips
+    }
+
+    private func buildLiDARChips() -> [StatusChip] {
+        let chip: StatusChip
+
+        switch cameraManager.lidarBoostState {
+        case .unavailable, .idle:
+            chip = StatusChip(
+                icon: "brain.head.profile",
+                text: "Vision Detect",
+                color: .blue
+            )
+        case .scanning:
+            chip = StatusChip(
+                icon: "sensor.tag.radiowaves.forward",
+                text: "Depth Scanning",
+                color: .purple
+            )
+        case .ready:
+            chip = StatusChip(
+                icon: "sensor.tag.radiowaves.forward.fill",
+                text: "Depth Ready",
+                color: .purple
+            )
+        }
+
+        return [chip]
     }
 
     private var bottomOverlay: some View {

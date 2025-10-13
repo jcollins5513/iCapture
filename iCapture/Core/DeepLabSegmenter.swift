@@ -235,7 +235,7 @@ private struct MultiArrayValueReader {
         if exponent == 0 {
             if mantissa == 0 { return sign == 0 ? 0 : -0 }
             let exp = -14
-            let frac = Float(mantissa) / 1024.0
+            let frac = Float(mantissa) / 1_024.0
             let magnitude = ldexpf(frac, Int32(exp))
             return sign == 0 ? magnitude : -magnitude
         }
@@ -245,7 +245,7 @@ private struct MultiArrayValueReader {
         }
 
         exponent -= 15
-        let frac = 1.0 + Float(mantissa) / 1024.0
+        let frac = 1.0 + Float(mantissa) / 1_024.0
         let magnitude = ldexpf(frac, Int32(exponent))
         return sign == 0 ? magnitude : -magnitude
     }

@@ -112,8 +112,12 @@ class ROIDetector: ObservableObject {
         if progress - lastLoggedBackgroundProgress >= 0.25 || progress >= 0.99 {
             lastLoggedBackgroundProgress = progress
             let percent = Int(progress * 100)
+            let frameCount = backgroundSampleFrames.count
             print(
-                "ROIDetector: Background sampling progress \(percent)% (frames: \(backgroundSampleFrames.count)) elapsed=\(String(format: "%.2f", elapsed))"
+                """
+                ROIDetector: Background sampling progress \(percent)% (frames: \(frameCount)) \
+                elapsed=\(String(format: "%.2f", elapsed))
+                """
             )
         }
 

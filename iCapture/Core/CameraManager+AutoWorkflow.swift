@@ -121,8 +121,12 @@ extension CameraManager {
                 let progress = self.roiDetector.backgroundSampleProgress
                 let learned = self.roiDetector.isBackgroundLearned
                 let elapsed = Date().timeIntervalSince(startedAt)
+                let progressPct = Int(progress * 100)
                 print(
-                    "CameraManager: Monitoring background sampling attempt \(attempt) - elapsed: \(String(format: "%.2f", elapsed))s, progress: \(Int(progress * 100))%, learned: \(learned)"
+                    """
+                    CameraManager: Monitoring background sampling attempt \(attempt) - \
+                    elapsed: \(String(format: "%.2f", elapsed))s, progress: \(progressPct)%, learned: \(learned)
+                    """
                 )
 
                 if self.roiDetector.isBackgroundLearned {
@@ -135,7 +139,10 @@ extension CameraManager {
 
                     if self.useLiDARDetection && (!self.lidarDetector.isTrackingNormal || framesCollected <= 2) {
                         print(
-                            "CameraManager: Background sampling collected \(framesCollected) frame(s) with limited LiDAR tracking; disabling LiDAR and retrying with Vision-only sampling"
+                            """
+                            CameraManager: Background sampling collected \(framesCollected) frame(s) \
+                            with limited LiDAR tracking; disabling LiDAR and retrying with Vision-only sampling
+                            """
                         )
                         self.disableLiDARDetection()
                         self.scheduleAutomaticBackgroundSampling(delay: 0.3)

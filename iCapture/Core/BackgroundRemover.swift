@@ -25,6 +25,19 @@ class BackgroundRemover: ObservableObject {
     private let depthForegroundThreshold: Float = 15.0 // retained for legacy paths
     private let deepLabSegmenter = DeepLabSegmenter.shared
     private let yoloSubjectDetector = YOLOSubjectDetector.shared
+    private let u2netRemover = U2NetBackgroundRemover.shared
+
+    // Enable/disable U2Net for testing - set to true to test U2Net performance
+    var useU2NetFallback = false
+
+    // MARK: - Helper Structures
+
+    private struct ImageContext {
+        let uiImage: UIImage
+        let cgImage: CGImage
+        let orientation: CGImagePropertyOrientation
+        let depthMap: CVPixelBuffer?
+    }
 
     // MARK: - Public Interface
 
@@ -168,10 +181,12 @@ extension BackgroundRemover {
                 let processedImage = self.applyForegroundMask(
                     result,
                     handler: handler,
-                    orientation: orientation,
-                    to: originalImage,
-                    cgImage: cgImage,
-                    depthMap: depthMap
+                    context: ImageContext(
+                        uiImage: originalImage,
+                        cgImage: cgImage,
+                        orientation: orientation,
+                        depthMap: depthMap
+                    )
                 )
                 completion(processedImage)
             }
@@ -191,24 +206,21 @@ extension BackgroundRemover {
     private func applyForegroundMask(
         _ segmentationResult: Any,
         handler: VNImageRequestHandler,
-        orientation: CGImagePropertyOrientation,
-        to image: UIImage,
-        cgImage: CGImage,
-        depthMap: CVPixelBuffer?
+        context: ImageContext
     ) -> UIImage? {
         print("BackgroundRemover: Applying foreground + (optional) depth mask")
 
         guard let observation = segmentationResult as? VNInstanceMaskObservation else {
-            return subjectLiftFallback(image: image, reason: "vision-invalid-observation")
+            return subjectLiftFallback(image: context.uiImage, reason: "vision-invalid-observation")
         }
 
         if #available(iOS 17.0, *) {
             // choose the best instance mask
             guard let maskPixelBuffer = dominantMaskPixelBuffer(from: observation, using: handler) else {
-                return subjectLiftFallback(image: image, reason: "vision-mask-missing")
+                return subjectLiftFallback(image: context.uiImage, reason: "vision-mask-missing")
             }
 
-            let inputCIImage = CIImage(cgImage: cgImage)
+            let inputCIImage = CIImage(cgImage: context.cgImage)
             let inputExtent = inputCIImage.extent
 
             // refine the vision mask
@@ -221,8 +233,8 @@ extension BackgroundRemover {
             var yoloApplied = false
 
             if let deepLabMask = deepLabSegmenter.makeSubjectMask(
-                for: cgImage,
-                orientation: orientation,
+                for: context.cgImage,
+                orientation: context.orientation,
                 targetExtent: inputExtent
             ) {
                 let normalizedMask = refinedMask(deepLabMask, targetExtent: inputExtent)
@@ -233,7 +245,7 @@ extension BackgroundRemover {
             var combinedMask = combineMasksUsingMaximum(subjectMasks, targetExtent: inputExtent) ?? visionMask
 
             // intersect with depth if present
-            if let depthMap = depthMap,
+            if let depthMap = context.depthMap,
                let depthMask = makeDepthMask(
                     from: depthMap,
                     guidedBy: maskPixelBuffer,
@@ -250,8 +262,8 @@ extension BackgroundRemover {
             }
 
             if let yoloMask = yoloSubjectDetector.subjectBoundingMask(
-                for: cgImage,
-                orientation: orientation,
+                for: context.cgImage,
+                orientation: context.orientation,
                 targetExtent: inputExtent
             ) {
                 combinedMask = multiplyMask(
@@ -263,27 +275,33 @@ extension BackgroundRemover {
             }
 
             combinedMask = refinedMask(combinedMask, targetExtent: inputExtent)
+            let deepLabStatus = deepLabUsed ? "✓" : "×"
+            let depthStatus = depthApplied ? "✓" : "×"
+            let yoloStatus = yoloApplied ? "✓" : "×"
             print(
-                "BackgroundRemover: Mask fusion summary [Vision ✓, DeepLab \(deepLabUsed ? "✓" : "×"), Depth \(depthApplied ? "✓" : "×"), YOLO \(yoloApplied ? "✓" : "×")]"
+                """
+                BackgroundRemover: Mask fusion summary \
+                [Vision ✓, DeepLab \(deepLabStatus), Depth \(depthStatus), YOLO \(yoloStatus)]
+                """
             )
 
             guard let liftedCIImage = subjectLiftedImage(from: inputCIImage, mask: combinedMask) else {
-                return subjectLiftFallback(image: image, reason: "blend-failed")
+                return subjectLiftFallback(image: context.uiImage, reason: "blend-failed")
             }
 
-            let colorSpace = cgImage.colorSpace ?? CGColorSpaceCreateDeviceRGB()
+            let colorSpace = context.cgImage.colorSpace ?? CGColorSpaceCreateDeviceRGB()
             guard let outputCG = ciContext.createCGImage(
                 liftedCIImage,
                 from: liftedCIImage.extent,
                 format: .RGBA16,
                 colorSpace: colorSpace
             ) else {
-                return subjectLiftFallback(image: image, reason: "ciimage-create-failed")
+                return subjectLiftFallback(image: context.uiImage, reason: "ciimage-create-failed")
             }
 
-            return UIImage(cgImage: outputCG, scale: image.scale, orientation: .up)
+            return UIImage(cgImage: outputCG, scale: context.uiImage.scale, orientation: .up)
         } else {
-            return subjectLiftFallback(image: image, reason: "platform-legacy")
+            return subjectLiftFallback(image: context.uiImage, reason: "platform-legacy")
         }
     }
 
@@ -420,9 +438,9 @@ extension BackgroundRemover {
         for row in 0..<height {
             let rowPtr = pointer.advanced(by: row * bytesPerRow)
             for col in 0..<width {
-                let v = Float(rowPtr[col])
-                total += v
-                if row >= cy0 && row < cy1 && col >= cx0 && col < cx1 { center += v }
+                let value = Float(rowPtr[col])
+                total += value
+                if row >= cy0 && row < cy1 && col >= cx0 && col < cx1 { center += value }
             }
         }
 
@@ -506,6 +524,18 @@ extension BackgroundRemover {
         if let lifted = attemptAppleSubjectLift(image: image, reason: reason) {
             return lifted
         }
+
+        // Try U2Net if enabled
+        if useU2NetFallback {
+            print("BackgroundRemover: Attempting U2Net fallback (\(reason))")
+            if let u2netResult = u2netRemover.removeBackground(from: image) {
+                print("BackgroundRemover: U2Net fallback succeeded (\(reason))")
+                return u2netResult
+            } else {
+                print("BackgroundRemover: U2Net fallback failed, continuing to legacy (\(reason))")
+            }
+        }
+
         print("BackgroundRemover: Resorting to legacy fallback (\(reason))")
         return performSimpleBackgroundRemovalSync(image: image)
     }
@@ -518,7 +548,7 @@ extension BackgroundRemover {
                 return nil
             }
             if let result = AppleSubjectLift.shared.liftSubjectSync(from: image, reason: reason) {
-                let durationMS = Int(result.analysisDuration * 1000)
+                let durationMS = Int(result.analysisDuration * 1_000)
                 print(
                     "BackgroundRemover: Apple subject lift succeeded (\(reason)) - subjects=\(result.subjectCount), \(durationMS)ms"
                 )
@@ -598,15 +628,15 @@ extension BackgroundRemover {
         var minY = height
         var maxY = -1
 
-        for y in 0..<height {
-            let row = pointer.advanced(by: y * bytesPerRow)
-            for x in 0..<width {
-                let alpha = row[x * bytesPerPixel + 3]
+        for yCoord in 0..<height {
+            let row = pointer.advanced(by: yCoord * bytesPerRow)
+            for xCoord in 0..<width {
+                let alpha = row[xCoord * bytesPerPixel + 3]
                 if alpha > 12 { // Small threshold to ignore halo pixels
-                    if x < minX { minX = x }
-                    if x > maxX { maxX = x }
-                    if y < minY { minY = y }
-                    if y > maxY { maxY = y }
+                    if xCoord < minX { minX = xCoord }
+                    if xCoord > maxX { maxX = xCoord }
+                    if yCoord < minY { minY = yCoord }
+                    if yCoord > maxY { maxY = yCoord }
                 }
             }
         }
@@ -785,8 +815,8 @@ private struct DepthStatistics {
         guard !samples.isEmpty else { return nil }
         samples.sort()
 
-        func percentile(_ p: Double) -> Float {
-            let clamped = min(1.0, max(0.0, p))
+        func percentile(_ percentage: Double) -> Float {
+            let clamped = min(1.0, max(0.0, percentage))
             let idx = Int(clamped * Double(samples.count - 1))
             return samples[idx]
         }

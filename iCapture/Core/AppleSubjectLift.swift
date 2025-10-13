@@ -93,7 +93,7 @@ final class AppleSubjectLift {
 
             let duration = Date().timeIntervalSince(startTime)
             print(
-                "AppleSubjectLift: Snapshot generated (\(subjects.count) subject(s), \(Int(duration * 1000))ms) [\(reason)]"
+                "AppleSubjectLift: Snapshot generated (\(subjects.count) subject(s), \(Int(duration * 1_000))ms) [\(reason)]"
             )
 
             return AppleSubjectLiftResult(

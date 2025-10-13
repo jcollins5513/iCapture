@@ -1,0 +1,26 @@
+#!/bin/bash
+# Script to add BackgroundRemoval SPM package to iCapture project
+
+echo "Adding BackgroundRemoval package to iCapture project..."
+echo ""
+echo "Please follow these steps in Xcode:"
+echo ""
+echo "1. Open iCapture.xcodeproj in Xcode"
+echo "2. Select the 'iCapture' project in the navigator"
+echo "3. Select the 'iCapture' target"
+echo "4. Click on the 'Package Dependencies' tab"
+echo "5. Click the '+' button"
+echo "6. Enter this URL: https://github.com/Ezaldeen99/BackgroundRemoval.git"
+echo "7. Select 'Up to Next Major Version' with '1.0.0'"
+echo "8. Click 'Add Package'"
+echo "9. Select 'BackgroundRemoval' and click 'Add Package'"
+echo ""
+echo "After adding the package, update U2NetBackgroundRemover.swift:"
+echo "  - Uncomment the import BackgroundRemoval line"
+echo "  - Uncomment the BackgroundRemoval usage code"
+echo ""
+echo "To test the U2Net background remover:"
+echo "  - In your code, set: backgroundRemover.useU2NetFallback = true"
+echo "  - This will use U2Net as a fallback when other methods don't work well"
+echo ""
+
